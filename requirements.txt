@@ -1,0 +1,6 @@
+matplotlib>=3.8
+mapbox-earcut>=1.0
+numpy>=1.26
+qrcode>=7.4
+shapely>=2.0
+trimesh>=4.0
