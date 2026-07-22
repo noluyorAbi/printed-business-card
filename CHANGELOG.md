@@ -21,6 +21,11 @@ and this project adheres to
   background decor (window chrome, PCB traces, contour rings, sine ribbons,
   halftone gradient) and two extra text layouts.
 
+- Ten more styles (`carbon`, `graph`, `hazard`, `maze`, `constellation`,
+  `radar`, `barcode`, `pixel`, `iso`, `bauhaus`), a `bauhaus` text layout, and
+  a `decor_keepout` flag that keeps dense textures off the text block.
+- Decor is despeckled after carving, so no crumb below 0.4 mm2 survives.
+
 ### Fixed
 
 - Extrusion is watertight when decor touches the frame at a single point: the

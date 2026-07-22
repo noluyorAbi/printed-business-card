@@ -92,7 +92,7 @@ plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
-Ten layouts ship with the script. A style only changes the 2D layout and
+Twenty layouts ship with the script. A style only changes the 2D layout and
 which filament is base and which is feature, so every one of them still prints
 as two parts with a single filament change.
 
@@ -113,17 +113,31 @@ as two parts with a single filament change.
 | `topo` | band | recessed | navy base, sand features |
 | `neon` | none | recessed | deep purple base, pink features |
 | `brutal` | none | recessed | black base, cream features |
+| `carbon` | none | recessed | graphite base, silver features |
+| `graph` | band | raised | paper white base, green features |
+| `hazard` | none | recessed | black base, yellow features |
+| `maze` | none | recessed | black base, red features |
+| `constellation` | band | recessed | navy base, white features |
+| `radar` | none | recessed | dark green base, turquoise features |
+| `barcode` | none | raised | white base, black features |
+| `pixel` | none | recessed | violet base, yellow features |
+| `iso` | two hairlines | recessed | slate base, blue features |
+| `bauhaus` | none | raised | cream base, red features |
 
 The QR mode follows the base color. On a dark base the dark modules are cut
 out of a light panel (`recess`); on a light base the dark modules themselves
 are the raised feature (`relief`). Either way the code decodes, which the test
 suite checks with OpenCV for every style.
 
-The last five carry background decor: scanline chrome, PCB traces, contour
-rings, sine ribbons, a halftone gradient. Decor is generated as its own
-geometry and then carved back out of the text and the QR quiet zone, so it can
-never eat legibility or a scan. Nothing in it drops below roughly 0.5 mm, the
-smallest feature a 0.2 mm nozzle prints cleanly.
+The last fifteen carry background decor: window chrome, PCB traces, contour
+rings, sine ribbons, a halftone gradient, a fibre weave, engineering paper,
+hazard stripes, a labyrinth, a star map, radar rings, barcode bars, a dither
+ramp, isometric paper, and Bauhaus primitives. Decor is generated as its own
+geometry, then carved back out of the text and the QR quiet zone, and finally
+despeckled, so leftover crumbs never reach the print. Styles with
+`decor_keepout` also keep the texture out of the whole text bounding box.
+Nothing drops below roughly 0.5 mm, the smallest feature a 0.2 mm nozzle
+prints cleanly.
 
 <table>
 <tr>
@@ -146,12 +160,32 @@ smallest feature a 0.2 mm nozzle prints cleanly.
 <td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/neon.png" alt="neon style preview"><br><b>neon</b></td>
 <td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/brutal.png" alt="brutal style preview"><br><b>brutal</b></td>
 </tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/carbon.png" alt="carbon style preview"><br><b>carbon</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/graph.png" alt="graph style preview"><br><b>graph</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hazard.png" alt="hazard style preview"><br><b>hazard</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/maze.png" alt="maze style preview"><br><b>maze</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/constellation.png" alt="constellation style preview"><br><b>constellation</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/radar.png" alt="radar style preview"><br><b>radar</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/barcode.png" alt="barcode style preview"><br><b>barcode</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/pixel.png" alt="pixel style preview"><br><b>pixel</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/iso.png" alt="iso style preview"><br><b>iso</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/bauhaus.png" alt="bauhaus style preview"><br><b>bauhaus</b></td>
+</tr>
 </table>
 
 To add a style, copy an entry in the `STYLES` dict at the top of
 `build_card.py` and change `frame`, `qr`, the two colors, and optionally
-`layout` (`default`, `terminal`, `brutal`) and `decor` (any key in the `DECOR`
-table).
+`layout` (`default`, `terminal`, `brutal`, `bauhaus`) and `decor` (any key in
+the `DECOR` table).
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/folder.svg" width="16" align="center"> How it works
 

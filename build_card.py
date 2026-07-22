@@ -45,6 +45,10 @@ QR_DATA = "https://www.adatepe.dev"
 #   frame:      "band" (default), "double" (two hairlines), "none"
 #   qr:         "recess" (dark modules cut out of a feature-color panel) or
 #               "relief" (dark modules raised in feature color, no panel)
+#   layout:     text block variant ("default", "terminal", "brutal", "bauhaus")
+#   decor:      background texture, any key in DECOR; always carved back out
+#               of the text and the QR quiet zone
+#   decor_keepout: also keep the texture out of the whole text bounding box
 #   base/feat:  preview colors, and which filament goes in which slot
 STYLES = {
     "classic": {
@@ -143,6 +147,110 @@ STYLES = {
         "feature_color": "#f5f1e6",
         "base_name": "Basis Schwarz",
         "feature_name": "Schrift Creme",
+    },
+    "carbon": {
+        "label": "Carbon: woven bundles, silver on graphite",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "carbon",
+        "decor_keepout": True,
+        "base_color": "#1c1c1e",
+        "feature_color": "#b9bcc2",
+        "base_name": "Basis Graphit",
+        "feature_name": "Schrift Silber",
+    },
+    "graph": {
+        "label": "Graph: 5 mm engineering paper, green ink on paper white",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "graph",
+        "decor_keepout": True,
+        "base_color": "#f4f6f2",
+        "feature_color": "#2f6f4e",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Gruen",
+    },
+    "hazard": {
+        "label": "Hazard: diagonal warning stripes along the bottom",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "hazard",
+        "base_color": "#141414",
+        "feature_color": "#f2c200",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gelb",
+    },
+    "maze": {
+        "label": "Maze: a labyrinth of unit segments, red on black",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "maze",
+        "base_color": "#101010",
+        "feature_color": "#e0483a",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Rot",
+    },
+    "constellation": {
+        "label": "Constellation: star map with linked neighbours",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "constellation",
+        "base_color": "#0d1730",
+        "feature_color": "#f0f4ff",
+        "base_name": "Basis Navy",
+        "feature_name": "Schrift Weiss",
+    },
+    "radar": {
+        "label": "Radar: rings sweeping from the bottom left corner",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "radar",
+        "base_color": "#041b16",
+        "feature_color": "#4ff0c0",
+        "base_name": "Basis Dunkelgruen",
+        "feature_name": "Schrift Tuerkis",
+    },
+    "barcode": {
+        "label": "Barcode: bars along the bottom, black on white",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "barcode",
+        "base_color": "#f5f5f5",
+        "feature_color": "#111111",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "pixel": {
+        "label": "Pixel: dither ramp out of the top right corner",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "pixel",
+        "base_color": "#14121f",
+        "feature_color": "#f7e26b",
+        "base_name": "Basis Violett",
+        "feature_name": "Schrift Gelb",
+    },
+    "iso": {
+        "label": "Iso: isometric graph paper, blue on slate",
+        "frame": "double",
+        "qr": "recess",
+        "decor": "iso",
+        "decor_keepout": True,
+        "base_color": "#101418",
+        "feature_color": "#7fb3ff",
+        "base_name": "Basis Schiefer",
+        "feature_name": "Schrift Blau",
+    },
+    "bauhaus": {
+        "label": "Bauhaus: ring, quarter disc and dot, red on cream",
+        "frame": "none",
+        "qr": "relief",
+        "layout": "bauhaus",
+        "decor": "bauhaus",
+        "base_color": "#f2ece1",
+        "feature_color": "#c8321e",
+        "base_name": "Basis Creme",
+        "feature_name": "Schrift Rot",
     },
 }
 DEFAULT_STYLE = "classic"
@@ -254,6 +362,14 @@ ROWS = [
 def build_content(layout):
     """Name, tagline and contact rows as one polygon, per layout variant."""
     parts = []
+    if layout == "bauhaus":
+        # same oversized name, but the contact block clears the quarter disc
+        parts.append(place_text("ALPEREN", 7.6, 4.5, 32.0, FONT_BOLD))
+        parts.append(place_text("ADATEPE", 7.6, 4.5, 23.0, FONT_BOLD))
+        for i, (_, label, _) in enumerate(ROWS):
+            parts.append(place_text(label, 2.6, 16.0, 14.0 - i * 3.6))
+        return unary_union(parts).buffer(0)
+
     if layout == "brutal":
         # name owns the card, tagline drops, contact lines shrink to one block
         parts.append(place_text("ALPEREN", 7.6, 4.5, 30.5, FONT_BOLD))
@@ -352,12 +468,155 @@ def decor_halftone(base):
     return unary_union(dots).intersection(base.buffer(-1.2))
 
 
+def decor_carbon(base):
+    """Carbon fibre weave: alternating bundles on a 3.4 mm grid."""
+    tiles = []
+    for i, x in enumerate(np.arange(2.0, CARD_W - 1.0, 3.4)):
+        for j, y in enumerate(np.arange(2.0, CARD_H - 1.0, 3.4)):
+            if (i + j) % 2:
+                tiles.append(box(x, y + 0.4, x + 2.9, y + 1.5))
+            else:
+                tiles.append(box(x + 0.4, y, x + 1.5, y + 2.9))
+    return unary_union(tiles).intersection(base.buffer(-1.2))
+
+
+def decor_graph(base):
+    """Engineering paper: 5 mm grid with a heavier line every 25 mm."""
+    lines = []
+    for x in np.arange(0.0, CARD_W + 1.0, 5.0):
+        w = 0.8 if x % 25 == 0 else 0.45
+        lines.append(box(x - w / 2, 0, x + w / 2, CARD_H))
+    for y in np.arange(0.0, CARD_H + 1.0, 5.0):
+        w = 0.8 if y % 25 == 0 else 0.45
+        lines.append(box(0, y - w / 2, CARD_W, y + w / 2))
+    return unary_union(lines).intersection(base.buffer(-1.4))
+
+
+def decor_hazard(base):
+    """Diagonal hazard stripes in the bottom band."""
+    from shapely.affinity import rotate
+
+    band = box(0, 1.5, CARD_W, 8.0)
+    stripes = [
+        rotate(box(x, -20, x + 2.4, 60), -45, origin=(x, 0))
+        for x in np.arange(-40.0, CARD_W + 40.0, 5.4)
+    ]
+    return unary_union(stripes).intersection(band).intersection(base.buffer(-1.2))
+
+
+def decor_maze(base):
+    """Labyrinth of unit segments on a fixed pseudo-random grid."""
+    rng = np.random.default_rng(7)
+    cell, w = 3.2, 0.5
+    segs = []
+    for x in np.arange(2.5, CARD_W - 2.5, cell):
+        for y in np.arange(2.5, CARD_H - 2.5, cell):
+            if rng.random() < 0.5:
+                segs.append(box(x, y - w / 2, x + cell, y + w / 2))
+            else:
+                segs.append(box(x - w / 2, y, x + w / 2, y + cell))
+    return unary_union(segs).intersection(base.buffer(-1.4))
+
+
+def decor_constellation(base):
+    """Star map: dots plus the short links between neighbouring dots."""
+    from shapely.geometry import LineString
+
+    rng = np.random.default_rng(23)
+    pts = [(float(rng.uniform(3, CARD_W - 3)), float(rng.uniform(3, CARD_H - 3)))
+           for _ in range(46)]
+    shapes = [Point(p).buffer(0.30 + 0.35 * float(rng.random()), 16) for p in pts]
+    for i, a in enumerate(pts):
+        for b in pts[i + 1:]:
+            d = np.hypot(a[0] - b[0], a[1] - b[1])
+            if d < 9.0:
+                shapes.append(LineString([a, b]).buffer(0.25, cap_style=2))
+    return unary_union(shapes).intersection(base.buffer(-1.2))
+
+
+def decor_radar(base):
+    """Radar sweep: rings around the bottom left corner."""
+    rings = []
+    for r in np.arange(6.0, 90.0, 5.0):
+        disc = Point(3.0, 2.0).buffer(r, 96)
+        rings.append(disc.difference(disc.buffer(-0.5)))
+    return unary_union(rings).intersection(base.buffer(-1.2))
+
+
+def decor_barcode(base):
+    """EAN-ish bars along the bottom edge."""
+    rng = np.random.default_rng(11)
+    bars, x = [], 3.0
+    while x < CARD_W - 3.0:
+        w = float(rng.choice([0.5, 0.8, 1.3]))
+        bars.append(box(x, 2.2, x + w, 7.4))
+        x += w + float(rng.choice([0.6, 0.9]))
+    return unary_union(bars).intersection(base.buffer(-1.2))
+
+
+def decor_pixel(base):
+    """Dither ramp: 1.6 mm pixels thinning out from the top right corner."""
+    rng = np.random.default_rng(3)
+    cell = 1.6
+    px = []
+    for x in np.arange(2.0, CARD_W - 2.0, cell):
+        for y in np.arange(2.0, CARD_H - 2.0, cell):
+            # density falls off with distance from the top right corner
+            d = np.hypot((CARD_W - x) / CARD_W, (CARD_H - y) / CARD_H)
+            if rng.random() < max(0.0, 0.95 - 1.5 * d):
+                px.append(box(x, y, x + cell - 0.25, y + cell - 0.25))
+    return unary_union(px).intersection(base.buffer(-1.2))
+
+
+def decor_iso(base):
+    """Isometric graph paper: two 30 degree families of lines."""
+    from shapely.affinity import rotate
+
+    lines = []
+    for angle in (30, -30):
+        for x in np.arange(-60.0, CARD_W + 60.0, 4.5):
+            lines.append(rotate(box(x, -40, x + 0.4, 90), angle, origin=(x, 22.5)))
+    return unary_union(lines).intersection(base.buffer(-1.4))
+
+
+def decor_bauhaus(base):
+    """Three primitives: a ring, a quarter disc and a solid dot."""
+    ring = Point(64.0, 37.5).buffer(6.0, 64)
+    ring = ring.difference(ring.buffer(-1.2))
+    quarter = Point(2.0, 2.0).buffer(11.0, 64).intersection(box(2.0, 2.0, 13.0, 13.0))
+    dot = Point(44.5, 39.0).buffer(2.4, 48)
+    bar = box(2.0, 18.4, 46.0, 19.4)
+    return unary_union([ring, quarter, dot, bar]).intersection(base.buffer(-1.2))
+
+
+def despeckle(geom, min_area=0.4, min_half_width=0.15):
+    """Drop crumbs left behind when decor is carved around text.
+
+    Anything smaller than min_area, or thinner than 2 x min_half_width, is
+    removed: it would not print cleanly and it reads as noise.
+    """
+    polys = list(geom.geoms) if geom.geom_type == "MultiPolygon" else [geom]
+    keep = [p for p in polys
+            if p.area >= min_area and not p.buffer(-min_half_width).is_empty]
+    return unary_union(keep) if keep else Polygon()
+
+
 DECOR = {
     "scanlines": decor_scanlines,
     "circuit": decor_circuit,
     "topo": decor_topo,
     "wave": decor_wave,
     "halftone": decor_halftone,
+    "carbon": decor_carbon,
+    "graph": decor_graph,
+    "hazard": decor_hazard,
+    "maze": decor_maze,
+    "constellation": decor_constellation,
+    "radar": decor_radar,
+    "barcode": decor_barcode,
+    "pixel": decor_pixel,
+    "iso": decor_iso,
+    "bauhaus": decor_bauhaus,
 }
 
 
@@ -378,7 +637,11 @@ def build_shapes(style=DEFAULT_STYLE):
     if st.get("decor"):
         texture = DECOR[st["decor"]](base)
         # keep the texture clear of text and of the QR quiet zone
-        texture = texture.difference(content.buffer(1.1)).difference(panel.buffer(1.2))
+        texture = texture.difference(content.buffer(1.4)).difference(panel.buffer(1.2))
+        if st.get("decor_keepout"):
+            # dense patterns get a clean rectangle around the whole text block
+            texture = texture.difference(content.envelope.buffer(1.6))
+        texture = despeckle(texture)
         white.append(texture)
 
     modules = qr_dark_modules()
@@ -522,6 +785,7 @@ def preview(base, white, path, style=DEFAULT_STYLE):
     ax.set_aspect("equal")
     ax.axis("off")
     fig.savefig(path, dpi=200, bbox_inches="tight", facecolor="#3a3a3a")
+    plt.close(fig)
 
 
 def build_style(style, prefix, preview_path, meshes=True):
