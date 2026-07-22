@@ -37,6 +37,64 @@ PANEL = (
 QR_CENTER = ((PANEL[0] + PANEL[2]) / 2, (PANEL[1] + PANEL[3]) / 2)
 QR_DATA = "https://www.adatepe.dev"
 
+# ---------------------------------------------------------------- styles
+# A style only changes the 2D layout and which filament reads as "base" or
+# "feature". The two-part, single-filament-change structure stays identical,
+# so every style prints the same way.
+#
+#   frame:      "band" (default), "double" (two hairlines), "none"
+#   qr:         "recess" (dark modules cut out of a feature-color panel) or
+#               "relief" (dark modules raised in feature color, no panel)
+#   base/feat:  preview colors, and which filament goes in which slot
+STYLES = {
+    "classic": {
+        "label": "Classic: black base, white features",
+        "frame": "band",
+        "qr": "recess",
+        "base_color": "#151515",
+        "feature_color": "#ececec",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "inverse": {
+        "label": "Inverse: white base, black features",
+        "frame": "band",
+        "qr": "relief",
+        "base_color": "#ececec",
+        "feature_color": "#151515",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "minimal": {
+        "label": "Minimal: no frame, black base",
+        "frame": "none",
+        "qr": "recess",
+        "base_color": "#151515",
+        "feature_color": "#ececec",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "outline": {
+        "label": "Outline: two hairlines instead of a band",
+        "frame": "double",
+        "qr": "recess",
+        "base_color": "#151515",
+        "feature_color": "#ececec",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "blueprint": {
+        "label": "Blueprint: white base, blue features",
+        "frame": "double",
+        "qr": "relief",
+        "base_color": "#f2f4f7",
+        "feature_color": "#1b3a6b",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Blau",
+    },
+}
+DEFAULT_STYLE = "classic"
+
 def _font(candidates, weight="normal"):
     import os
 
@@ -119,13 +177,29 @@ def qr_dark_modules():
 
 
 # ---------------------------------------------------------------- build 2D layout
-def build_shapes():
+def build_frame(base, kind, qr_mode="recess"):
+    if kind == "none":
+        return Polygon()
+    if kind == "double":
+        hair = 0.35
+        outer = base.buffer(-FRAME_OUT).difference(base.buffer(-FRAME_OUT - hair))
+        inner = base.buffer(-FRAME_IN - 0.6).difference(base.buffer(-FRAME_IN - 0.6 - hair))
+        band = unary_union([outer, inner])
+        # let the hairlines stop cleanly at the QR panel instead of running under it
+        if qr_mode == "recess":
+            return band.difference(box(*PANEL).buffer(0.5))
+        return band
+    return base.buffer(-FRAME_OUT).difference(base.buffer(-FRAME_IN))
+
+
+def build_shapes(style=DEFAULT_STYLE):
+    """2D layout for a style: returns (base polygon, feature polygon)."""
+    st = STYLES[style] if isinstance(style, str) else style
     base = box(CORNER_R, CORNER_R, CARD_W - CORNER_R, CARD_H - CORNER_R).buffer(CORNER_R, 32)
 
-    frame = base.buffer(-FRAME_OUT).difference(base.buffer(-FRAME_IN))
-    panel = box(*PANEL)
-
-    white = [frame, panel]
+    white = [build_frame(base, st["frame"], st["qr"])]
+    if st["qr"] == "recess":
+        white.append(box(*PANEL))
 
     # Name
     white.append(place_text("Alperen Adatepe", 5.6, 5.5, 35.5))
@@ -142,8 +216,12 @@ def build_shapes():
         white.append(icon_fn(7.3, y + 1.1))
         white.append(place_text(label, 3.1, 10.6, y))
 
+    modules = qr_dark_modules()
     white_union = unary_union(white).buffer(0)
-    white_union = white_union.difference(qr_dark_modules()).buffer(0)
+    if st["qr"] == "recess":
+        white_union = white_union.difference(modules).buffer(0)
+    else:
+        white_union = unary_union([white_union, modules]).buffer(0)
     # keep everything on the card
     white_union = white_union.intersection(base)
     # drop collinear T-vertices left over from module-grid unions; 5 µm tolerance
@@ -250,7 +328,7 @@ def write_3mf(path, parts):
         z.writestr("Metadata/model_settings.config", model_settings)
 
 
-def preview(base, white, path):
+def preview(base, white, path, style=DEFAULT_STYLE):
     import matplotlib.pyplot as plt
     from matplotlib.patches import PathPatch
     from matplotlib.path import Path as MplPath
@@ -266,10 +344,11 @@ def preview(base, white, path):
                 codes += [MplPath.MOVETO] + [MplPath.LINETO] * (len(rv) - 2) + [MplPath.CLOSEPOLY]
             ax.add_patch(PathPatch(MplPath(verts, codes), **kw))
 
+    st = STYLES[style] if isinstance(style, str) else style
     fig, ax = plt.subplots(figsize=(10, 6.5))
     fig.patch.set_facecolor("#3a3a3a")
-    patch(base, facecolor="#151515", edgecolor="none")
-    patch(white, facecolor="#ececec", edgecolor="none")
+    patch(base, facecolor=st["base_color"], edgecolor="none")
+    patch(white, facecolor=st["feature_color"], edgecolor="none")
     ax.set_xlim(-3, CARD_W + 3)
     ax.set_ylim(-3, CARD_H + 3)
     ax.set_aspect("equal")
@@ -277,24 +356,65 @@ def preview(base, white, path):
     fig.savefig(path, dpi=200, bbox_inches="tight", facecolor="#3a3a3a")
 
 
+def build_style(style, prefix, preview_path, meshes=True):
+    st = STYLES[style]
+    base2d, white2d = build_shapes(style)
+    if meshes:
+        base_mesh = extrude(base2d, BASE_Z, 0.0)
+        white_mesh = extrude(white2d, TOP_Z, BASE_Z)
+        print(f"{style} base: {len(base_mesh.faces)} faces, "
+              f"watertight={base_mesh.is_watertight}")
+        print(f"{style} features: {len(white_mesh.faces)} faces, "
+              f"watertight={white_mesh.is_watertight}")
+        base_mesh.export(f"{prefix}_base.stl")
+        white_mesh.export(f"{prefix}_top.stl")
+        write_3mf(
+            f"{prefix}.3mf",
+            [(st["base_name"], 1, base_mesh), (st["feature_name"], 2, white_mesh)],
+        )
+    preview(base2d, white2d, preview_path, style)
+    print(f"{style}: {preview_path}")
+
+
 def main():
-    base2d, white2d = build_shapes()
-    base_mesh = extrude(base2d, BASE_Z, 0.0)
-    white_mesh = extrude(white2d, TOP_Z, BASE_Z)
+    import argparse
 
-    print(f"base: {len(base_mesh.faces)} faces, watertight={base_mesh.is_watertight}")
-    print(f"white: {len(white_mesh.faces)} faces, watertight={white_mesh.is_watertight}")
+    ap = argparse.ArgumentParser(description="Generate the printable business card.")
+    ap.add_argument("--style", default=DEFAULT_STYLE, choices=sorted(STYLES),
+                    help="card style to build (default: %(default)s)")
+    ap.add_argument("--all", action="store_true",
+                    help="render a preview for every style into --preview-dir")
+    ap.add_argument("--preview-dir", default="assets/previews",
+                    help="where --all writes its previews (default: %(default)s)")
+    args = ap.parse_args()
 
-    base_mesh.export("visitenkarte_base_black.stl")
-    white_mesh.export("visitenkarte_top_white.stl")
-    write_3mf(
-        "visitenkarte.3mf",
-        [
-            ("Basis Schwarz", 1, base_mesh),
-            ("Schrift Weiss", 2, white_mesh),
-        ],
-    )
-    preview(base2d, white2d, "visitenkarte_preview.png")
+    if args.all:
+        import os
+
+        os.makedirs(args.preview_dir, exist_ok=True)
+        for name in sorted(STYLES):
+            build_style(name, f"visitenkarte_{name}",
+                        os.path.join(args.preview_dir, f"{name}.png"), meshes=False)
+        print("done")
+        return
+
+    if args.style == DEFAULT_STYLE:
+        # keep the historical filenames for the default card
+        base2d, white2d = build_shapes(DEFAULT_STYLE)
+        base_mesh = extrude(base2d, BASE_Z, 0.0)
+        white_mesh = extrude(white2d, TOP_Z, BASE_Z)
+        print(f"base: {len(base_mesh.faces)} faces, watertight={base_mesh.is_watertight}")
+        print(f"white: {len(white_mesh.faces)} faces, watertight={white_mesh.is_watertight}")
+        base_mesh.export("visitenkarte_base_black.stl")
+        white_mesh.export("visitenkarte_top_white.stl")
+        write_3mf(
+            "visitenkarte.3mf",
+            [("Basis Schwarz", 1, base_mesh), ("Schrift Weiss", 2, white_mesh)],
+        )
+        preview(base2d, white2d, "visitenkarte_preview.png", DEFAULT_STYLE)
+    else:
+        build_style(args.style, f"visitenkarte_{args.style}",
+                    f"visitenkarte_{args.style}_preview.png")
     print("done")
 
 

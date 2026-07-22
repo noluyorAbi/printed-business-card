@@ -90,6 +90,47 @@ To make it your card, edit the constants and the text at the top of
 and tagline, the `rows` list for the contact lines. Sizes and positions are
 plain constants in the same file.
 
+## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
+
+Five layouts ship with the script. A style only changes the 2D layout and
+which filament is base and which is feature, so every one of them still prints
+as two parts with a single filament change.
+
+```bash
+.venv/bin/python build_card.py --style inverse   # one style, STL + 3MF + preview
+.venv/bin/python build_card.py --all             # preview of every style
+```
+
+| Style | Frame | QR | Filaments |
+| --- | --- | --- | --- |
+| `classic` | band | recessed | black base, white features |
+| `inverse` | band | raised | white base, black features |
+| `minimal` | none | recessed | black base, white features |
+| `outline` | two hairlines | recessed | black base, white features |
+| `blueprint` | two hairlines | raised | white base, blue features |
+
+The QR mode follows the base color. On a dark base the dark modules are cut
+out of a light panel (`recess`); on a light base the dark modules themselves
+are the raised feature (`relief`). Either way the code decodes, which the test
+suite checks with OpenCV for all five styles.
+
+<table>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/classic.png" alt="classic style preview"><br><b>classic</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/inverse.png" alt="inverse style preview"><br><b>inverse</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/minimal.png" alt="minimal style preview"><br><b>minimal</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/outline.png" alt="outline style preview"><br><b>outline</b></td>
+</tr>
+<tr>
+<td colspan="2"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/blueprint.png" alt="blueprint style preview"><br><b>blueprint</b></td>
+</tr>
+</table>
+
+To add a style, copy an entry in the `STYLES` dict at the top of
+`build_card.py` and change `frame`, `qr` and the two colors.
+
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/folder.svg" width="16" align="center"> How it works
 
 The card is built as 2D geometry first, then extruded:

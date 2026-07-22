@@ -14,5 +14,8 @@ and this project adheres to
   (per color) and as a Bambu Studio 3MF with per-part filament assignment.
 - Recessed, scannable QR code (verified in tests with OpenCV).
 - Smoke tests covering geometry validity, watertightness and QR decoding.
+- Five card styles (`classic`, `inverse`, `minimal`, `outline`, `blueprint`)
+  selectable with `--style`, plus `--all` to render a preview of each one.
+- Style previews in `assets/previews/`, embedded in the README.
 
 [Unreleased]: https://github.com/noluyorAbi/printed-business-card/commits/main
