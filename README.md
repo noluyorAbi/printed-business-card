@@ -111,7 +111,7 @@ plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
-137 styles ship with the script. A style only changes the 2D layout and
+163 styles ship with the script. A style only changes the 2D layout and
 which filament is base and which is feature, so every one of them still prints
 as two parts with a single filament change.
 
@@ -264,6 +264,32 @@ default) or `--corners square`. A style can pin its own with
 | `curl` | curl | none | recessed | flat | the response headers of a developer |
 | `todo` | todo | none | raised | flat | two things done, three left |
 | `manifesto` | manifesto | none | recessed | emboss text, square corners | three words, square corners |
+| `hilbert` | default | `hilbert` | recessed | flat | one unbroken space filling curve |
+| `sierpinski` | default | `sierpinski` | recessed | flat | a triangle subdivided five times |
+| `dragon` | default | `dragon` | recessed | flat | twelve folds of the dragon curve |
+| `truchet` | default | `truchet` | raised | flat | quarter arcs that wander into loops |
+| `lissajous` | default | `lissajous` | recessed | flat | three figures a scope would draw |
+| `rule30` | default | `rule30` | recessed | flat | order on the left, chaos on the right |
+| `mandelbrot` | default | `mandelbrot` | recessed | flat | the set, eroded to what a nozzle holds |
+| `phyllotaxis` | default | `phyllotaxis` | recessed | flat | sunflower packing at 137.5 degrees |
+| `fibonacci` | default | `fibonacci` | raised | flat | squares with the golden spiral through them |
+| `wireglobe` | default | `wireglobe` | recessed | flat | latitudes and longitudes, no fill |
+| `code39` | default | `code39` | raised | flat | a real barcode of the surname, verified by the tests |
+| `morse` | default | `morse` | recessed | engraved decor | ADATEPE engraved as dots and dashes |
+| `punchtape` | default | `punchtape` | raised | engraved decor | the name in ASCII on eight hole tape |
+| `magstripe` | default | `magstripe` | recessed | flat | the three track layout, homage not data |
+| `coremem` | default | `coremem` | recessed | flat | ferrite cores with the wires threaded between |
+| `dsky` | default | `dsky` | recessed | flat | Apollo registers up top, caution lamps below |
+| `graycode` | default | `graycode` | recessed | flat | a six bit encoder disc, one bit per step |
+| `frontpanel` | default | `frontpanel` | recessed | emboss decor | blinkenlights over a row of paddles |
+| `monoscope` | default | `monoscope` | recessed | flat | a broadcast test card with a resolution wedge |
+| `flamegraph` | default | `flamegraph` | recessed | flat | the profiler mountain range |
+| `teletext` | default | `teletext` | recessed | flat | a header band over mosaic cells |
+| `workbench` | default | `workbench` | recessed | flat | Amiga window chrome with gadgets |
+| `ansi` | ansi | none | recessed | flat | a BBS box drawn in double lines |
+| `konami` | konami | none | recessed | flat | up up down down, then hire me |
+| `vcard` | vcard | none | raised | flat | the card as its own vCard source |
+| `asm` | asm | none | recessed | flat | seven instructions and a string literal |
 
 ### Depth, without a second color change
 
@@ -312,6 +338,20 @@ the right edge for the styles whose decor occupies the bottom strip.
 Every combination is decoded from the rendered preview with OpenCV in the test
 suite, so a variant that would stop scanning fails the build.
 
+### Machine readable, not just machine themed
+
+Two of the styles carry real encodings next to the QR code:
+
+- `code39` prints an actual Code 39 barcode of the surname. The table and the
+  bar geometry are generated here, and the test suite renders the bars and
+  hands them to zxing, which has to read back `ADATEPE` or the build fails.
+- `morse` engraves the same name as dots and dashes, and `punchtape` punches
+  it as eight hole ASCII paper tape, sprocket track included.
+
+`magstripe` is the exception that proves the rule: a magnetic reader senses
+flux reversals, not topography, so that one is an homage to the track layout
+and is not readable by anything.
+
 ### Decor
 
 Most styles carry a background texture, listed in the table above: everything
@@ -329,13 +369,14 @@ texture out of the whole text bounding box. Nothing drops below roughly
 `vertical` (name rotated along the edge), `outline` (hollow letters) and
 `ticker` (departure board caps).
 
-Sixteen more are monospaced code blocks, set in DejaVu Sans Mono (which ships
+Twenty more are monospaced code blocks, set in DejaVu Sans Mono (which ships
 with matplotlib, so they render the same everywhere): `diff` (added lines
 raised, removed lines engraved into the base), `tree` (the card as `tree`
 output, box drawing characters included), `json` (an object literal), `vim` (a buffer with a
 tilde column, a block cursor and a filled status line), plus `hexdump`,
 `makefile`, `dockerfile`, `manpage`, `stacktrace`, `rustc`, `sql`, `haskell`,
-`roguelike`, `tracker`, `tags`, `commit`, `readme`, `env`, `curl` and `todo`.
+`roguelike`, `tracker`, `tags`, `commit`, `readme`, `env`, `curl`, `todo`, `ansi` (a BBS box in
+double lines), `konami`, `vcard` (the card as its own vCard source) and `asm`.
 Two hand set layouts round it out: `devtag`, which leads with the `</>` glyph,
 and `manifesto`, three words and a name. The
 mono advance of 0.595 em is what sets the line budget: at `EM_CODE` the text
@@ -570,6 +611,51 @@ column holds 21 characters, so every code line is written to fit it.
 <tr>
 <td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/todo.png" alt="todo style preview"><br><b>todo</b></td>
 <td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/manifesto.png" alt="manifesto style preview"><br><b>manifesto</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hilbert.png" alt="hilbert style preview"><br><b>hilbert</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/sierpinski.png" alt="sierpinski style preview"><br><b>sierpinski</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/dragon.png" alt="dragon style preview"><br><b>dragon</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/truchet.png" alt="truchet style preview"><br><b>truchet</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/lissajous.png" alt="lissajous style preview"><br><b>lissajous</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/rule30.png" alt="rule30 style preview"><br><b>rule30</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/mandelbrot.png" alt="mandelbrot style preview"><br><b>mandelbrot</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/phyllotaxis.png" alt="phyllotaxis style preview"><br><b>phyllotaxis</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/fibonacci.png" alt="fibonacci style preview"><br><b>fibonacci</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/wireglobe.png" alt="wireglobe style preview"><br><b>wireglobe</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/code39.png" alt="code39 style preview"><br><b>code39</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/morse.png" alt="morse style preview"><br><b>morse</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/punchtape.png" alt="punchtape style preview"><br><b>punchtape</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/magstripe.png" alt="magstripe style preview"><br><b>magstripe</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/coremem.png" alt="coremem style preview"><br><b>coremem</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/dsky.png" alt="dsky style preview"><br><b>dsky</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/graycode.png" alt="graycode style preview"><br><b>graycode</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/frontpanel.png" alt="frontpanel style preview"><br><b>frontpanel</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/monoscope.png" alt="monoscope style preview"><br><b>monoscope</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/flamegraph.png" alt="flamegraph style preview"><br><b>flamegraph</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/teletext.png" alt="teletext style preview"><br><b>teletext</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/workbench.png" alt="workbench style preview"><br><b>workbench</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/ansi.png" alt="ansi style preview"><br><b>ansi</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/konami.png" alt="konami style preview"><br><b>konami</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/vcard.png" alt="vcard style preview"><br><b>vcard</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/asm.png" alt="asm style preview"><br><b>asm</b></td>
+<td width="33%"></td>
 <td width="33%"></td>
 </tr>
 </table>

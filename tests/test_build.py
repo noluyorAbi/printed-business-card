@@ -117,6 +117,28 @@ def test_corner_option():
             assert body.is_watertight
 
 
+def test_code39_actually_decodes():
+    """The Code 39 style is a real barcode, not barcode shaped decor."""
+    import cv2
+    import matplotlib
+    import numpy as np
+    import zxingcpp
+
+    matplotlib.use("Agg")
+    bars, width = build_card.code39_bars("ADATEPE")
+    assert width < build_card.CARD_W - 8.0   # leaves the quiet zones
+
+    # render the bars alone, dark on light, and hand them to a real decoder
+    scale = 20
+    img = np.full((160, int(width * scale) + 200, 3), 255, dtype=np.uint8)
+    for x, w in bars:
+        x0 = int(x * scale) + 100
+        img[20:140, x0:x0 + int(w * scale)] = 0
+    results = zxingcpp.read_barcodes(img)
+    assert [r.text for r in results] == ["ADATEPE"], results
+    assert "39" in str(results[0].format), results[0].format
+
+
 def test_card_fits_a_wallet():
     """ID-1 (bank card) is 85.60 x 53.98 mm; stay inside it with clearance."""
     assert build_card.CARD_W <= 85.6 - 1.0

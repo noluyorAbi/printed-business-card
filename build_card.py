@@ -62,7 +62,8 @@ PANEL_MARGIN = 2.6    # equal gap to the right and bottom edge
 BOTTOM_DECORS = {"wave", "waveform", "helix", "spiral", "mountains", "city",
                  "barcode", "hazard", "ticket", "scanlines", "gitgraph",
                  "diffnote", "vimchrome", "ledmatrix", "railroad",
-                 "keycaps", "turingtape"}
+                 "keycaps", "turingtape", "morse", "punchtape", "magstripe",
+                 "teletext", "flamegraph", "frontpanel", "code39"}
 
 
 def panel_box(st=None):
@@ -1615,6 +1616,280 @@ STYLES = {
         "base_name": "Basis Schwarz",
         "feature_name": "Schrift Weiss",
     },
+    "hilbert": {
+        "label": "Hilbert: one unbroken space filling curve",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "hilbert",
+        "decor_keepout": True,
+        "base_color": "#0b1220",
+        "feature_color": "#8fd3ff",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Hellblau",
+    },
+    "sierpinski": {
+        "label": "Sierpinski: a triangle subdivided five times",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "sierpinski",
+        "decor_keepout": True,
+        "base_color": "#150e1e",
+        "feature_color": "#f0c0ff",
+        "base_name": "Basis Violett",
+        "feature_name": "Schrift Flieder",
+    },
+    "dragon": {
+        "label": "Dragon: twelve folds of the dragon curve",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "dragon",
+        "decor_keepout": True,
+        "base_color": "#101010",
+        "feature_color": "#ff8f5c",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Koralle",
+    },
+    "truchet": {
+        "label": "Truchet: quarter arcs that wander into loops",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "truchet",
+        "decor_keepout": True,
+        "base_color": "#f4f1ea",
+        "feature_color": "#2f3e46",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Schiefer",
+    },
+    "lissajous": {
+        "label": "Lissajous: three figures a scope would draw",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "lissajous",
+        "decor_keepout": True,
+        "base_color": "#04140f",
+        "feature_color": "#6effc0",
+        "base_name": "Basis Dunkelgruen",
+        "feature_name": "Schrift Mint",
+    },
+    "rule30": {
+        "label": "Rule 30: order on the left, chaos on the right",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "rule30",
+        "decor_keepout": True,
+        "base_color": "#0d0d0f",
+        "feature_color": "#e8e8ea",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "mandelbrot": {
+        "label": "Mandelbrot: the set, eroded to what a nozzle holds",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "mandelbrot",
+        "decor_keepout": True,
+        "base_color": "#05060a",
+        "feature_color": "#b6c9ff",
+        "base_name": "Basis Nacht",
+        "feature_name": "Schrift Lavendel",
+    },
+    "phyllotaxis": {
+        "label": "Phyllotaxis: sunflower packing at 137.5 degrees",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "phyllotaxis",
+        "decor_keepout": True,
+        "base_color": "#1a1408",
+        "feature_color": "#ffd98a",
+        "base_name": "Basis Umbra",
+        "feature_name": "Schrift Honig",
+    },
+    "fibonacci": {
+        "label": "Fibonacci: squares with the golden spiral through them",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "fibonacci",
+        "decor_keepout": True,
+        "base_color": "#f7f3e8",
+        "feature_color": "#2b3a2f",
+        "base_name": "Basis Bone",
+        "feature_name": "Schrift Moos",
+    },
+    "wireglobe": {
+        "label": "Wireglobe: latitudes and longitudes, no fill",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "wireglobe",
+        "base_color": "#071019",
+        "feature_color": "#7fe3ff",
+        "base_name": "Basis Tiefsee",
+        "feature_name": "Schrift Cyan",
+    },
+    "code39": {
+        "label": "Code 39: a real barcode of the surname, verified by the tests",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "code39",
+        "base_color": "#f5f5f2",
+        "feature_color": "#141414",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "morse": {
+        "label": "Morse: ADATEPE engraved as dots and dashes",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "morse",
+        "decor_mode": "engrave",
+        "base_color": "#161616",
+        "feature_color": "#f2f2f2",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "punchtape": {
+        "label": "Punchtape: the name in ASCII on eight hole tape",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "punchtape",
+        "decor_mode": "engrave",
+        "base_color": "#d9cdb4",
+        "feature_color": "#241f1a",
+        "base_name": "Basis Tape",
+        "feature_name": "Schrift Schwarz",
+    },
+    "magstripe": {
+        "label": "Magstripe: the three track layout, homage not data",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "magstripe",
+        "base_color": "#1c1c20",
+        "feature_color": "#d8d8dc",
+        "base_name": "Basis Anthrazit",
+        "feature_name": "Schrift Silber",
+    },
+    "coremem": {
+        "label": "Coremem: ferrite cores with the wires threaded between",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "coremem",
+        "decor_keepout": True,
+        "base_color": "#14100c",
+        "feature_color": "#e0c9a6",
+        "base_name": "Basis Ferrit",
+        "feature_name": "Schrift Kupfer",
+    },
+    "dsky": {
+        "label": "DSKY: Apollo registers up top, caution lamps below",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "dsky",
+        "base_color": "#0b0b0d",
+        "feature_color": "#8de08d",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gruen",
+    },
+    "graycode": {
+        "label": "Graycode: a six bit encoder disc, one bit per step",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "graycode",
+        "base_color": "#0f0f12",
+        "feature_color": "#d7d7dd",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Silber",
+    },
+    "frontpanel": {
+        "label": "Frontpanel: blinkenlights over a row of paddles",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "frontpanel",
+        "emboss": "decor",
+        "base_color": "#161a1f",
+        "feature_color": "#ffd166",
+        "base_name": "Basis Schiefer",
+        "feature_name": "Schrift Bernstein",
+    },
+    "monoscope": {
+        "label": "Monoscope: a broadcast test card with a resolution wedge",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "monoscope",
+        "base_color": "#0a0a0a",
+        "feature_color": "#f0f0f0",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "flamegraph": {
+        "label": "Flamegraph: the profiler mountain range",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "flamegraph",
+        "base_color": "#140f0a",
+        "feature_color": "#ff9f45",
+        "base_name": "Basis Kohle",
+        "feature_name": "Schrift Flamme",
+    },
+    "teletext": {
+        "label": "Teletext: a header band over mosaic cells",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "teletext",
+        "base_color": "#0a0a0a",
+        "feature_color": "#ffe066",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gelb",
+    },
+    "workbench": {
+        "label": "Workbench: Amiga window chrome with gadgets",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "workbench",
+        "decor_clear": 0.6,
+        "base_color": "#0e1a2b",
+        "feature_color": "#dfe6ef",
+        "base_name": "Basis Amiga-Blau",
+        "feature_name": "Schrift Weiss",
+    },
+    "ansi": {
+        "label": "ANSI: a BBS box drawn in double lines",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "ansi",
+        "base_color": "#101010",
+        "feature_color": "#55ff55",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gruen",
+    },
+    "konami": {
+        "label": "Konami: up up down down, then hire me",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "konami",
+        "base_color": "#0b0b1a",
+        "feature_color": "#ff4d6d",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Rot",
+    },
+    "vcard": {
+        "label": "Vcard: the card as its own vCard source",
+        "frame": "band",
+        "qr": "relief",
+        "layout": "vcard",
+        "base_color": "#f7f7f5",
+        "feature_color": "#1b2733",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Tinte",
+    },
+    "asm": {
+        "label": "Asm: seven instructions and a string literal",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "asm",
+        "base_color": "#141414",
+        "feature_color": "#ffd166",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Bernstein",
+    },
 }
 DEFAULT_STYLE = "classic"
 
@@ -1996,6 +2271,41 @@ CODE_BLOCKS = {
         ("[ ] hire Alperen", 1),
         ("[ ] in.adatepe.dev", 0),
         ("[ ] git.adatepe.dev", 0),
+    ],
+    "ansi": [
+        ("\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557", 0),
+        ("\u2551  ALPEREN ADATEPE  \u2551", 1),
+        ("\u255f\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2562", 0),
+        ("\u2551 adatepe.dev       \u2551", 0),
+        ("\u2551 in.adatepe.dev    \u2551", 0),
+        ("\u2551 git.adatepe.dev   \u2551", 0),
+        ("\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d", 0),
+    ],
+    "konami": [
+        ("\u2191 \u2191 \u2193 \u2193 \u2190 \u2192 \u2190 \u2192 B A", 1),
+        ("", 0),
+        ("cheat: hire Alperen", 1),
+        ("adatepe.dev", 0),
+        ("in.adatepe.dev", 0),
+        ("git.adatepe.dev", 0),
+    ],
+    "vcard": [
+        ("BEGIN:VCARD", 0),
+        ("VERSION:4.0", 0),
+        ("FN:Alperen Adatepe", 1),
+        ("ROLE:developer", 0),
+        ("URL:adatepe.dev", 0),
+        ("URL:git.adatepe.dev", 0),
+        ("END:VCARD", 0),
+    ],
+    "asm": [
+        ("section .text", 0),
+        ("global _alperen", 0),
+        ("_alperen:", 1),
+        ("  mov rdi, site", 0),
+        ("  call hire", 0),
+        ("  ret", 0),
+        ('site db "adatepe.dev"', 0),
     ],
     "vim": [
         ("Alperen Adatepe", 1),
@@ -3084,6 +3394,466 @@ def decor_turingtape(base):
     return _band(shapes, base, (0.0, BOTTOM[1], CARD_W, BOTTOM[3] + 3.4))
 
 
+FIGURE = (TEXT_X1 + 1.5, CARD_H - 20.0, CARD_W - EDGE_SAFE, CARD_H - EDGE_SAFE)
+FIGURE_CX = (FIGURE[0] + FIGURE[2]) / 2
+FIGURE_CY = (FIGURE[1] + FIGURE[3]) / 2
+
+
+def _fit(geom, pad=0.0):
+    """Scale and centre a drawing into the free block above the QR panel."""
+    b = geom.bounds
+    w, h = FIGURE[2] - FIGURE[0] - 2 * pad, FIGURE[3] - FIGURE[1] - 2 * pad
+    k = min(w / max(b[2] - b[0], 1e-9), h / max(b[3] - b[1], 1e-9))
+    geom = shp_scale(geom, k, k, origin=(b[0], b[1]))
+    b = geom.bounds
+    return shp_translate(geom, FIGURE_CX - (b[0] + b[2]) / 2, FIGURE_CY - (b[1] + b[3]) / 2)
+
+
+def _hilbert(order):
+    """Points of a Hilbert curve on the unit square, recursively."""
+    def rot(n, x, y, rx, ry):
+        if ry == 0:
+            if rx == 1:
+                x, y = n - 1 - x, n - 1 - y
+            x, y = y, x
+        return x, y
+
+    n = 2 ** order
+    pts = []
+    for d in range(n * n):
+        rx = ry = 0
+        x = y = 0
+        t = d
+        s = 1
+        while s < n:
+            rx = 1 & (t // 2)
+            ry = 1 & (t ^ rx)
+            x, y = rot(s, x, y, rx, ry)
+            x += s * rx
+            y += s * ry
+            t //= 4
+            s *= 2
+        pts.append((x, y))
+    return pts, n
+
+
+def decor_hilbert(base):
+    """A space filling Hilbert curve over the whole card."""
+    from shapely.geometry import LineString
+
+    # order 3 in the free block: 2.5 mm pitch, so the ribbon and the gap
+    # between two passes both stay above what the nozzle holds
+    pts, _ = _hilbert(3)
+    line = _fit(LineString([(float(x), float(y)) for x, y in pts]), pad=0.6)
+    return _all([line.buffer(0.42, cap_style=2, join_style=1)], base, 1.0)
+
+
+def decor_sierpinski(base):
+    """Sierpinski triangle, subdivided five times."""
+    def split(tri, depth):
+        if depth == 0:
+            return [Polygon(tri)]
+        (ax, ay), (bx, by), (cx, cy) = tri
+        ab = ((ax + bx) / 2, (ay + by) / 2)
+        bc = ((bx + cx) / 2, (by + cy) / 2)
+        ca = ((cx + ax) / 2, (cy + ay) / 2)
+        return (split((tri[0], ab, ca), depth - 1)
+                + split((ab, tri[1], bc), depth - 1)
+                + split((ca, bc, tri[2]), depth - 1))
+
+    tri = ((0.0, 0.0), (20.0, 0.0), (10.0, 17.0))
+    return _all([_fit(unary_union(split(tri, 4)), pad=0.4)], base, 1.0)
+
+
+def decor_dragon(base):
+    """The dragon curve, twelve folds of it."""
+    from shapely.geometry import LineString
+
+    turns = []
+    for _ in range(10):
+        turns = turns + [1] + [0 if t else 1 for t in reversed(turns)]
+    x, y, dx, dy, step = 0.0, 0.0, 1.0, 0.0, 1.0
+    pts = [(0.0, 0.0)]
+    for t in turns:
+        x, y = x + dx * step, y + dy * step
+        pts.append((x, y))
+        dx, dy = (-dy, dx) if t else (dy, -dx)
+    return _all([_fit(LineString(pts), pad=0.6).buffer(0.3, cap_style=2, join_style=1)],
+                base, 1.0)
+
+
+def decor_truchet(base):
+    """Truchet tiles: quarter arcs that link up into wandering paths."""
+    rng = np.random.default_rng(101)
+    size = 6.0
+    arcs = []
+    for x in np.arange(1.0, CARD_W, size):
+        for y in np.arange(1.0, CARD_H, size):
+            corners = ((x, y), (x + size, y + size)) if rng.random() < 0.5 else \
+                      ((x + size, y), (x, y + size))
+            for cx, cy in corners:
+                ring = Point(cx, cy).buffer(size / 2, 48)
+                arcs.append(ring.difference(ring.buffer(-0.5))
+                            .intersection(box(x, y, x + size, y + size)))
+    return _all(arcs, base)
+
+
+def decor_lissajous(base):
+    """Three Lissajous figures, the way a scope draws them."""
+    from shapely.geometry import LineString
+
+    curves = []
+    t = np.linspace(0, 2 * np.pi, 700)
+    for i, (a, b_, r) in enumerate(((3, 2, 8.0), (5, 4, 8.0))):
+        cx = FIGURE_CX + (-6.5 if i == 0 else 6.5)
+        pts = list(zip(cx + r * np.sin(a * t), FIGURE_CY + r * np.sin(b_ * t + i)))
+        curves.append(LineString(pts).buffer(0.3, cap_style=2))
+    return _all(curves, base, 1.0)
+
+
+def decor_rule30(base):
+    """Rule 30, the cellular automaton that ships inside Mathematica."""
+    size = 1.7
+    cols = int((CARD_W - 2 * EDGE_SAFE) / size)
+    rows = int((CARD_H - 2 * EDGE_SAFE) / size)
+    state = np.zeros(cols, dtype=int)
+    state[cols // 2] = 1
+    cells = []
+    for r in range(rows):
+        for c in np.nonzero(state)[0]:
+            x = EDGE_SAFE + c * size
+            y = CARD_H - EDGE_SAFE - (r + 1) * size
+            cells.append(box(x, y, x + size - 0.4, y + size - 0.4))
+        left, right = np.roll(state, 1), np.roll(state, -1)
+        state = np.bitwise_xor(left, np.bitwise_or(state, right))
+    return _all(cells, base)
+
+
+def decor_mandelbrot(base):
+    """The Mandelbrot set, sampled coarse enough to print."""
+    size = 1.3
+    cells = []
+    for px in np.arange(EDGE_SAFE, CARD_W - EDGE_SAFE, size):
+        for py in np.arange(EDGE_SAFE, CARD_H - EDGE_SAFE, size):
+            cr = -2.2 + (px - EDGE_SAFE) / (CARD_W - 2 * EDGE_SAFE) * 3.0
+            ci = -1.25 + (py - EDGE_SAFE) / (CARD_H - 2 * EDGE_SAFE) * 2.5
+            zr = zi = 0.0
+            for _ in range(40):
+                zr, zi = zr * zr - zi * zi + cr, 2 * zr * zi + ci
+                if zr * zr + zi * zi > 4.0:
+                    break
+            else:
+                cells.append(box(px, py, px + size - 0.25, py + size - 0.25))
+    # the seahorse valley filaments are infinitely thin, so erode anything the
+    # nozzle could not hold before printing it
+    body = unary_union(cells).buffer(-0.25).buffer(0.25)
+    return _all([body], base)
+
+
+def decor_phyllotaxis(base):
+    """Sunflower packing: Vogel's model, 137.5 degrees per seed."""
+    golden = np.pi * (3 - np.sqrt(5))
+    seeds = []
+    for i in range(320):
+        r = 1.55 * np.sqrt(i)
+        a = i * golden
+        x, y = CX + r * np.cos(a), CY + r * np.sin(a)
+        seeds.append(Point(x, y).buffer(0.34 + 0.0016 * i, 16))
+    return _all(seeds, base)
+
+
+def decor_fibonacci(base):
+    """Fibonacci squares with the golden spiral drawn through them.
+
+    Drawn at final size and only translated into place: scaling the drawing
+    would thin the 0.4 mm outlines below what the nozzle can hold.
+    """
+    from shapely.geometry import LineString
+
+    unit = 0.92
+    a, b_ = 1, 1
+    x, y = 0.0, 0.0
+    shapes, direction = [], 0
+    for _ in range(6):
+        s_ = a * unit * 2.0
+        if direction == 0:
+            rect, corner = box(x, y, x + s_, y + s_), (x, y + s_)
+            nxt = (x + s_, y)
+        elif direction == 1:
+            rect, corner = box(x, y, x + s_, y + s_), (x, y)
+            nxt = (x, y + s_)
+        elif direction == 2:
+            rect, corner = box(x - s_, y, x, y + s_), (x, y)
+            nxt = (x - s_, y)
+        else:
+            rect, corner = box(x - s_, y - s_, x, y), (x, y)
+            nxt = (x, y - s_)
+        shapes.append(rect.difference(rect.buffer(-0.42)))
+        arc = LineString(Point(corner).buffer(s_, 72).exterior)
+        shapes.append(arc.buffer(0.26).intersection(rect))
+        x, y = nxt
+        direction = (direction + 1) % 4
+        a, b_ = b_, a + b_
+    drawing = unary_union(shapes)
+    b = drawing.bounds
+    return _all([shp_translate(drawing, FIGURE_CX - (b[0] + b[2]) / 2,
+                               FIGURE_CY - (b[1] + b[3]) / 2)], base, 1.0)
+
+
+def decor_wireglobe(base):
+    """A wireframe globe: latitudes and longitudes, no fill."""
+    from shapely.affinity import scale as aff_scale
+
+    cx, cy, r = CARD_W * 0.72, CY, 13.0
+    shapes = []
+    outer = Point(cx, cy).buffer(r, 96)
+    shapes.append(outer.difference(outer.buffer(-0.45)))
+    for k in (0.28, 0.58, 0.86):
+        ell = aff_scale(Point(cx, cy).buffer(r, 96), k, 1.0)
+        shapes.append(ell.difference(ell.buffer(-0.35)))
+    for dy in (-0.62, -0.3, 0.0, 0.3, 0.62):
+        ell = aff_scale(Point(cx, cy + dy * r).buffer(r, 96), 1.0, 0.16)
+        shapes.append(ell.difference(ell.buffer(-0.35)).intersection(outer))
+    return _all(shapes, base, 1.0)
+
+
+MORSE = {"A": ".-", "D": "-..", "E": ".", "P": ".--.", "T": "-", "V": "...-",
+         ".": ".-.-.-", "0": "-----"}
+
+
+def decor_morse(base):
+    """ADATEPE in Morse, engraved: dots and dashes you can feel."""
+    unit, h = 1.4, 2.2
+    shapes, x = [], TEXT_X0
+    for ch in "ADATEPE":
+        for sym in MORSE[ch]:
+            width = unit if sym == "." else unit * 3
+            shapes.append(box(x, BOTTOM_CY - h / 2, x + width, BOTTOM_CY + h / 2))
+            x += width + unit
+        x += unit * 2       # gap between letters
+    return _band(shapes, base)
+
+
+def decor_punchtape(base):
+    """Eight hole paper tape: the name in ASCII, with the sprocket track."""
+    pitch, hole, sprocket = 2.54, 0.9, 0.5
+    shapes = []
+    for i, ch in enumerate("ALPEREN"):
+        x = TEXT_X0 + i * pitch * 1.6
+        bits = format(ord(ch), "08b")
+        for b_i, bit in enumerate(reversed(bits)):
+            y = BOTTOM[1] + 0.9 + b_i * 0.78
+            if bit == "1":
+                shapes.append(Point(x, y).buffer(hole / 2, 16))
+        shapes.append(Point(x, BOTTOM[1] + 0.9 + 3.5 * 0.78).buffer(sprocket / 2, 12))
+    return _band(shapes, base)
+
+
+def decor_magstripe(base):
+    """The magnetic stripe of a bank card, with its three tracks."""
+    top = BOTTOM[1] + 0.6
+    stripe = box(0.0, top, CARD_W, top + 4.6)
+    tracks = [box(2.0, top + 0.9 + i * 1.4, CARD_W - 2.0, top + 1.2 + i * 1.4)
+              for i in range(3)]
+    return _all([stripe.difference(unary_union(tracks))], base, 0.4)
+
+
+def decor_teletext(base):
+    """Teletext mosaic: a header band and blocky graphics cells."""
+    rng = np.random.default_rng(1974)   # Ceefax went live in 1974
+    cell_w, cell_h = 2.1, 1.6
+    shapes = [box(EDGE_SAFE, CARD_H - EDGE_SAFE - 3.2, CARD_W - EDGE_SAFE, CARD_H - EDGE_SAFE)]
+    for x in np.arange(EDGE_SAFE, CARD_W - EDGE_SAFE, cell_w):
+        for y in np.arange(EDGE_SAFE, EDGE_SAFE + 8 * cell_h, cell_h):
+            if rng.random() < 0.5:
+                shapes.append(box(x, y, x + cell_w - 0.35, y + cell_h - 0.3))
+    return _all(shapes, base)
+
+
+def decor_workbench(base):
+    """Amiga Workbench window chrome: title bar, gadgets, drag lines."""
+    win = base.buffer(-1.6)
+    frame = win.difference(win.buffer(-0.6))
+    bx0, by0, bx1, by1 = win.bounds
+    bar_h = 5.2
+    bar = box(bx0, by1 - bar_h, bx1, by1)
+    lines = [box(bx0 + 9.0, by1 - bar_h + 1.2 + i * 1.0, bx1 - 14.0,
+                 by1 - bar_h + 1.6 + i * 1.0) for i in range(3)]
+    close = box(bx0 + 1.2, by1 - bar_h + 1.0, bx0 + 6.0, by1 - 1.0)
+    depth = box(bx1 - 6.6, by1 - bar_h + 1.0, bx1 - 1.4, by1 - 1.0)
+    gadgets = unary_union([close.difference(close.buffer(-0.55)),
+                           depth.difference(depth.buffer(-0.55))])
+    return _all([frame, bar.difference(unary_union(lines).buffer(0.0)).difference(
+        unary_union([close, depth]).buffer(0.6)), gadgets], base, 0.6)
+
+
+CODE39 = {
+    "0": "nnnwwnwnn", "1": "wnnwnnnnw", "2": "nnwwnnnnw", "3": "wnwwnnnnn",
+    "4": "nnnwwnnnw", "5": "wnnwwnnnn", "6": "nnwwwnnnn", "7": "nnnwnnwnw",
+    "8": "wnnwnnwnn", "9": "nnwwnnwnn", "A": "wnnnnwnnw", "B": "nnwnnwnnw",
+    "C": "wnwnnwnnn", "D": "nnnnwwnnw", "E": "wnnnwwnnn", "F": "nnwnwwnnn",
+    "G": "nnnnnwwnw", "H": "wnnnnwwnn", "I": "nnwnnwwnn", "J": "nnnnwwwnn",
+    "K": "wnnnnnnww", "L": "nnwnnnnww", "M": "wnwnnnnwn", "N": "nnnnwnnww",
+    "O": "wnnnwnnwn", "P": "nnwnwnnwn", "Q": "nnnnnnwww", "R": "wnnnnnwwn",
+    "S": "nnwnnnwwn", "T": "nnnnwnwwn", "U": "wwnnnnnnw", "V": "nwwnnnnnw",
+    "W": "wwwnnnnnn", "X": "nwnnwnnnw", "Y": "wwnnwnnnn", "Z": "nwwnwnnnn",
+    "-": "nwnnnnwnw", ".": "wwnnnnwnn", " ": "nwwnnnwnn", "$": "nwnwnwnnn",
+    "/": "nwnwnnnwn", "+": "nwnnnwnwn", "%": "nnnwnwnwn", "*": "nwnnwnwnn",
+}
+
+
+def code39_bars(text, narrow=0.5, ratio=3.0):
+    """Code 39 as (x, width) bar pairs. Start and stop are the * character.
+
+    Nine elements per character, alternating bar and space, three of them
+    wide. The test suite decodes the rendered card with zxing to prove the
+    table is right, so this is a real barcode and not barcode shaped decor.
+    """
+    bars, x = [], 0.0
+    for ch in f"*{text.upper()}*":
+        for i, el in enumerate(CODE39[ch]):
+            w = narrow * (ratio if el == "w" else 1.0)
+            if i % 2 == 0:
+                bars.append((x, w))
+            x += w
+        x += narrow      # inter character gap
+    return bars, x - narrow
+
+
+def decor_code39(base):
+    """A Code 39 barcode of the surname, raised dark bars on a light base."""
+    narrow = 0.52
+    bars, width = code39_bars("ADATEPE", narrow)
+    x0 = (CARD_W - width) / 2
+    h = min(6.4, BOTTOM[3] - BOTTOM[1] - 0.6)
+    return _band([box(x0 + x, BOTTOM_CY - h / 2, x0 + x + w, BOTTOM_CY + h / 2)
+                  for x, w in bars], base)
+
+
+def decor_coremem(base):
+    """Ferrite core memory: toroids on 45 degree diagonals, wires threaded
+    between them. The wires stop at the cores, so the holes stay open."""
+    from shapely.affinity import rotate
+
+    from shapely.geometry import LineString
+
+    pitch, od, wall = 3.6, 2.7, 0.6
+    cores, disks, centres = [], [], []
+    for i, x in enumerate(np.arange(EDGE_SAFE + 2.0, CARD_W - EDGE_SAFE, pitch)):
+        for j, y in enumerate(np.arange(EDGE_SAFE + 1.5, CARD_H - EDGE_SAFE, pitch)):
+            ring = Point(x, y).buffer(od / 2, 32)
+            ring = ring.difference(ring.buffer(-wall))
+            ring = rotate(shp_scale(ring, 1.0, 0.62), 45 if (i + j) % 2 else -45,
+                          origin=(x, y))
+            cores.append(ring)
+            disks.append(Point(x, y).buffer(od / 2 + 0.25, 24))
+            centres.append((x, y))
+    xs = sorted({round(c[0], 2) for c in centres})
+    ys = sorted({round(c[1], 2) for c in centres})
+    wires = [LineString([(EDGE_SAFE, y), (CARD_W - EDGE_SAFE, y)]).buffer(0.25)
+             for y in ys]
+    wires += [LineString([(x, EDGE_SAFE), (x, CARD_H - EDGE_SAFE)]).buffer(0.25)
+              for x in xs]
+    threaded = unary_union(wires).difference(unary_union(disks))
+    return _all(cores + [threaded], base)
+
+
+def decor_dsky(base):
+    """The Apollo guidance computer panel: three registers up in the corner,
+    the caution annunciators along the bottom."""
+    shapes = []
+    rx, ry = CARD_W - 30.0, CARD_H - 18.0
+    shapes.append(box(rx - 1.4, ry - 1.4, rx + 27.0, ry + 15.6).difference(
+        box(rx - 1.4, ry - 1.4, rx + 27.0, ry + 15.6).buffer(-0.5)))
+    for row in range(3):
+        y = ry + row * 5.2
+        for col in range(5):
+            x = rx + 1.0 + col * 5.0
+            cell = box(x, y, x + 3.6, y + 4.2)
+            shapes.append(cell.difference(cell.buffer(-0.42)))
+    for col in range(4):
+        x = EDGE_SAFE + 2.0 + col * 12.0
+        lamp = box(x, BOTTOM_CY - 2.6, x + 10.0, BOTTOM_CY + 2.6)
+        shapes.append(lamp.difference(lamp.buffer(-0.45)))
+    return _all(shapes, base, 1.0)
+
+
+def decor_flamegraph(base):
+    """A profiler flame graph: frames stacked, each one narrower than its
+    parent, in the strip under the contact rows."""
+    h, gap = 2.1, 0.5
+    rows = [
+        [(0.0, 46.0)],
+        [(0.0, 27.0), (28.0, 18.0)],
+        [(2.0, 12.0), (15.0, 9.0), (30.0, 14.0)],
+    ]
+    shapes = []
+    for level, frames in enumerate(rows):
+        y = BOTTOM[1] + 0.4 + level * (h + gap)
+        for x0, w in frames:
+            shapes.append(box(TEXT_X0 + x0, y, TEXT_X0 + x0 + w, y + h))
+    return _band(shapes, base, (0.0, BOTTOM[1], CARD_W, BOTTOM[3] + 1.2))
+
+
+def decor_monoscope(base):
+    """A broadcast test card: circle in a grid, castellations, a centre cross."""
+    cx, cy, r = CARD_W * 0.72, CARD_H * 0.70, 11.5
+    shapes = []
+    disc = Point(cx, cy).buffer(r, 96)
+    shapes.append(disc.difference(disc.buffer(-0.5)))
+    inner = Point(cx, cy).buffer(r * 0.62, 96)
+    shapes.append(inner.difference(inner.buffer(-0.4)))
+    for gx in np.arange(cx - r, cx + r + 0.1, r / 3):
+        shapes.append(box(gx - 0.2, cy - r, gx + 0.2, cy + r).intersection(disc))
+    for gy in np.arange(cy - r, cy + r + 0.1, r / 3):
+        shapes.append(box(cx - r, gy - 0.2, cx + r, gy + 0.2).intersection(disc))
+    shapes.append(box(cx - 3.2, cy - 0.45, cx + 3.2, cy + 0.45))
+    shapes.append(box(cx - 0.45, cy - 3.2, cx + 0.45, cy + 3.2))
+    # resolution wedge: bars that stop at the printable limit
+    for i, w in enumerate((1.6, 1.2, 0.9, 0.7, 0.55)):
+        x = cx - r - 1.0 - i * 1.9
+        shapes.append(box(x, cy - 3.0, x + w, cy + 3.0))
+    return _all(shapes, base, 1.0)
+
+
+def decor_graycode(base):
+    """A six bit Gray code encoder disc: one bit flips per step."""
+    from shapely.geometry import Polygon as Poly
+
+    cx, cy = CARD_W * 0.73, CARD_H * 0.70
+    shapes = []
+    for bit in range(6):
+        r_out = 4.2 + bit * 2.0
+        r_in = r_out - 1.5
+        for step in range(64):
+            gray = step ^ (step >> 1)
+            if not (gray >> bit) & 1:
+                continue
+            a0, a1 = step * 2 * np.pi / 64, (step + 1) * 2 * np.pi / 64
+            pts = [(cx + r_in * np.cos(a), cy + r_in * np.sin(a))
+                   for a in np.linspace(a0, a1, 6)]
+            pts += [(cx + r_out * np.cos(a), cy + r_out * np.sin(a))
+                    for a in np.linspace(a1, a0, 6)]
+            shapes.append(Poly(pts))
+    hub = Point(cx, cy).buffer(2.6, 48)
+    shapes.append(hub.difference(hub.buffer(-0.6)))
+    return _all(shapes, base, 1.0)
+
+
+def decor_frontpanel(base):
+    """Blinkenlights: a row of indicator lamps over a row of switch paddles."""
+    shapes = []
+    for i in range(16):
+        x = EDGE_SAFE + 1.5 + i * 3.1
+        gap = 0.9 if i in (5, 10) else 0.0
+        shapes.append(Point(x + gap, BOTTOM_CY + 1.8).buffer(1.05, 24))
+    for i in range(8):
+        x = EDGE_SAFE + 2.5 + i * 6.2
+        paddle = box(x, BOTTOM_CY - 3.4, x + 2.4, BOTTOM_CY - 0.6)
+        shapes.append(paddle.difference(paddle.buffer(-0.45)))
+    return _band(shapes, base)
+
+
 def despeckle(geom, min_area=0.4, min_half_width=0.15):
     """Drop crumbs left behind when decor is carved around text.
 
@@ -3166,6 +3936,28 @@ DECOR = {
     "logicgates": decor_logicgates,
     "keycaps": decor_keycaps,
     "turingtape": decor_turingtape,
+    "hilbert": decor_hilbert,
+    "sierpinski": decor_sierpinski,
+    "dragon": decor_dragon,
+    "truchet": decor_truchet,
+    "lissajous": decor_lissajous,
+    "rule30": decor_rule30,
+    "mandelbrot": decor_mandelbrot,
+    "phyllotaxis": decor_phyllotaxis,
+    "fibonacci": decor_fibonacci,
+    "wireglobe": decor_wireglobe,
+    "morse": decor_morse,
+    "punchtape": decor_punchtape,
+    "magstripe": decor_magstripe,
+    "teletext": decor_teletext,
+    "workbench": decor_workbench,
+    "coremem": decor_coremem,
+    "dsky": decor_dsky,
+    "flamegraph": decor_flamegraph,
+    "monoscope": decor_monoscope,
+    "graycode": decor_graycode,
+    "frontpanel": decor_frontpanel,
+    "code39": decor_code39,
 }
 
 

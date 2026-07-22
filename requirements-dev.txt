@@ -2,3 +2,4 @@
 networkx>=3.0
 opencv-python-headless>=4.9
 pytest>=8.0
+zxing-cpp>=2.2      # decodes the Code 39 style in the tests

@@ -54,6 +54,16 @@ and this project adheres to
 - Style keys `emboss`, `decor_mode`, `plate`, `shadow`, `qr_shape`, plus QR
   modes `deep` and `framed`, and five text layouts (`centered`, `monogram`,
   `vertical`, `outline`, `ticker`).
+- Twenty six more styles, bringing the set to 163. Generative geometry
+  (`hilbert`, `sierpinski`, `dragon`, `truchet`, `lissajous`, `rule30`,
+  `mandelbrot`, `phyllotaxis`, `fibonacci`, `wireglobe`), encodings and
+  artefacts (`code39`, `morse`, `punchtape`, `magstripe`, `coremem`, `dsky`,
+  `graycode`, `frontpanel`, `monoscope`, `flamegraph`), retro interfaces
+  (`teletext`, `workbench`) and four more code blocks (`ansi`, `konami`,
+  `vcard`, `asm`).
+- `code39` is a real Code 39 barcode, generated from the 43 character table in
+  this repo. A test renders the bars and decodes them with zxing, so a wrong
+  table fails the build instead of shipping a barcode that only looks like one.
 - A corner option: `card_outline(corners)`, the `--corners round|square` flag
   and a per style `"corners"` key. `tags` and `manifesto` ship square.
 - A blind deboss mode (`text_mode: engrave`): the type itself becomes a groove
