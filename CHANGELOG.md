@@ -13,8 +13,9 @@ and this project adheres to
 - Card grows from 80 x 45 mm to 84 x 52 mm, inside ID-1 with clearance, corner
   radius 2.5 to 3.0 mm.
 - QR shrinks from 25 to 22 mm (0.88 mm modules) and its quiet zone is now
-  measured in modules (3) instead of millimetres. The panel is vertically
-  centred.
+  measured in modules (3) instead of millimetres. The panel sits in the bottom
+  right corner with an equal 2.6 mm gap to both edges, except for styles whose
+  decor runs along the bottom strip, which keep it centred on the right edge.
 - Type is larger and letterspaced: name 6.0, tagline 4.2 over two lines,
   contact rows 4.8, with tracking, so strokes stay at or above 0.45 mm and
   gaps at or above 0.38 mm on a 0.2 mm nozzle. The `www.` prefix is gone; its
@@ -61,6 +62,12 @@ and this project adheres to
 
 - `build_shapes` returns a `Card` of four layers instead of two polygons, and
   `card_meshes` assembles the printable parts from it.
+
+### Fixed
+
+- Letterspacing used prefix bounding boxes to place glyphs, which drops side
+  bearings and trailing spaces and produced random wide gaps between letter
+  pairs. Glyph positions now come from the font's own advances and kerning.
 
 ### Added tests
 

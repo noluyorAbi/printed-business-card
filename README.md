@@ -75,6 +75,10 @@ Design decisions that matter for printing:
   0.88 mm module, above the roughly 0.8 mm floor a 0.2 mm nozzle holds, and
   the quiet zone is 3 modules wide (expressed in modules, so it survives any
   change of QR size).
+- **QR parked in the bottom right corner**, with the same 2.6 mm gap to the
+  right and the bottom edge. Styles whose decor runs along the bottom strip
+  (waves, skyline, barcode, hazard stripes and friends) keep the panel centred
+  on the right edge instead, so the pattern keeps its full run.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/download.svg" width="16" align="center"> Install
 
@@ -244,7 +248,9 @@ offset ghost, so it reads as a drop shadow in real relief).
 
 ### QR variants
 
-`qr` picks how the code is built and `qr_shape` picks the module outline:
+`qr` picks how the code is built and `qr_shape` picks the module outline. The
+panel position follows the style: bottom right corner by default, centred on
+the right edge for the styles whose decor occupies the bottom strip.
 
 | `qr` | What happens |
 | --- | --- |

@@ -14,7 +14,7 @@ is what stops letters from bleeding into each other on the print.
 """
 
 from collections import namedtuple
-from functools import reduce
+from functools import lru_cache, reduce
 
 import numpy as np
 import qrcode
@@ -52,12 +52,25 @@ QR_SIZE = 22.0
 QR_MODULES = 25
 QR_QUIET = 3.0 * QR_SIZE / QR_MODULES   # 3 modules
 PANEL_SIDE = QR_SIZE + 2 * QR_QUIET
-PANEL = (
-    CARD_W - FRAME_OUT - PANEL_SIDE,
-    CY - PANEL_SIDE / 2,
-    CARD_W - FRAME_OUT,
-    CY + PANEL_SIDE / 2,
-)  # x0, y0, x1, y1
+PANEL_MARGIN = 2.6    # equal gap to the right and bottom edge
+
+# Decors that live in the bottom strip. Those styles keep the panel centred on
+# the right edge so the pattern keeps its full run; everything else parks the
+# code in the bottom right corner, which reads cleaner.
+BOTTOM_DECORS = {"wave", "waveform", "helix", "spiral", "mountains", "city",
+                 "barcode", "hazard", "ticket", "scanlines"}
+
+
+def panel_box(st=None):
+    """QR panel rectangle: bottom right by default, centred for bottom decor."""
+    x1 = CARD_W - PANEL_MARGIN
+    x0 = x1 - PANEL_SIDE
+    if st and st.get("decor") in BOTTOM_DECORS:
+        return (x0, CY - PANEL_SIDE / 2, x1, CY + PANEL_SIDE / 2)
+    return (x0, PANEL_MARGIN, x1, PANEL_MARGIN + PANEL_SIDE)
+
+
+PANEL = panel_box()
 QR_CENTER = ((PANEL[0] + PANEL[2]) / 2, (PANEL[1] + PANEL[3]) / 2)
 QR_DATA = "https://www.adatepe.dev"
 
@@ -1228,6 +1241,37 @@ def _outline(tp):
     return reduce(lambda a, b: a.symmetric_difference(b), polys).buffer(0)
 
 
+@lru_cache(maxsize=32)
+def _ft_font(path, em):
+    from matplotlib.ft2font import FT2Font
+
+    font = FT2Font(path)
+    font.set_size(em, 72)   # TextPath renders at 72 dpi, so 1 point == 1 unit
+    return font
+
+
+def _advances(s, em, fp):
+    """Exact pen positions for a string: real glyph advances plus kerning.
+
+    Measuring prefixes with bounding boxes gets this wrong, because a bounding
+    box drops side bearings and trailing spaces, which shows up as random wide
+    gaps between letter pairs.
+    """
+    from matplotlib.ft2font import Kerning
+    from matplotlib.font_manager import findfont
+
+    font = _ft_font(findfont(fp), em)
+    xs, x, prev = [], 0.0, None
+    for ch in s:
+        idx = font.get_char_index(ord(ch))
+        if prev is not None:
+            x += font.get_kerning(prev, idx, Kerning.DEFAULT) / 64.0
+        xs.append(x)
+        x += font.load_char(ord(ch)).linearHoriAdvance / 65536.0
+        prev = idx
+    return xs
+
+
 def text_shape(s, em, fp=FONT, track=0.0):
     """Text as a polygon at em size.
 
@@ -1239,23 +1283,12 @@ def text_shape(s, em, fp=FONT, track=0.0):
     if not track:
         return _outline(TextPath((0, 0), s, size=em, prop=fp))
 
-    # Position glyph i at the prefix advance plus i tracking steps. The prefix
-    # advance is measured with a sentinel glyph appended, which is what makes
-    # trailing spaces count; measuring the prefix bounding box alone drops them
-    # and the word spacing collapses.
-    ref = TextPath((0, 0), "H", size=em, prop=fp).get_extents().x1
-
-    def advance(prefix):
-        if not prefix:
-            return 0.0
-        return TextPath((0, 0), prefix + "H", size=em, prop=fp).get_extents().x1 - ref
-
     glyphs = []
-    for i, ch in enumerate(s):
+    for i, (ch, x) in enumerate(zip(s, _advances(s, em, fp))):
         if ch == " ":
             continue
         glyph = _outline(TextPath((0, 0), ch, size=em, prop=fp))
-        glyphs.append(shp_translate(glyph, xoff=advance(s[:i]) + i * track))
+        glyphs.append(shp_translate(glyph, xoff=x + i * track))
     return unary_union(glyphs).buffer(0) if glyphs else Polygon()
 
 
@@ -1310,7 +1343,7 @@ def qr_matrix():
     return qr.get_matrix()
 
 
-def qr_dark_modules(shape="square"):
+def qr_dark_modules(shape="square", panel=None):
     """Dark modules as one polygon.
 
     shape: "square" is the plain grid, "round" softens the corners and "dot"
@@ -1320,8 +1353,9 @@ def qr_dark_modules(shape="square"):
     m = qr_matrix()
     n = len(m)
     mod = QR_SIZE / n
-    x0 = QR_CENTER[0] - QR_SIZE / 2
-    y0 = QR_CENTER[1] - QR_SIZE / 2
+    px0, py0, px1, py1 = panel or PANEL
+    x0 = (px0 + px1) / 2 - QR_SIZE / 2
+    y0 = (py0 + py1) / 2 - QR_SIZE / 2
     eps = 0.02
     cells = []
     for row in range(n):
@@ -1343,9 +1377,9 @@ def qr_dark_modules(shape="square"):
     return union
 
 
-def qr_finder_frame():
+def qr_finder_frame(panel=None):
     """Corner brackets around the QR panel, like a viewfinder."""
-    x0, y0, x1, y1 = PANEL
+    x0, y0, x1, y1 = panel or PANEL
     arm, w = 5.0, 0.7
     marks = []
     for cx, sx in ((x0 + 0.4, 1), (x1 - 0.4, -1)):
@@ -1358,7 +1392,7 @@ def qr_finder_frame():
 
 
 # ---------------------------------------------------------------- build 2D layout
-def build_frame(base, kind, qr_mode="recess"):
+def build_frame(base, kind, qr_mode="recess", panel=None):
     if kind == "none":
         return Polygon()
     if kind == "double":
@@ -1368,7 +1402,7 @@ def build_frame(base, kind, qr_mode="recess"):
         band = unary_union([outer, inner])
         # let the hairlines stop cleanly at the QR panel instead of running under it
         if qr_mode == "recess":
-            return band.difference(box(*PANEL).buffer(0.5))
+            return band.difference(box(*(panel or PANEL)).buffer(0.5))
         return band
     return base.buffer(-FRAME_OUT).difference(base.buffer(-FRAME_IN))
 
@@ -1413,7 +1447,7 @@ def build_content(layout):
         parts.append(place_text("Alperen Adatepe", EM_ROW * 0.85, TEXT_X0, MARGIN + 1.0,
                                 FONT_BOLD, TRACK_ROW))
         for i, (_, label) in enumerate(ROWS):
-            parts.append(place_text(label, EM_ROW * 0.68, TEXT_X0 + 24.0,
+            parts.append(place_text(label, EM_ROW * 0.66, TEXT_X0 + 22.5,
                                     CY + 4.0 - i * ROW_LEAD * 0.75, FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
@@ -2289,11 +2323,13 @@ def build_shapes(style=DEFAULT_STYLE):
     st = STYLES[style] if isinstance(style, str) else style
     qr_mode = st["qr"]
     base = box(CORNER_R, CORNER_R, CARD_W - CORNER_R, CARD_H - CORNER_R).buffer(CORNER_R, 32)
-    panel = box(*PANEL)
+    panel_rect = panel_box(st)
+    panel = box(*panel_rect)
 
-    frame = build_frame(base, st["frame"], "recess" if qr_mode in PANEL_MODES else "relief")
+    frame = build_frame(base, st["frame"], "recess" if qr_mode in PANEL_MODES else "relief",
+                        panel_rect)
     content = build_content(st.get("layout", "default"))
-    modules = qr_dark_modules(st.get("qr_shape", "square"))
+    modules = qr_dark_modules(st.get("qr_shape", "square"), panel_rect)
 
     texture = Polygon()
     if st.get("decor"):
@@ -2323,7 +2359,7 @@ def build_shapes(style=DEFAULT_STYLE):
     if qr_mode in PANEL_MODES:
         feature.append(panel)
     if qr_mode == "framed":
-        feature.append(qr_finder_frame())
+        feature.append(qr_finder_frame(panel_rect))
 
     feature = unary_union(feature).buffer(0)
     if qr_mode in PANEL_MODES:

@@ -49,14 +49,14 @@ def test_text_stays_inside_the_column():
     """Type may never creep under the QR panel, at any card or type size."""
     from shapely.geometry import box
 
-    panel = box(*build_card.PANEL).buffer(1.0)
-    layouts = {st.get("layout", "default") for st in build_card.STYLES.values()}
-    for layout in sorted(layouts):
+    for name, st in build_card.STYLES.items():
+        layout = st.get("layout", "default")
+        panel = box(*build_card.panel_box(st)).buffer(0.8)
         content = build_card.build_content(layout)
-        assert content.intersection(panel).area < 0.01, layout
+        assert content.intersection(panel).area < 0.01, name
         x0, y0, x1, y1 = content.bounds
-        assert x0 >= 2.0, layout
-        assert y0 >= 2.0 and y1 <= build_card.CARD_H - 2.0, layout
+        assert x0 >= 2.0, name
+        assert y0 >= 2.0 and y1 <= build_card.CARD_H - 2.0, name
 
 
 def test_printable_feature_sizes():
