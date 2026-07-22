@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements-dev.txt
+
+      - name: Test
+        run: pytest -q
+
+      - name: Build card
+        run: python build_card.py
+
+  meta:
+    name: meta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No em dashes or en dashes
+        run: |
+          set -eu
+          if git grep -nI -P '\xe2\x80\x94|\xe2\x80\x93' -- . > /tmp/dashes.txt; then
+            echo "Em dashes or en dashes found. Use a comma, semicolon, colon, period or parentheses:" >&2
+            cat /tmp/dashes.txt >&2
+            exit 1
+          fi
+
+      - name: README assets exist
+        run: |
+          set -eu
+          missing=0
+          for f in $(grep -o 'raw.githubusercontent.com/noluyorAbi/printed-business-card/main/[^")]*' README.md | sed 's|.*/main/||' | sort -u); do
+            if [ ! -f "$f" ]; then
+              echo "README references $f, which is not in the repository" >&2
+              missing=1
+            fi
+          done
+          exit "$missing"
