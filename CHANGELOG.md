@@ -54,6 +54,13 @@ and this project adheres to
 - Style keys `emboss`, `decor_mode`, `plate`, `shadow`, `qr_shape`, plus QR
   modes `deep` and `framed`, and five text layouts (`centered`, `monogram`,
   `vertical`, `outline`, `ticker`).
+- Ten developer styles, bringing the set to 110: `gitgraph` (commit graph),
+  `diff` (added lines raised, removed lines engraved), `punchcard` (engraved
+  80 column holes), `perfboard` (2.54 mm hole grid), `dip` (the card as a chip,
+  with legs and a pin 1 notch), `vim`, `tree`, `json`, `scope` (graticule with
+  a sine and a square trace) and `conway` (embossed gliders). Four of them use
+  a new monospaced code layout, and a `decor_clear` key lets a style tighten
+  the clearance between decor and text.
 - Fifty three more styles, bringing the set to 100, and fourteen more decor
   builders (scales, squares, tri, arrows, crosses, zebra, bamboo, rain,
   bubbles, radiate, sunset, perspective, braille, blocks).

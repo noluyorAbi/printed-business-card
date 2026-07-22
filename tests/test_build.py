@@ -93,6 +93,14 @@ def test_printable_feature_sizes():
         assert stroke >= 0.45, (text, stroke)
         assert gap >= 0.38, (text, gap)
 
+    # the code layouts use a monospaced face, whose fixed advance leaves a
+    # slightly tighter gap; it still has to clear two extrusion widths
+    for text in ("git.adatepe.dev", "+ digital experiences"):
+        stroke, gap = stroke_and_gap(
+            build_card.text_shape(text, build_card.EM_CODE, build_card.FONT_MONO))
+        assert stroke >= 0.42, (text, stroke)
+        assert gap >= 0.34, (text, gap)
+
 
 def test_card_fits_a_wallet():
     """ID-1 (bank card) is 85.60 x 53.98 mm; stay inside it with clearance."""

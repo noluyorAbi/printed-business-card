@@ -111,7 +111,7 @@ plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
-100 styles ship with the script. A style only changes the 2D layout and
+110 styles ship with the script. A style only changes the 2D layout and
 which filament is base and which is feature, so every one of them still prints
 as two parts with a single filament change.
 
@@ -222,6 +222,16 @@ as two parts with a single filament change.
 | `ghost` | default | none | recessed | emboss text, shadow | outlined name over its own shadow |
 | `depth` | default | `graph` | recessed + engraved | emboss text, engraved decor, deep QR | engraved grid, raised text, deep QR |
 | `totem` | vertical | `lattice` | recessed | engraved decor | vertical name, engraved lattice |
+| `gitgraph` | default | `gitgraph` | recessed | flat | a commit graph running along the bottom |
+| `diff` | diff | `diffnote` | recessed | engraved decor | added lines raised, removed lines engraved |
+| `punchcard` | default | `punchcard` | raised | engraved decor | 80 column holes engraved into manila |
+| `perfboard` | default | `perfboard` | raised | engraved decor | 2.54 mm hole grid with power rails |
+| `dip` | default | `dip` | recessed | emboss decor | the card as a chip, legs and a pin 1 notch |
+| `vim` | vim | `vimchrome` | recessed | emboss decor | buffer with a tilde column and a status line |
+| `tree` | tree | none | recessed | flat | the card as tree output |
+| `json` | json | none | raised | flat | the card as an object literal |
+| `scope` | default | `scope` | recessed | flat | graticule with a sine and a square trace |
+| `conway` | default | `conway` | recessed | emboss decor | gliders and still lifes, embossed |
 
 ### Depth, without a second color change
 
@@ -284,6 +294,14 @@ texture out of the whole text bounding box. Nothing drops below roughly
 `brutal` (oversized name), `bauhaus`, `centered`, `monogram` (large initials),
 `vertical` (name rotated along the edge), `outline` (hollow letters) and
 `ticker` (departure board caps).
+
+Four more are monospaced code blocks, set in DejaVu Sans Mono (which ships
+with matplotlib, so they render the same everywhere): `diff` (added lines
+raised, removed lines engraved into the base), `tree` (the card as `tree`
+output, box drawing characters included), `json` (an object literal) and `vim`
+(a buffer with a tilde column, a block cursor and a filled status line). The
+mono advance of 0.595 em is what sets the line budget: at `EM_CODE` the text
+column holds 21 characters, so every code line is written to fit it.
 
 <table>
 <tr>
@@ -453,7 +471,22 @@ texture out of the whole text bounding box. Nothing drops below roughly
 </tr>
 <tr>
 <td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/totem.png" alt="totem style preview"><br><b>totem</b></td>
-<td width="33%"></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/gitgraph.png" alt="gitgraph style preview"><br><b>gitgraph</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/diff.png" alt="diff style preview"><br><b>diff</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/punchcard.png" alt="punchcard style preview"><br><b>punchcard</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/perfboard.png" alt="perfboard style preview"><br><b>perfboard</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/dip.png" alt="dip style preview"><br><b>dip</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/vim.png" alt="vim style preview"><br><b>vim</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/tree.png" alt="tree style preview"><br><b>tree</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/json.png" alt="json style preview"><br><b>json</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/scope.png" alt="scope style preview"><br><b>scope</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/conway.png" alt="conway style preview"><br><b>conway</b></td>
 <td width="33%"></td>
 </tr>
 </table>

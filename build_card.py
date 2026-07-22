@@ -58,7 +58,8 @@ PANEL_MARGIN = 2.6    # equal gap to the right and bottom edge
 # the right edge so the pattern keeps its full run; everything else parks the
 # code in the bottom right corner, which reads cleaner.
 BOTTOM_DECORS = {"wave", "waveform", "helix", "spiral", "mountains", "city",
-                 "barcode", "hazard", "ticket", "scanlines"}
+                 "barcode", "hazard", "ticket", "scanlines", "gitgraph",
+                 "diffnote", "vimchrome"}
 
 
 def panel_box(st=None):
@@ -1214,6 +1215,117 @@ STYLES = {
         "base_name": "Basis Waldnacht",
         "feature_name": "Schrift Limette",
     },
+    "gitgraph": {
+        "label": "Gitgraph: a commit graph running along the bottom",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "gitgraph",
+        "base_color": "#1b1b1f",
+        "feature_color": "#f05133",
+        "base_name": "Basis Anthrazit",
+        "feature_name": "Schrift Git-Orange",
+    },
+    "diff": {
+        "label": "Diff: added lines raised, removed lines engraved",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "diff",
+        "decor": "diffnote",
+        "decor_mode": "engrave",
+        "base_color": "#0f1419",
+        "feature_color": "#a6e3a1",
+        "base_name": "Basis Tinte",
+        "feature_name": "Schrift Gruen",
+    },
+    "punchcard": {
+        "label": "Punchcard: 80 column holes engraved into manila",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "punchcard",
+        "decor_mode": "engrave",
+        "base_color": "#e8dcc0",
+        "feature_color": "#26221c",
+        "base_name": "Basis Manila",
+        "feature_name": "Schrift Schwarz",
+    },
+    "perfboard": {
+        "label": "Perfboard: 2.54 mm hole grid with power rails",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "perfboard",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#d9c39a",
+        "feature_color": "#2b2b2b",
+        "base_name": "Basis FR4",
+        "feature_name": "Schrift Schwarz",
+    },
+    "dip": {
+        "label": "DIP: the card as a chip, legs and a pin 1 notch",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "dip",
+        "decor_keepout": True,
+        "emboss": "decor",
+        "base_color": "#1a1a1c",
+        "feature_color": "#c9ccd1",
+        "base_name": "Basis Kunststoff",
+        "feature_name": "Schrift Silber",
+    },
+    "vim": {
+        "label": "Vim: buffer with a tilde column and a status line",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "vim",
+        "decor": "vimchrome",
+        "emboss": "decor",
+        "decor_clear": 0.6,
+        "base_color": "#1e1e2e",
+        "feature_color": "#a6e3a1",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Gruen",
+    },
+    "tree": {
+        "label": "Tree: the card as tree output",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "tree",
+        "base_color": "#101010",
+        "feature_color": "#e6e6e6",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "json": {
+        "label": "JSON: the card as an object literal",
+        "frame": "none",
+        "qr": "relief",
+        "layout": "json",
+        "base_color": "#f6f8fa",
+        "feature_color": "#24292f",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Tinte",
+    },
+    "scope": {
+        "label": "Scope: graticule with a sine and a square trace",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "scope",
+        "base_color": "#05130d",
+        "feature_color": "#7dff9b",
+        "base_name": "Basis Phosphor",
+        "feature_name": "Schrift Gruen",
+    },
+    "conway": {
+        "label": "Conway: gliders and still lifes, embossed",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "conway",
+        "emboss": "decor",
+        "base_color": "#0d0d12",
+        "feature_color": "#dfe6ff",
+        "base_name": "Basis Nachtschwarz",
+        "feature_name": "Schrift Weiss",
+    },
 }
 DEFAULT_STYLE = "classic"
 
@@ -1229,6 +1341,13 @@ def _font(candidates, weight="normal"):
 
 FONT = _font(["/System/Library/Fonts/Supplemental/Arial.ttf"])
 FONT_BOLD = _font(["/System/Library/Fonts/Supplemental/Arial Bold.ttf"], weight="bold")
+# DejaVu Sans Mono ships with matplotlib, so the code layouts render the same
+# everywhere. Its advance is 0.595 em, which is what sets the line budget:
+# at EM_CODE the text column holds 21 characters.
+FONT_MONO = FontProperties(family="DejaVu Sans Mono")
+FONT_MONO_BOLD = FontProperties(family="DejaVu Sans Mono", weight="bold")
+EM_CODE = 3.6         # stroke 0.44 mm, 2.14 mm per character
+CODE_LEAD = EM_CODE * 1.55
 
 
 # ---------------------------------------------------------------- text -> shapely
@@ -1417,6 +1536,59 @@ ROWS = [
 ]
 
 
+# Code shaped layouts. Every line is monospaced and at most 21 characters,
+# which is what the text column holds at EM_CODE.
+CODE_BLOCKS = {
+    "diff": [
+        ("+++ b/adatepe.card", 0),
+        ("+ Alperen Adatepe", 1),
+        ("+ digital experiences", 0),
+        ("+ adatepe.dev", 0),
+        ("+ in.adatepe.dev", 0),
+        ("+ git.adatepe.dev", 0),
+    ],
+    "tree": [
+        ("adatepe.dev/", 1),
+        ("\u251c\u2500 Alperen Adatepe", 0),
+        ("\u251c\u2500 links/", 0),
+        ("\u2502  \u251c\u2500 in.adatepe.dev", 0),
+        ("\u2502  \u2514\u2500 git.adatepe.dev", 0),
+        ("\u2514\u2500 card.3mf", 0),
+    ],
+    "json": [
+        ("{", 0),
+        (' "name":', 0),
+        ('   "Alperen Adatepe",', 1),
+        (' "links": [', 0),
+        ('   "in.adatepe.dev",', 0),
+        ('   "git.adatepe.dev" ]', 0),
+        ("}", 0),
+    ],
+    "vim": [
+        ("Alperen Adatepe", 1),
+        ("digital experiences", 0),
+        ("", 0),
+        ("adatepe.dev", 0),
+        ("in.adatepe.dev", 0),
+        ("git.adatepe.dev", 0),
+    ],
+}
+
+
+def _code_block(layout):
+    """A monospaced block of lines, top aligned under the top margin."""
+    lines = CODE_BLOCKS[layout]
+    x0 = TEXT_X0 + (3.0 if layout == "vim" else 0.0)   # vim leaves room for ~
+    top = CARD_H - MARGIN - EM_CODE
+    parts = []
+    for i, (text, bold) in enumerate(lines):
+        if not text:
+            continue
+        parts.append(place_text(text, EM_CODE, x0, top - i * CODE_LEAD,
+                                FONT_MONO_BOLD if bold else FONT_MONO))
+    return unary_union(parts).buffer(0)
+
+
 TAGLINE = ("Creating powerful", "digital experiences")
 
 
@@ -1433,6 +1605,9 @@ def build_content(layout):
     change of card size or type scale moves all nine layouts at once.
     """
     parts = []
+
+    if layout in CODE_BLOCKS:
+        return _code_block(layout)
 
     if layout == "centered":
         parts.append(_centered("Alperen Adatepe", EM_NAME, NAME_Y, FONT_BOLD, TRACK_NAME))
@@ -2230,6 +2405,137 @@ def decor_blocks(base):
     return _all(cells, base)
 
 
+def decor_gitgraph(base):
+    """A commit graph running along the bottom strip, git log style."""
+    from shapely.geometry import LineString
+
+    y = BOTTOM_CY
+    shapes = [box(4.0, y - 0.25, CARD_W - 4.0, y + 0.25)]
+    for x in np.arange(6.0, CARD_W - 4.0, 9.0):
+        ring = Point(x, y).buffer(1.15, 32)
+        shapes.append(ring.difference(ring.buffer(-0.45)))
+    # one branch that forks off, carries two commits and merges back
+    for sign, x0, x1 in ((1.0, 12.0, 34.0), (-1.0, 40.0, 64.0)):
+        off = 3.4 * sign
+        xs = np.linspace(x0, x1, 90)
+        ys = y + off * np.sin(np.pi * (xs - x0) / (x1 - x0))
+        shapes.append(LineString(list(zip(xs, ys))).buffer(0.32, cap_style=2))
+        for xb in (x0 + (x1 - x0) * 0.35, x0 + (x1 - x0) * 0.65):
+            yb = y + off * np.sin(np.pi * (xb - x0) / (x1 - x0))
+            shapes.append(Point(xb, yb).buffer(0.85, 24))
+    return _band(shapes, base)
+
+
+def decor_diffnote(base):
+    """The removed lines of the diff, engraved under the added ones."""
+    lines = [
+        place_text("@@ -1,3 +1,6 @@", EM_CODE, TEXT_X0, BOTTOM_CY + 1.6, FONT_MONO),
+        place_text("- www.adatepe.dev", EM_CODE, TEXT_X0, BOTTOM_CY - 3.0, FONT_MONO),
+    ]
+    return unary_union(lines).intersection(base.buffer(-1.0))
+
+
+def decor_punchcard(base):
+    """IBM punched card: rows of rectangular holes, engraved."""
+    rng = np.random.default_rng(1928)   # the year the 80 column card shipped
+    # punched in two bands, top and bottom, so the middle stays a print area
+    bands = (list(np.arange(3.0, 9.0, 3.0)),
+             list(np.arange(CARD_H - 9.0, CARD_H - 3.0, 3.0)))
+    holes = []
+    for col in np.arange(3.0, CARD_W - 3.0, 2.1):
+        for rows in bands:
+            for row in rng.choice(rows, size=int(rng.integers(1, len(rows) + 1)),
+                                  replace=False):
+                holes.append(box(col, row, col + 1.1, row + 2.0))
+    return _all(holes, base)
+
+
+def decor_perfboard(base):
+    """Prototyping board: 2.54 mm hole grid with power rails."""
+    holes = [Point(x, y).buffer(0.55, 20)
+             for x in np.arange(3.5, CARD_W - 2.0, 2.54)
+             for y in np.arange(3.5, CARD_H - 2.0, 2.54)]
+    rails = [box(2.5, CARD_H - 3.4, CARD_W - 2.5, CARD_H - 2.9),
+             box(2.5, CARD_H - 5.0, CARD_W - 2.5, CARD_H - 4.5)]
+    return _all(holes + rails, base)
+
+
+def decor_dip(base):
+    """The card as a DIP package: legs along both long edges, pin 1 notch."""
+    legs = []
+    for x in np.arange(6.0, CARD_W - 5.0, 6.4):
+        legs.append(box(x, CARD_H - 5.2, x + 2.6, CARD_H - 2.2))
+        legs.append(box(x, 2.2, x + 2.6, 5.2))
+    notch = Point(EDGE_SAFE + 0.4, CY).buffer(2.6, 40)
+    notch = notch.difference(notch.buffer(-0.6))
+    dot = Point(EDGE_SAFE + 4.6, CY - 6.0).buffer(0.9, 24)
+    body = base.buffer(-1.4)
+    body = body.difference(body.buffer(-0.5))
+    return _all(legs + [notch, dot, body], base, 0.6)
+
+
+def decor_scope(base):
+    """Oscilloscope graticule with a trace across it."""
+    from shapely.geometry import LineString
+
+    lines = []
+    for x in np.arange(CX % 8.4, CARD_W, 8.4):
+        lines.append(box(x - 0.15, EDGE_SAFE, x + 0.15, CARD_H - EDGE_SAFE))
+    for y in np.arange(CY % 6.5, CARD_H, 6.5):
+        lines.append(box(EDGE_SAFE, y - 0.15, CARD_W - EDGE_SAFE, y + 0.15))
+    xs = np.linspace(EDGE_SAFE, CARD_W - EDGE_SAFE, 300)
+    sine = CY + 9.0 * np.sin(xs / 6.0)
+    lines.append(LineString(list(zip(xs, sine))).buffer(0.35, cap_style=2))
+    # a square wave under it, the way a scope shows two channels
+    sq, y_lo, y_hi, period = [], CY - 15.0, CY - 10.0, 9.0
+    for i, x in enumerate(np.arange(EDGE_SAFE, CARD_W - EDGE_SAFE, period / 2)):
+        y = y_hi if i % 2 else y_lo
+        sq.append(box(x, y - 0.3, min(x + period / 2, CARD_W - EDGE_SAFE), y + 0.3))
+        sq.append(box(x - 0.3, min(y_lo, y_hi), x + 0.3, max(y_lo, y_hi)))
+    lines += sq
+    return _all(lines, base, 1.4)
+
+
+def decor_conway(base):
+    """Game of Life: a glider fleet, a blinker and a couple of still lifes."""
+    cell = 2.6
+    glider = [(0, 2), (1, 0), (1, 2), (2, 1), (2, 2)]
+    blinker = [(0, 0), (1, 0), (2, 0)]
+    block = [(0, 0), (0, 1), (1, 0), (1, 1)]
+    beacon = [(0, 0), (0, 1), (1, 0), (2, 3), (3, 2), (3, 3)]
+    placed = [
+        (glider, 3.0, CARD_H - 11.0), (glider, 13.0, CARD_H - 8.0),
+        (glider, CARD_W - 15.0, CARD_H - 12.0), (glider, CARD_W - 27.0, CARD_H - 8.0),
+        (blinker, CARD_W - 7.0, CARD_H - 20.0), (beacon, CARD_W - 21.0, 3.0),
+        (block, 3.5, 3.5), (block, 22.0, 3.0), (blinker, 33.0, 3.2),
+        (block, 44.0, 3.4), (glider, CARD_W - 9.0, 12.0),
+    ]
+    cells = []
+    for pattern, ox, oy in placed:
+        for gx, gy in pattern:
+            x, y = ox + gx * cell, oy + gy * cell
+            cells.append(box(x, y, x + cell - 0.35, y + cell - 0.35))
+    return _all(cells, base)
+
+
+def decor_vimchrome(base):
+    """The tilde column of an empty buffer plus a filled status line."""
+    # bold and a size up, because a regular "~" is a 0.29 mm stroke and the
+    # despeckle pass drops it (correctly: it would not print)
+    tildes = [place_text("~", EM_CODE * 1.2, TEXT_X0 - 2.8, y, FONT_MONO_BOLD)
+              for y in np.arange(MARGIN + 5.0, CARD_H - MARGIN - EM_CODE, CODE_LEAD)]
+    bar_h = EM_CODE * 2.2
+    bar = box(EDGE_SAFE, EDGE_SAFE + 0.4, CARD_W - EDGE_SAFE, EDGE_SAFE + 0.4 + bar_h)
+    label = place_text("-- NORMAL --  adatepe.card", EM_CODE, TEXT_X0 - 1.0,
+                       EDGE_SAFE + 0.4 + bar_h * 0.30, FONT_MONO_BOLD)
+    ruler = place_text("1,1", EM_CODE, CARD_W - 12.0,
+                       EDGE_SAFE + 0.4 + bar_h * 0.30, FONT_MONO_BOLD)
+    cursor = box(TEXT_X0 + 3.0, CARD_H - MARGIN - EM_CODE - 2 * CODE_LEAD - 0.4,
+                 TEXT_X0 + 3.0 + EM_CODE * 0.6, CARD_H - MARGIN - 2 * CODE_LEAD + 0.2)
+    bar = bar.difference(unary_union([label, ruler]).buffer(0.2))
+    return _all(tildes + [bar, cursor], base, 0.6)
+
+
 def despeckle(geom, min_area=0.4, min_half_width=0.15):
     """Drop crumbs left behind when decor is carved around text.
 
@@ -2299,6 +2605,14 @@ DECOR = {
     "perspective": decor_perspective,
     "braille": decor_braille,
     "blocks": decor_blocks,
+    "gitgraph": decor_gitgraph,
+    "diffnote": decor_diffnote,
+    "punchcard": decor_punchcard,
+    "perfboard": decor_perfboard,
+    "dip": decor_dip,
+    "scope": decor_scope,
+    "conway": decor_conway,
+    "vimchrome": decor_vimchrome,
 }
 
 
@@ -2335,7 +2649,8 @@ def build_shapes(style=DEFAULT_STYLE):
     if st.get("decor"):
         texture = DECOR[st["decor"]](base)
         # keep the texture clear of the text and of the QR quiet zone
-        texture = texture.difference(content.buffer(1.4)).difference(panel.buffer(1.2))
+        clear = st.get("decor_clear", 1.4)
+        texture = texture.difference(content.buffer(clear)).difference(panel.buffer(1.2))
         if st.get("decor_keepout"):
             # dense patterns get a clean rectangle around the whole text block
             texture = texture.difference(content.envelope.buffer(1.6))
