@@ -9,20 +9,19 @@ import build_card  # noqa: E402
 
 
 def test_shapes_build():
-    base, white = build_card.build_shapes()
-    assert base.area > 3000  # roughly 80 x 45 minus rounded corners
-    assert white.area > 100
-    assert white.within(base.buffer(0.01))
+    card = build_card.build_shapes()
+    assert card.base.area > 3000  # roughly 80 x 45 minus rounded corners
+    assert card.feature.area > 100
+    assert card.feature.within(card.base.buffer(0.01))
 
 
 def test_extrusions_watertight():
-    base, white = build_card.build_shapes()
-    base_mesh = build_card.extrude(base, build_card.BASE_Z, 0.0)
-    white_mesh = build_card.extrude(white, build_card.TOP_Z, build_card.BASE_Z)
+    card = build_card.build_shapes()
+    base_mesh, feature_mesh = build_card.card_meshes(card)
     assert base_mesh.is_watertight
-    for body in white_mesh.split(only_watertight=False):
+    for body in feature_mesh.split(only_watertight=False):
         assert body.is_watertight
-    assert float(white_mesh.bounds[0][2]) == build_card.BASE_Z
+    assert float(feature_mesh.bounds[0][2]) == build_card.BASE_Z
 
 
 def test_every_style_builds_and_scans(tmp_path):
@@ -31,13 +30,17 @@ def test_every_style_builds_and_scans(tmp_path):
 
     matplotlib.use("Agg")
     for style in sorted(build_card.STYLES):
-        base, white = build_card.build_shapes(style)
-        assert white.within(base.buffer(0.01)), style
-        white_mesh = build_card.extrude(white, build_card.TOP_Z, build_card.BASE_Z)
-        for body in white_mesh.split(only_watertight=False):
-            assert body.is_watertight, style
+        card = build_card.build_shapes(style)
+        assert card.feature.within(card.base.buffer(0.01)), style
+        base_mesh, feature_mesh = build_card.card_meshes(card)
+        for mesh in (base_mesh, feature_mesh):
+            for body in mesh.split(only_watertight=False):
+                assert body.is_watertight, style
+        # the engrave layer never eats through the base, and never collides
+        # with the feature layer sitting on top of it
+        assert card.engrave.intersection(card.feature).area < 0.01, style
         png = tmp_path / f"{style}.png"
-        build_card.preview(base, white, str(png), style)
+        build_card.preview(card, str(png), style)
         data, _, _ = cv2.QRCodeDetector().detectAndDecode(cv2.imread(str(png)))
         assert data == build_card.QR_DATA, style
 
@@ -47,8 +50,8 @@ def test_qr_scans(tmp_path):
     import matplotlib
 
     matplotlib.use("Agg")
-    base, white = build_card.build_shapes()
+    card = build_card.build_shapes()
     png = tmp_path / "preview.png"
-    build_card.preview(base, white, str(png))
+    build_card.preview(card, str(png))
     data, _, _ = cv2.QRCodeDetector().detectAndDecode(cv2.imread(str(png)))
     assert data == build_card.QR_DATA

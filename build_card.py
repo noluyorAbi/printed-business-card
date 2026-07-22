@@ -7,6 +7,7 @@ preview PNG. Card: 80 x 45 mm. Base 0.0-0.6 mm (black), features 0.6-1.0 mm
 shows, which keeps the whole print at a single filament change.
 """
 
+from collections import namedtuple
 from functools import reduce
 
 import numpy as np
@@ -24,6 +25,8 @@ CARD_W, CARD_H = 80.0, 45.0   # compact wallet card, 80 mm long x 45 mm wide
 CORNER_R = 2.5
 BASE_Z = 0.6          # black base thickness
 TOP_Z = 0.4           # white feature height
+HIGH_Z = 0.3          # extra height for embossed features (feels raised)
+ENGRAVE_Z = 0.3       # groove depth cut into the top of the base
 FRAME_IN, FRAME_OUT = 1.8, 1.0   # frame band: inset 1.0..1.8 mm from edge
 
 QR_SIZE = 25.0
@@ -36,6 +39,13 @@ PANEL = (
 )  # x0, y0, x1, y1
 QR_CENTER = ((PANEL[0] + PANEL[2]) / 2, (PANEL[1] + PANEL[3]) / 2)
 QR_DATA = "https://www.adatepe.dev"
+
+# Every style resolves to these four 2D layers. base and feature are the two
+# filaments; engrave is cut ENGRAVE_Z deep into the top of the base, high sits
+# HIGH_Z above the feature. Both extra layers are optional and cost nothing at
+# print time: they change z only, never the filament, so the card still needs a
+# single change.
+Card = namedtuple("Card", "base engrave feature high")
 
 # ---------------------------------------------------------------- styles
 # A style only changes the 2D layout and which filament reads as "base" or
@@ -541,6 +551,597 @@ STYLES = {
         "base_name": "Basis Graphit",
         "feature_name": "Schrift Blau",
     },
+    "scales": {
+        "label": "Scales: overlapping arcs, brass on ink",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "scales",
+        "decor_keepout": True,
+        "base_color": "#12161c",
+        "feature_color": "#d9a441",
+        "base_name": "Basis Tinte",
+        "feature_name": "Schrift Messing",
+    },
+    "ripple": {
+        "label": "Ripple: concentric squares, cyan on navy",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "squares",
+        "decor_keepout": True,
+        "base_color": "#0b1b2b",
+        "feature_color": "#7fe3ff",
+        "base_name": "Basis Navy",
+        "feature_name": "Schrift Cyan",
+    },
+    "tri": {
+        "label": "Tri: triangle tessellation, lime on olive",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "tri",
+        "decor_keepout": True,
+        "base_color": "#1a2113",
+        "feature_color": "#c3e88d",
+        "base_name": "Basis Olive",
+        "feature_name": "Schrift Limette",
+    },
+    "arrows": {
+        "label": "Arrows: rows pointing at the QR panel",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "arrows",
+        "decor_keepout": True,
+        "base_color": "#141414",
+        "feature_color": "#ff8a5b",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Koralle",
+    },
+    "crosses": {
+        "label": "Crosses: scattered X marks, ice on steel",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "crosses",
+        "decor_keepout": True,
+        "base_color": "#1c2126",
+        "feature_color": "#dfe9f3",
+        "base_name": "Basis Stahl",
+        "feature_name": "Schrift Eis",
+    },
+    "zebra": {
+        "label": "Zebra: sine warped bands, bone on charcoal",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "zebra",
+        "decor_keepout": True,
+        "base_color": "#171717",
+        "feature_color": "#efe7dc",
+        "base_name": "Basis Kohle",
+        "feature_name": "Schrift Bone",
+    },
+    "bamboo": {
+        "label": "Bamboo: rods with nodes, jade on paper",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "bamboo",
+        "decor_keepout": True,
+        "base_color": "#f3f1e7",
+        "feature_color": "#2f6b4f",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Jade",
+    },
+    "rain": {
+        "label": "Rain: diagonal dashes on a window",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "rain",
+        "base_color": "#0b1220",
+        "feature_color": "#9ec8ff",
+        "base_name": "Basis Mitternacht",
+        "feature_name": "Schrift Regenblau",
+    },
+    "bubbles": {
+        "label": "Bubbles: rings floating upward",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "bubbles",
+        "base_color": "#04212b",
+        "feature_color": "#8ff0e8",
+        "base_name": "Basis Tiefsee",
+        "feature_name": "Schrift Aqua",
+    },
+    "radiate": {
+        "label": "Radiate: bars fanning from one point",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "radiate",
+        "decor_keepout": True,
+        "base_color": "#1b1020",
+        "feature_color": "#ffb3f0",
+        "base_name": "Basis Nachtviolett",
+        "feature_name": "Schrift Rosa",
+    },
+    "sunset": {
+        "label": "Sunset: bars thinning towards the top",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "sunset",
+        "decor_keepout": True,
+        "base_color": "#2a0f2e",
+        "feature_color": "#ff9e58",
+        "base_name": "Basis Beere",
+        "feature_name": "Schrift Orange",
+    },
+    "perspective": {
+        "label": "Perspective: grid converging on a vanishing point",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "perspective",
+        "decor_keepout": True,
+        "base_color": "#0d0f14",
+        "feature_color": "#b6c2ff",
+        "base_name": "Basis Nacht",
+        "feature_name": "Schrift Lavendel",
+    },
+    "braille": {
+        "label": "Braille: engraved dot cells you can feel",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "braille",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#1d1d1f",
+        "feature_color": "#f5f5f7",
+        "base_name": "Basis Anthrazit",
+        "feature_name": "Schrift Weiss",
+    },
+    "blocks": {
+        "label": "Blocks: coarse random rectangles",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "blocks",
+        "decor_keepout": True,
+        "base_color": "#101010",
+        "feature_color": "#7ef9a2",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Neongruen",
+    },
+    "relief": {
+        "label": "Relief: the whole text block raised a second step",
+        "frame": "band",
+        "qr": "recess",
+        "emboss": "text",
+        "base_color": "#151515",
+        "feature_color": "#ececec",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "deepqr": {
+        "label": "Deep QR: modules cut through the panel and into the base",
+        "frame": "band",
+        "qr": "deep",
+        "base_color": "#101010",
+        "feature_color": "#f0f0f0",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "dotmatrix": {
+        "label": "Dot matrix: every QR module is a raised disc",
+        "frame": "none",
+        "qr": "relief",
+        "qr_shape": "dot",
+        "base_color": "#f7f7f5",
+        "feature_color": "#101010",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "softqr": {
+        "label": "Soft QR: rounded modules, gentler on the eye",
+        "frame": "band",
+        "qr": "relief",
+        "qr_shape": "round",
+        "base_color": "#f7f2ea",
+        "feature_color": "#3b2f2f",
+        "base_name": "Basis Creme",
+        "feature_name": "Schrift Espresso",
+    },
+    "viewfinder": {
+        "label": "Viewfinder: corner brackets around the code",
+        "frame": "none",
+        "qr": "framed",
+        "base_color": "#0e0e0e",
+        "feature_color": "#ffd166",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Amber",
+    },
+    "embossqr": {
+        "label": "Emboss QR: raised modules standing off the base",
+        "frame": "none",
+        "qr": "relief",
+        "emboss": "qr",
+        "base_color": "#f2f2f2",
+        "feature_color": "#1b1b1b",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "stencil": {
+        "label": "Stencil: text knocked out of a full bleed slab",
+        "frame": "none",
+        "qr": "recess",
+        "plate": True,
+        "base_color": "#141414",
+        "feature_color": "#f2f2f2",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "shadow": {
+        "label": "Shadow: text over its own offset ghost",
+        "frame": "none",
+        "qr": "recess",
+        "emboss": "text",
+        "shadow": True,
+        "base_color": "#101010",
+        "feature_color": "#ff5252",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Rot",
+    },
+    "poster": {
+        "label": "Poster: everything centred on the left half",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "centered",
+        "base_color": "#111318",
+        "feature_color": "#f4f1ea",
+        "base_name": "Basis Nacht",
+        "feature_name": "Schrift Bone",
+    },
+    "signet": {
+        "label": "Signet: an embossed monogram next to the links",
+        "frame": "band",
+        "qr": "recess",
+        "qr_shape": "round",
+        "layout": "monogram",
+        "emboss": "text",
+        "base_color": "#12212b",
+        "feature_color": "#e8c88c",
+        "base_name": "Basis Petrol",
+        "feature_name": "Schrift Gold",
+    },
+    "spine": {
+        "label": "Spine: the name set vertically along the edge",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "vertical",
+        "base_color": "#161616",
+        "feature_color": "#7fd1ff",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Himmel",
+    },
+    "hollow": {
+        "label": "Hollow: outlined letters, less filament, sharper edge",
+        "frame": "band",
+        "qr": "recess",
+        "layout": "outline",
+        "base_color": "#1a1a1a",
+        "feature_color": "#f0e6d2",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Leinen",
+    },
+    "board": {
+        "label": "Board: departure board caps",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "ticker",
+        "emboss": "text",
+        "base_color": "#0a0a0a",
+        "feature_color": "#ffcc33",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Bernstein",
+    },
+    "groove": {
+        "label": "Groove: hatching engraved into the base",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "hatch",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#1e1e22",
+        "feature_color": "#f5f5f5",
+        "base_name": "Basis Graphit",
+        "feature_name": "Schrift Weiss",
+    },
+    "valley": {
+        "label": "Valley: contour rings engraved, not raised",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "topo",
+        "decor_mode": "engrave",
+        "base_color": "#16232b",
+        "feature_color": "#e6d5b8",
+        "base_name": "Basis Schiefer",
+        "feature_name": "Schrift Sand",
+    },
+    "carved": {
+        "label": "Carved: labyrinth grooves under the text",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "maze",
+        "decor_mode": "engrave",
+        "base_color": "#241a12",
+        "feature_color": "#e8c9a0",
+        "base_name": "Basis Nussbaum",
+        "feature_name": "Schrift Sand",
+    },
+    "tide": {
+        "label": "Tide: engraved ribbons along the bottom",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "wave",
+        "decor_mode": "engrave",
+        "base_color": "#06212e",
+        "feature_color": "#a8e6f0",
+        "base_name": "Basis Tiefblau",
+        "feature_name": "Schrift Eis",
+    },
+    "millimeter": {
+        "label": "Millimeter: engraved 5 mm paper grid",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "graph",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#f0efe9",
+        "feature_color": "#26343d",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Schiefer",
+    },
+    "comb": {
+        "label": "Comb: engraved honeycomb, matte inside the cells",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "hex",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#1b1b1b",
+        "feature_color": "#e0b354",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gold",
+    },
+    "dune": {
+        "label": "Dune: engraved ridges with an embossed name",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "mountains",
+        "decor_mode": "engrave",
+        "emboss": "text",
+        "base_color": "#241c12",
+        "feature_color": "#f0dcb4",
+        "base_name": "Basis Sandstein",
+        "feature_name": "Schrift Sand",
+    },
+    "skyline": {
+        "label": "Skyline: raised city with an embossed name",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "city",
+        "emboss": "text",
+        "base_color": "#05070d",
+        "feature_color": "#f2f2f2",
+        "base_name": "Basis Nachtschwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "crest": {
+        "label": "Crest: embossed Bauhaus primitives",
+        "frame": "none",
+        "qr": "relief",
+        "layout": "bauhaus",
+        "decor": "bauhaus",
+        "emboss": "decor",
+        "base_color": "#f0ebe1",
+        "feature_color": "#1f4b99",
+        "base_name": "Basis Creme",
+        "feature_name": "Schrift Blau",
+    },
+    "waffle": {
+        "label": "Waffle: embossed lattice you can feel",
+        "frame": "double",
+        "qr": "recess",
+        "decor": "lattice",
+        "decor_keepout": True,
+        "emboss": "decor",
+        "base_color": "#122626",
+        "feature_color": "#e0b354",
+        "base_name": "Basis Petrol",
+        "feature_name": "Schrift Gold",
+    },
+    "pinstripe": {
+        "label": "Pinstripe: engraved hairlines under a raised name",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "moire",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "emboss": "text",
+        "base_color": "#101014",
+        "feature_color": "#dcdce4",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Silber",
+    },
+    "weathered": {
+        "label": "Weathered: engraved terrazzo chips",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "terrazzo",
+        "decor_mode": "engrave",
+        "base_color": "#efe9dd",
+        "feature_color": "#4a5a4a",
+        "base_name": "Basis Kalk",
+        "feature_name": "Schrift Moos",
+    },
+    "frost": {
+        "label": "Frost: engraved starfield, raised text",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "starfield",
+        "decor_mode": "engrave",
+        "emboss": "text",
+        "base_color": "#0a1020",
+        "feature_color": "#e8f0ff",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Frost",
+    },
+    "bark": {
+        "label": "Bark: engraved chevrons, warm palette",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "chevron",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#2b1d12",
+        "feature_color": "#e3b98a",
+        "base_name": "Basis Rinde",
+        "feature_name": "Schrift Holz",
+    },
+    "dotwork": {
+        "label": "Dotwork: engraved polka grid",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "polka",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#f6f1f4",
+        "feature_color": "#5b2a4a",
+        "base_name": "Basis Rose",
+        "feature_name": "Schrift Beere",
+    },
+    "tread": {
+        "label": "Tread: hazard stripes embossed like a step edge",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "hazard",
+        "emboss": "decor",
+        "base_color": "#131313",
+        "feature_color": "#f2c200",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gelb",
+    },
+    "circuitry": {
+        "label": "Circuitry: PCB traces raised a second step",
+        "frame": "double",
+        "qr": "framed",
+        "decor": "circuit",
+        "emboss": "decor",
+        "base_color": "#0b3d2e",
+        "feature_color": "#d9b45b",
+        "base_name": "Basis Platinengruen",
+        "feature_name": "Schrift Gold",
+    },
+    "weave": {
+        "label": "Weave: carbon bundles engraved into the base",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "carbon",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#1b1b1d",
+        "feature_color": "#c8ccd2",
+        "base_name": "Basis Graphit",
+        "feature_name": "Schrift Silber",
+    },
+    "nightsky": {
+        "label": "Nightsky: raised stars, rounded QR",
+        "frame": "none",
+        "qr": "recess",
+        "qr_shape": "round",
+        "decor": "starfield",
+        "emboss": "decor",
+        "base_color": "#060a1a",
+        "feature_color": "#ffffff",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Weiss",
+    },
+    "mosaic": {
+        "label": "Mosaic: engraved checker fading left",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "checker",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#f2f2f2",
+        "feature_color": "#1b1b1b",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "rainstorm": {
+        "label": "Rainstorm: engraved rain over a raised name",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "rain",
+        "decor_mode": "engrave",
+        "emboss": "text",
+        "base_color": "#0b1220",
+        "feature_color": "#cfe3ff",
+        "base_name": "Basis Mitternacht",
+        "feature_name": "Schrift Eisblau",
+    },
+    "coral": {
+        "label": "Coral: engraved scales, warm on warm",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "scales",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#2b1414",
+        "feature_color": "#ff8f7a",
+        "base_name": "Basis Bordeaux",
+        "feature_name": "Schrift Koralle",
+    },
+    "plateau": {
+        "label": "Plateau: knocked out slab with dotted QR",
+        "frame": "none",
+        "qr": "recess",
+        "qr_shape": "dot",
+        "plate": True,
+        "base_color": "#0f0f0f",
+        "feature_color": "#f6f6f6",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "ghost": {
+        "label": "Ghost: outlined name over its own shadow",
+        "frame": "none",
+        "qr": "recess",
+        "emboss": "text",
+        "shadow": True,
+        "base_color": "#1a1a1a",
+        "feature_color": "#9be7c4",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Mint",
+    },
+    "depth": {
+        "label": "Depth: engraved grid, raised text, deep QR",
+        "frame": "none",
+        "qr": "deep",
+        "decor": "graph",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "emboss": "text",
+        "base_color": "#12161a",
+        "feature_color": "#e9eef2",
+        "base_name": "Basis Schiefer",
+        "feature_name": "Schrift Weiss",
+    },
+    "totem": {
+        "label": "Totem: vertical name, engraved lattice",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "vertical",
+        "decor": "lattice",
+        "decor_keepout": True,
+        "decor_mode": "engrave",
+        "base_color": "#161a12",
+        "feature_color": "#d8e07a",
+        "base_name": "Basis Waldnacht",
+        "feature_name": "Schrift Limette",
+    },
 }
 DEFAULT_STYLE = "classic"
 
@@ -602,12 +1203,22 @@ def icon_github(cx, cy, r=1.8):
 
 
 # ---------------------------------------------------------------- QR
-def qr_dark_modules():
+def qr_matrix():
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,
                        border=0, box_size=1)
     qr.add_data(QR_DATA)
     qr.make(fit=True)
-    m = qr.get_matrix()
+    return qr.get_matrix()
+
+
+def qr_dark_modules(shape="square"):
+    """Dark modules as one polygon.
+
+    shape: "square" is the plain grid, "round" softens the corners and "dot"
+    turns every module into a disc. Rounded and dotted modules stay above the
+    contrast a decoder needs, which the test suite checks for every style.
+    """
+    m = qr_matrix()
     n = len(m)
     mod = QR_SIZE / n
     x0 = QR_CENTER[0] - QR_SIZE / 2
@@ -620,9 +1231,31 @@ def qr_dark_modules():
                 # row 0 is top of the QR -> highest y
                 cx0 = x0 + col * mod
                 cy0 = y0 + (n - 1 - row) * mod
-                cells.append(box(cx0 - eps, cy0 - eps, cx0 + mod + eps, cy0 + mod + eps))
-    print(f"QR: version {qr.version}, {n}x{n} modules, module {mod:.2f} mm")
-    return unary_union(cells)
+                if shape == "dot":
+                    cells.append(Point(cx0 + mod / 2, cy0 + mod / 2)
+                                 .buffer(mod * 0.56, 16))
+                else:
+                    cells.append(box(cx0 - eps, cy0 - eps,
+                                     cx0 + mod + eps, cy0 + mod + eps))
+    union = unary_union(cells)
+    if shape == "round":
+        r = mod * 0.22
+        union = union.buffer(-r).buffer(r * 2).buffer(-r)
+    return union
+
+
+def qr_finder_frame():
+    """Corner brackets around the QR panel, like a viewfinder."""
+    x0, y0, x1, y1 = PANEL
+    arm, w = 5.0, 0.7
+    marks = []
+    for cx, sx in ((x0 + 0.4, 1), (x1 - 0.4, -1)):
+        for cy, sy in ((y0 + 0.4, 1), (y1 - 0.4, -1)):
+            marks.append(box(min(cx, cx + sx * arm), min(cy, cy + sy * w),
+                             max(cx, cx + sx * arm), max(cy, cy + sy * w)))
+            marks.append(box(min(cx, cx + sx * w), min(cy, cy + sy * arm),
+                             max(cx, cx + sx * w), max(cy, cy + sy * arm)))
+    return unary_union(marks)
 
 
 # ---------------------------------------------------------------- build 2D layout
@@ -651,6 +1284,62 @@ ROWS = [
 def build_content(layout):
     """Name, tagline and contact rows as one polygon, per layout variant."""
     parts = []
+    if layout == "centered":
+        for txt, em, y, fp in (("Alperen Adatepe", 5.4, 33.0, FONT_BOLD),
+                               ("Creating powerful digital experiences", 2.8, 28.5, FONT),
+                               ("through modern solutions.", 2.8, 25.0, FONT)):
+            shape = text_shape(txt, em, fp)
+            b = shape.bounds
+            parts.append(shp_translate(shape, 25.0 - (b[0] + b[2]) / 2, y))
+        for i, (_, label, _) in enumerate(ROWS):
+            shape = text_shape(label, 2.9, FONT)
+            b = shape.bounds
+            parts.append(shp_translate(shape, 25.0 - (b[0] + b[2]) / 2, 18.0 - i * 4.0))
+        return unary_union(parts).buffer(0)
+
+    if layout == "monogram":
+        parts.append(place_text("AA", 15.0, 4.0, 16.0, FONT_BOLD))
+        parts.append(place_text("Alperen Adatepe", 3.4, 4.5, 10.0, FONT_BOLD))
+        for i, (_, label, _) in enumerate(ROWS):
+            parts.append(place_text(label, 2.6, 27.5, 16.0 + i * 3.6))
+        return unary_union(parts).buffer(0)
+
+    if layout == "vertical":
+        from shapely.affinity import rotate
+
+        name = rotate(text_shape("ALPEREN ADATEPE", 3.4, FONT_BOLD), 90, origin=(0, 0))
+        b = name.bounds
+        parts.append(shp_translate(name, 8.0 - b[0], 4.0 - b[1]))
+        parts.append(place_text("Creating powerful digital", 2.8, 13.0, 33.0))
+        parts.append(place_text("experiences through", 2.8, 13.0, 29.4))
+        parts.append(place_text("modern solutions.", 2.8, 13.0, 25.8))
+        for i, (icon_fn, label, _) in enumerate(ROWS):
+            y = 19.0 - i * 4.4
+            parts.append(icon_fn(15.0, y + 1.1))
+            parts.append(place_text(label, 2.9, 18.4, y))
+        return unary_union(parts).buffer(0)
+
+    if layout == "outline":
+        # letters as hollow rings: less filament, and a sharper tactile edge
+        solid = [place_text("Alperen Adatepe", 5.0, 5.0, 34.5, FONT_BOLD)]
+        rings = unary_union(solid).buffer(0)
+        parts.append(rings.difference(rings.buffer(-0.45)))
+        parts.append(place_text("Creating powerful digital experiences", 3.0, 5.5, 30.0))
+        parts.append(place_text("through modern solutions.", 3.0, 5.5, 26.2))
+        for icon_fn, label, y in ROWS:
+            parts.append(icon_fn(7.3, y + 1.1))
+            parts.append(place_text(label, 3.1, 10.6, y))
+        return unary_union(parts).buffer(0)
+
+    if layout == "ticker":
+        # one long line per row, like a departure board
+        parts.append(place_text("ALPEREN  ADATEPE", 5.2, 4.5, 35.0, FONT_BOLD))
+        parts.append(place_text("DIGITAL  EXPERIENCES", 2.3, 4.5, 30.8))
+        parts.append(place_text("MODERN  SOLUTIONS", 2.3, 4.5, 27.0))
+        for i, (_, label, _) in enumerate(ROWS):
+            parts.append(place_text(label.upper(), 2.3, 4.5, 22.0 - i * 4.4, FONT_BOLD))
+        return unary_union(parts).buffer(0)
+
     if layout == "bauhaus":
         # same oversized name, but the contact block clears the quarter disc
         parts.append(place_text("ALPEREN", 7.6, 4.5, 32.0, FONT_BOLD))
@@ -1209,6 +1898,174 @@ def decor_mesh(base):
     return _all(edges, base, 1.4)
 
 
+def decor_scales(base):
+    """Fish scales: overlapping arcs on a staggered grid."""
+    arcs = []
+    for row, y in enumerate(np.arange(2.0, CARD_H + 3.0, 2.4)):
+        for x in np.arange(1.0 + (1.8 if row % 2 else 0.0), CARD_W + 4.0, 3.6):
+            disc = Point(x, y).buffer(2.0, 40)
+            arcs.append(disc.difference(disc.buffer(-0.42)).intersection(
+                box(x - 2.2, y - 2.2, x + 2.2, y)))
+    return _all(arcs, base)
+
+
+def decor_squares(base):
+    """Concentric squares, like a ripple in a pond with corners."""
+    rings = []
+    for r in np.arange(2.0, 46.0, 3.2):
+        sq = box(20.0 - r, 22.5 - r, 20.0 + r, 22.5 + r)
+        rings.append(sq.difference(sq.buffer(-0.5)))
+    return _all(rings, base)
+
+
+def decor_tri(base):
+    """Triangle tessellation."""
+    from shapely.geometry import LineString
+
+    lines = []
+    step = 5.0
+    for y in np.arange(0.0, CARD_H + step, step):
+        lines.append(box(0, y, CARD_W, y + 0.4))
+    for x in np.arange(-CARD_H, CARD_W + CARD_H, step):
+        lines.append(LineString([(x, 0), (x + CARD_H, CARD_H)]).buffer(0.2, cap_style=2))
+        lines.append(LineString([(x, 0), (x - CARD_H, CARD_H)]).buffer(0.2, cap_style=2))
+    return _all(lines, base, 1.4)
+
+
+def decor_arrows(base):
+    """Rows of small arrows pointing at the QR panel."""
+    marks = []
+    for y in np.arange(3.0, CARD_H - 1.0, 4.0):
+        for x in np.arange(3.0, CARD_W - 2.0, 4.5):
+            marks.append(Polygon([(x, y - 1.1), (x + 2.0, y), (x, y + 1.1),
+                                  (x + 0.5, y)]))
+    return _all(marks, base)
+
+
+def decor_crosses(base):
+    """Scattered X marks."""
+    from shapely.geometry import LineString
+
+    rng = np.random.default_rng(53)
+    marks = []
+    for x in np.arange(3.0, CARD_W - 1.0, 4.0):
+        for y in np.arange(3.0, CARD_H - 1.0, 4.0):
+            r = float(rng.uniform(0.7, 1.4))
+            marks.append(LineString([(x - r, y - r), (x + r, y + r)]).buffer(0.24, cap_style=2))
+            marks.append(LineString([(x - r, y + r), (x + r, y - r)]).buffer(0.24, cap_style=2))
+    return _all(marks, base)
+
+
+def decor_zebra(base):
+    """Vertical bands warped by a slow sine, like brushed stripes."""
+    bands = []
+    ys = np.linspace(0, CARD_H, 90)
+    for x in np.arange(1.0, CARD_W + 2.0, 3.4):
+        left = x + 1.6 * np.sin(ys / 7.0 + x / 9.0)
+        pts = [(lx, y) for lx, y in zip(left, ys)]
+        pts += [(lx + 1.4, y) for lx, y in zip(left[::-1], ys[::-1])]
+        bands.append(Polygon(pts))
+    return _all(bands, base)
+
+
+def decor_bamboo(base):
+    """Vertical rods with nodes."""
+    rods = []
+    for x in np.arange(3.0, CARD_W - 1.0, 5.0):
+        rods.append(box(x, 2.0, x + 1.0, CARD_H - 2.0))
+        for y in np.arange(4.0, CARD_H - 2.0, 6.0):
+            rods.append(box(x - 0.6, y, x + 1.6, y + 0.6))
+    return _all(rods, base)
+
+
+def decor_rain(base):
+    """Diagonal dashes, like rain on a window."""
+    from shapely.geometry import LineString
+
+    rng = np.random.default_rng(61)
+    drops = []
+    for _ in range(150):
+        x, y = rng.uniform(1, CARD_W - 1), rng.uniform(1, CARD_H - 1)
+        length = float(rng.uniform(1.4, 3.2))
+        drops.append(LineString([(x, y), (x + length * 0.4, y - length)])
+                     .buffer(0.22, cap_style=2))
+    return _all(drops, base)
+
+
+def decor_bubbles(base):
+    """Rings of mixed radius, floating upward."""
+    rng = np.random.default_rng(67)
+    rings = []
+    for _ in range(60):
+        x, y = rng.uniform(2, CARD_W - 2), rng.uniform(2, CARD_H - 2)
+        r = float(rng.uniform(0.9, 3.4))
+        disc = Point(x, y).buffer(r, 40)
+        rings.append(disc.difference(disc.buffer(-0.42)))
+    return _all(rings, base)
+
+
+def decor_radiate(base):
+    """Bars radiating from a point, longer where there is room."""
+    from shapely.affinity import rotate
+
+    bars = []
+    for i, a in enumerate(np.linspace(0, 360, 48, endpoint=False)):
+        length = 6.0 + 5.0 * abs(np.sin(i * 1.7))
+        bar = box(3.0, -0.35, 3.0 + length, 0.35)
+        bars.append(rotate(shp_translate(bar, 24.0, 22.5), a, origin=(24.0, 22.5)))
+    return _all(bars, base)
+
+
+def decor_sunset(base):
+    """Horizontal bars thinning out towards the top, a printed gradient."""
+    bars, y, gap = [], 2.0, 0.6
+    height = 2.2
+    while y < CARD_H - 2.0:
+        bars.append(box(0, y, CARD_W, y + height))
+        y += height + gap
+        height = max(0.45, height * 0.82)
+    return _all(bars, base)
+
+
+def decor_perspective(base):
+    """Grid lines converging on a vanishing point."""
+    from shapely.geometry import LineString
+
+    lines = []
+    vp = (40.0, 24.0)
+    for x in np.arange(-30.0, CARD_W + 30.0, 6.0):
+        lines.append(LineString([(x, -2.0), vp]).buffer(0.22, cap_style=2))
+    for k in range(1, 12):
+        y = 2.0 + (vp[1] - 2.0) * (1 - 0.78 ** k)
+        lines.append(box(0, y, CARD_W, y + 0.4))
+    return _all(lines, base, 1.4)
+
+
+def decor_braille(base):
+    """Dot pairs on a braille cell grid: the most tactile texture here."""
+    rng = np.random.default_rng(71)
+    dots = []
+    for x in np.arange(3.0, CARD_W - 2.0, 4.2):
+        for y in np.arange(3.0, CARD_H - 2.0, 5.4):
+            for dx in (0.0, 1.6):
+                for dy in (0.0, 1.6, 3.2):
+                    if rng.random() < 0.55:
+                        dots.append(Point(x + dx, y + dy).buffer(0.55, 20))
+    return _all(dots, base)
+
+
+def decor_blocks(base):
+    """Random rectangles on a coarse grid, like a QR that lost its mind."""
+    rng = np.random.default_rng(73)
+    cells = []
+    for x in np.arange(2.0, CARD_W - 1.0, 2.6):
+        for y in np.arange(2.0, CARD_H - 1.0, 2.6):
+            if rng.random() < 0.45:
+                w = 2.2 * float(rng.choice([1, 1, 2]))
+                cells.append(box(x, y, x + w, y + 2.2))
+    return _all(cells, base)
+
+
 def despeckle(geom, min_area=0.4, min_half_width=0.15):
     """Drop crumbs left behind when decor is carved around text.
 
@@ -1264,48 +2121,115 @@ DECOR = {
     "knit": decor_knit,
     "lattice": decor_lattice,
     "mesh": decor_mesh,
+    "scales": decor_scales,
+    "squares": decor_squares,
+    "tri": decor_tri,
+    "arrows": decor_arrows,
+    "crosses": decor_crosses,
+    "zebra": decor_zebra,
+    "bamboo": decor_bamboo,
+    "rain": decor_rain,
+    "bubbles": decor_bubbles,
+    "radiate": decor_radiate,
+    "sunset": decor_sunset,
+    "perspective": decor_perspective,
+    "braille": decor_braille,
+    "blocks": decor_blocks,
 }
 
 
+# QR modes. "recess" cuts the dark modules out of a light panel, "relief"
+# raises them with no panel (only readable on a light base), "deep" also sinks
+# them into the base, "framed" adds corner brackets. The module outline itself
+# is a separate axis: qr_shape is "square", "round" or "dot".
+PANEL_MODES = {"recess", "deep", "framed"}
+RELIEF_MODES = {"relief"}
+
+
+def _clean(geom, base):
+    """Trim to the card, drop T-vertices and point contacts, then heal."""
+    geom = geom.intersection(base).simplify(0.005).buffer(0)
+    # the close-then-open pass below fixes point contacts but re-inserts a lot
+    # of near collinear vertices; simplifying again keeps the meshes small
+    return geom.buffer(0.01).buffer(-0.01).buffer(0).simplify(0.002).buffer(0)
+
+
 def build_shapes(style=DEFAULT_STYLE):
-    """2D layout for a style: returns (base polygon, feature polygon)."""
+    """Resolve a style into the four 2D layers of a Card."""
     st = STYLES[style] if isinstance(style, str) else style
+    qr_mode = st["qr"]
     base = box(CORNER_R, CORNER_R, CARD_W - CORNER_R, CARD_H - CORNER_R).buffer(CORNER_R, 32)
     panel = box(*PANEL)
 
-    white = [build_frame(base, st["frame"], st["qr"])]
-    if st["qr"] == "recess":
-        white.append(panel)
-
+    frame = build_frame(base, st["frame"], "recess" if qr_mode in PANEL_MODES else "relief")
     content = build_content(st.get("layout", "default"))
+    modules = qr_dark_modules(st.get("qr_shape", "square"))
 
-    white.append(content)
-
+    texture = Polygon()
     if st.get("decor"):
         texture = DECOR[st["decor"]](base)
-        # keep the texture clear of text and of the QR quiet zone
+        # keep the texture clear of the text and of the QR quiet zone
         texture = texture.difference(content.buffer(1.4)).difference(panel.buffer(1.2))
         if st.get("decor_keepout"):
             # dense patterns get a clean rectangle around the whole text block
             texture = texture.difference(content.envelope.buffer(1.6))
         texture = despeckle(texture)
-        white.append(texture)
 
-    modules = qr_dark_modules()
-    white_union = unary_union(white).buffer(0)
-    if st["qr"] == "recess":
-        white_union = white_union.difference(modules).buffer(0)
+    engraved = st.get("decor_mode") == "engrave"
+    feature = [frame]
+    if not engraved:
+        feature.append(texture)
+
+    if st.get("plate"):
+        # full bleed slab with the text knocked out of it
+        feature.append(base.buffer(-FRAME_OUT).difference(content.buffer(0.0)))
     else:
-        white_union = unary_union([white_union, modules]).buffer(0)
-    # keep everything on the card
-    white_union = white_union.intersection(base)
-    # drop collinear T-vertices left over from module-grid unions; 5 µm tolerance
-    # is invisible but required for watertight extrusion
-    white_union = white_union.simplify(0.005).buffer(0)
-    # close-then-open by 10 um: removes point-touching contacts between decor
-    # and frame, which shapely accepts but extrusion cannot make watertight
-    white_union = white_union.buffer(0.01).buffer(-0.01).buffer(0)
-    return base, white_union
+        if st.get("shadow"):
+            # only the name casts the ghost; doubling the small type is mush
+            name = content.intersection(box(0, 33.0, CARD_W, CARD_H))
+            feature.append(shp_translate(name, 0.6, -0.6))
+        feature.append(content)
+
+    if qr_mode in PANEL_MODES:
+        feature.append(panel)
+    if qr_mode == "framed":
+        feature.append(qr_finder_frame())
+
+    feature = unary_union(feature).buffer(0)
+    if qr_mode in PANEL_MODES:
+        feature = feature.difference(modules).buffer(0)
+    else:
+        feature = unary_union([feature, modules]).buffer(0)
+    feature = _clean(feature, base)
+
+    # engrave layer: grooves cut into the top of the base
+    engrave = []
+    if engraved:
+        engrave.append(texture)
+    if qr_mode == "deep":
+        engrave.append(modules.intersection(panel))
+    if engrave:
+        engrave = _clean(unary_union(engrave).buffer(0), base.buffer(-0.8))
+        # the grooves are subtracted from the base, so the same crumb and point
+        # contact cleanup applies here, otherwise the split base is not solid
+        engrave = despeckle(engrave.difference(feature.buffer(0.25)).buffer(0), 0.4, 0.12)
+        engrave = engrave.simplify(0.005).buffer(0.01).buffer(-0.01).buffer(0)
+    else:
+        engrave = Polygon()
+
+    # high layer: whatever the style wants to feel raised under a thumb
+    emboss = st.get("emboss")
+    high = {
+        None: Polygon(),
+        "text": content,
+        "frame": frame,
+        "panel": panel,
+        "decor": texture if not engraved else Polygon(),
+        "qr": modules if qr_mode in RELIEF_MODES else Polygon(),
+    }[emboss]
+    high = _clean(high.intersection(feature), base) if not high.is_empty else Polygon()
+
+    return Card(base, engrave, feature, high)
 
 
 # ---------------------------------------------------------------- 3D + export
@@ -1406,7 +2330,37 @@ def write_3mf(path, parts):
         z.writestr("Metadata/model_settings.config", model_settings)
 
 
-def preview(base, white, path, style=DEFAULT_STYLE):
+def card_meshes(card):
+    """Two printable parts: the base filament and the feature filament.
+
+    A style with an engrave layer splits the base into two stacked solids, so
+    the grooves are real geometry instead of a texture. A style with a high
+    layer stacks a second solid on the features. Both stay inside their own
+    filament, so the print is still one color change.
+    """
+    if card.engrave.is_empty:
+        base_mesh = extrude(card.base, BASE_Z, 0.0)
+    else:
+        lower = extrude(card.base, BASE_Z - ENGRAVE_Z, 0.0)
+        upper = extrude(card.base.difference(card.engrave), ENGRAVE_Z, BASE_Z - ENGRAVE_Z)
+        base_mesh = trimesh.util.concatenate([lower, upper])
+
+    feature_mesh = extrude(card.feature, TOP_Z, BASE_Z)
+    if not card.high.is_empty:
+        feature_mesh = trimesh.util.concatenate(
+            [feature_mesh, extrude(card.high, HIGH_Z, BASE_Z + TOP_Z)])
+    return base_mesh, feature_mesh
+
+
+def _shade(hex_color, amount):
+    """Blend a hex color towards white (amount > 0) or black (amount < 0)."""
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (1, 3, 5))
+    target = 255 if amount > 0 else 0
+    f = abs(amount)
+    return "#%02x%02x%02x" % tuple(int(c + (target - c) * f) for c in (r, g, b))
+
+
+def preview(card, path, style=DEFAULT_STYLE):
     import matplotlib.pyplot as plt
     from matplotlib.patches import PathPatch
     from matplotlib.path import Path as MplPath
@@ -1425,33 +2379,38 @@ def preview(base, white, path, style=DEFAULT_STYLE):
     st = STYLES[style] if isinstance(style, str) else style
     fig, ax = plt.subplots(figsize=(10, 6.5))
     fig.patch.set_facecolor("#3a3a3a")
-    patch(base, facecolor=st["base_color"], edgecolor="none")
-    patch(white, facecolor=st["feature_color"], edgecolor="none")
+    patch(card.base, facecolor=st["base_color"], edgecolor="none")
+    if not card.engrave.is_empty:
+        # grooves read as a darker shade of the base filament
+        patch(card.engrave, facecolor=_shade(st["base_color"], -0.55), edgecolor="none")
+    patch(card.feature, facecolor=st["feature_color"], edgecolor="none")
+    if not card.high.is_empty:
+        # embossed geometry catches more light than the rest of the feature
+        patch(shp_translate(card.high, 0.25, -0.25),
+              facecolor=_shade(st["feature_color"], -0.35), edgecolor="none")
+        patch(card.high, facecolor=_shade(st["feature_color"], 0.35), edgecolor="none")
     ax.set_xlim(-3, CARD_W + 3)
     ax.set_ylim(-3, CARD_H + 3)
     ax.set_aspect("equal")
     ax.axis("off")
-    fig.savefig(path, dpi=200, bbox_inches="tight", facecolor="#3a3a3a")
+    fig.savefig(path, dpi=160, bbox_inches="tight", facecolor="#3a3a3a")
     plt.close(fig)
 
 
 def build_style(style, prefix, preview_path, meshes=True):
     st = STYLES[style]
-    base2d, white2d = build_shapes(style)
+    card = build_shapes(style)
     if meshes:
-        base_mesh = extrude(base2d, BASE_Z, 0.0)
-        white_mesh = extrude(white2d, TOP_Z, BASE_Z)
-        print(f"{style} base: {len(base_mesh.faces)} faces, "
-              f"watertight={base_mesh.is_watertight}")
-        print(f"{style} features: {len(white_mesh.faces)} faces, "
-              f"watertight={white_mesh.is_watertight}")
+        base_mesh, feature_mesh = card_meshes(card)
+        print(f"{style} base: {len(base_mesh.faces)} faces")
+        print(f"{style} features: {len(feature_mesh.faces)} faces")
         base_mesh.export(f"{prefix}_base.stl")
-        white_mesh.export(f"{prefix}_top.stl")
+        feature_mesh.export(f"{prefix}_top.stl")
         write_3mf(
             f"{prefix}.3mf",
-            [(st["base_name"], 1, base_mesh), (st["feature_name"], 2, white_mesh)],
+            [(st["base_name"], 1, base_mesh), (st["feature_name"], 2, feature_mesh)],
         )
-    preview(base2d, white2d, preview_path, style)
+    preview(card, preview_path, style)
     print(f"{style}: {preview_path}")
 
 
@@ -1479,9 +2438,8 @@ def main():
 
     if args.style == DEFAULT_STYLE:
         # keep the historical filenames for the default card
-        base2d, white2d = build_shapes(DEFAULT_STYLE)
-        base_mesh = extrude(base2d, BASE_Z, 0.0)
-        white_mesh = extrude(white2d, TOP_Z, BASE_Z)
+        card = build_shapes(DEFAULT_STYLE)
+        base_mesh, white_mesh = card_meshes(card)
         print(f"base: {len(base_mesh.faces)} faces, watertight={base_mesh.is_watertight}")
         print(f"white: {len(white_mesh.faces)} faces, watertight={white_mesh.is_watertight}")
         base_mesh.export("visitenkarte_base_black.stl")
@@ -1490,7 +2448,7 @@ def main():
             "visitenkarte.3mf",
             [("Basis Schwarz", 1, base_mesh), ("Schrift Weiss", 2, white_mesh)],
         )
-        preview(base2d, white2d, "visitenkarte_preview.png", DEFAULT_STYLE)
+        preview(card, "visitenkarte_preview.png", DEFAULT_STYLE)
     else:
         build_style(args.style, f"visitenkarte_{args.style}",
                     f"visitenkarte_{args.style}_preview.png")

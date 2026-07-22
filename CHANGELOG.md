@@ -30,6 +30,21 @@ and this project adheres to
   glitch, moire, checker, matrix, starfield, snake, brackets, ticket, knit,
   lattice, mesh), bringing the set to 47.
 
+- A depth model: every style resolves into four layers (base, engrave,
+  feature, high). Engraved grooves and embossed features change z only, so a
+  card still prints with a single filament change.
+- Style keys `emboss`, `decor_mode`, `plate`, `shadow`, `qr_shape`, plus QR
+  modes `deep` and `framed`, and five text layouts (`centered`, `monogram`,
+  `vertical`, `outline`, `ticker`).
+- Fifty three more styles, bringing the set to 100, and fourteen more decor
+  builders (scales, squares, tri, arrows, crosses, zebra, bamboo, rain,
+  bubbles, radiate, sunset, perspective, braille, blocks).
+
+### Changed
+
+- `build_shapes` returns a `Card` of four layers instead of two polygons, and
+  `card_meshes` assembles the printable parts from it.
+
 ### Fixed
 
 - Extrusion is watertight when decor touches the frame at a single point: the
