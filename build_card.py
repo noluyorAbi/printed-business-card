@@ -1975,8 +1975,22 @@ def text_shape(s, em, fp=FONT, track=0.0):
     return unary_union(glyphs).buffer(0) if glyphs else Polygon()
 
 
-def place_text(s, em, x, y, fp=FONT, track=0.0):
-    return shp_translate(text_shape(s, em, fp, track), xoff=x, yoff=y)
+def place_text(s, em, x, y, fp=FONT, track=0.0, max_x=None):
+    """Place text, shrinking it if it would run past max_x.
+
+    The card is not built against one machine's font list: Arial exists on
+    macOS, DejaVu Sans stands in elsewhere, and DejaVu is the wider face. A
+    layout tuned to one of them runs into the QR panel on the other, so every
+    line states how much room it has and is fitted to it.
+    """
+    shape = text_shape(s, em, fp, track)
+    if max_x is not None and not shape.is_empty:
+        width = shape.bounds[2] - shape.bounds[0]
+        room = max_x - x
+        if width > room > 0:
+            k = room / width
+            shape = text_shape(s, em * k, fp, track * k)
+    return shp_translate(shape, xoff=x, yoff=y)
 
 
 # ---------------------------------------------------------------- icons
@@ -2328,17 +2342,30 @@ def _code_block(layout):
         if not text:
             continue
         parts.append(place_text(text, EM_CODE, x0, top - i * CODE_LEAD,
-                                FONT_MONO_BOLD if bold else FONT_MONO))
+                                FONT_MONO_BOLD if bold else FONT_MONO,
+                                max_x=TEXT_X1))
     return unary_union(parts).buffer(0)
 
 
 TAGLINE = ("Creating powerful", "digital experiences")
 
 
+NAME_ROOM = CARD_W - EDGE_SAFE      # lines above the panel band may run wide
+
+
 def _centered(txt, em, y, fp=FONT, track=0.0, cx=None):
     shape = text_shape(txt, em, fp, track)
+    centre = TEXT_CX if cx is None else cx
+    # a centred line grows in both directions, so its room is twice the
+    # smaller of the two margins around the centre
+    room = min((TEXT_X1 - TEXT_X0) if y < 40.0 else (NAME_ROOM - TEXT_X0),
+               2 * (centre - MARGIN))
+    width = shape.bounds[2] - shape.bounds[0]
+    if width > room:
+        k = room / width
+        shape = text_shape(txt, em * k, fp, track * k)
     b = shape.bounds
-    return shp_translate(shape, (TEXT_CX if cx is None else cx) - (b[0] + b[2]) / 2, y)
+    return shp_translate(shape, centre - (b[0] + b[2]) / 2, y)
 
 
 def build_content(layout):
@@ -2355,26 +2382,26 @@ def build_content(layout):
     if layout == "devtag":
         # the one glyph every developer reads as "this person writes code"
         parts.append(place_text("</>", 13.0, TEXT_X0, CARD_H - MARGIN - 9.6,
-                                FONT_MONO_BOLD))
+                                FONT_MONO_BOLD, max_x=NAME_ROOM))
         parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, 31.6,
-                                FONT_BOLD, TRACK_NAME))
+                                FONT_BOLD, TRACK_NAME, max_x=TEXT_X1))
         parts.append(place_text("digital experiences", EM_TAG, TEXT_X0, 25.0,
-                                FONT, TRACK_TAG))
+                                FONT, TRACK_TAG, max_x=TEXT_X1))
         for i, (icon_fn, label) in enumerate(ROWS):
             y = 18.2 - i * 5.5
             parts.append(icon_fn(ICON_X, y + ICON_DY))
-            parts.append(place_text(label, EM_ROW * 0.82, LABEL_X, y, FONT, TRACK_ROW))
+            parts.append(place_text(label, EM_ROW * 0.82, LABEL_X, y, FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "manifesto":
         for i, word in enumerate(("BUILD.", "SHIP.", "REPEAT.")):
             parts.append(place_text(word, EM_HERO, TEXT_X0,
                                     CARD_H - MARGIN - EM_HERO - i * EM_HERO * 1.25,
-                                    FONT_BOLD, TRACK_HERO))
+                                    FONT_BOLD, TRACK_HERO, max_x=NAME_ROOM))
         parts.append(place_text("Alperen Adatepe", EM_ROW * 0.9, TEXT_X0, 9.5,
-                                FONT_BOLD, TRACK_ROW))
+                                FONT_BOLD, TRACK_ROW, max_x=TEXT_X1))
         parts.append(place_text("adatepe.dev  in  git", EM_ROW * 0.72, TEXT_X0, 4.6,
-                                FONT, TRACK_ROW))
+                                FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "centered":
@@ -2386,12 +2413,12 @@ def build_content(layout):
         return unary_union(parts).buffer(0)
 
     if layout == "monogram":
-        parts.append(place_text("AA", EM_NAME * 2.7, TEXT_X0, CY - 3.0, FONT_BOLD))
+        parts.append(place_text("AA", EM_NAME * 2.7, TEXT_X0, CY - 3.0, FONT_BOLD, max_x=TEXT_X1))
         parts.append(place_text("Alperen Adatepe", EM_ROW * 0.85, TEXT_X0, MARGIN + 1.0,
-                                FONT_BOLD, TRACK_ROW))
+                                FONT_BOLD, TRACK_ROW, max_x=TEXT_X1))
         for i, (_, label) in enumerate(ROWS):
             parts.append(place_text(label, EM_ROW * 0.66, TEXT_X0 + 22.5,
-                                    CY + 4.0 - i * ROW_LEAD * 0.75, FONT, TRACK_ROW))
+                                    CY + 4.0 - i * ROW_LEAD * 0.75, FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "vertical":
@@ -2404,12 +2431,12 @@ def build_content(layout):
         col = TEXT_X0 + EM_ROW * 2.0
         for i, line in enumerate(TAGLINE):
             parts.append(place_text(line, EM_TAG * 0.85, col, TAG_Y - i * TAG_LEAD,
-                                    FONT, TRACK_TAG))
+                                    FONT, TRACK_TAG, max_x=TEXT_X1))
         for i, (icon_fn, label) in enumerate(ROWS):
             y = row_y(i)
             parts.append(icon_fn(col + ICON_R, y + ICON_DY))
             parts.append(place_text(label, EM_ROW * 0.78, col + 2 * ICON_R + 1.4, y,
-                                    FONT, TRACK_ROW))
+                                    FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "outline":
@@ -2418,23 +2445,23 @@ def build_content(layout):
         solid = shp_translate(solid, TEXT_X0, NAME_Y)
         parts.append(solid.difference(solid.buffer(-EM_NAME * 0.085)))
         for i, line in enumerate(TAGLINE):
-            parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+            parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG, max_x=TEXT_X1))
         for i, (icon_fn, label) in enumerate(ROWS):
             y = row_y(i)
             parts.append(icon_fn(ICON_X, y + ICON_DY))
-            parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW))
+            parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "ticker":
         # one long line per row, like a departure board
         parts.append(place_text("ALPEREN  ADATEPE", EM_NAME * 0.9, TEXT_X0, NAME_Y,
-                                FONT_BOLD, TRACK_NAME))
+                                FONT_BOLD, TRACK_NAME, max_x=NAME_ROOM))
         for i, line in enumerate(TAGLINE):
             parts.append(place_text(line.upper(), EM_TAG * 0.8, TEXT_X0,
-                                    TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+                                    TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG, max_x=TEXT_X1))
         for i, (_, label) in enumerate(ROWS):
             parts.append(place_text(label.upper(), EM_ROW * 0.78, TEXT_X0, row_y(i),
-                                    FONT_BOLD, TRACK_ROW))
+                                    FONT_BOLD, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout in ("bauhaus", "brutal"):
@@ -2442,9 +2469,9 @@ def build_content(layout):
         # underneath. bauhaus indents the block to clear the quarter disc.
         indent = 12.0 if layout == "bauhaus" else 0.0
         parts.append(place_text("ALPEREN", EM_HERO, TEXT_X0, CARD_H - MARGIN - EM_HERO,
-                                FONT_BOLD, TRACK_HERO))
+                                FONT_BOLD, TRACK_HERO, max_x=NAME_ROOM))
         parts.append(place_text("ADATEPE", EM_HERO, TEXT_X0,
-                                CARD_H - MARGIN - EM_HERO * 2.2, FONT_BOLD, TRACK_HERO))
+                                CARD_H - MARGIN - EM_HERO * 2.2, FONT_BOLD, TRACK_HERO, max_x=NAME_ROOM))
         for i, (_, label) in enumerate(ROWS):
             parts.append(place_text(label, EM_ROW * 0.75, TEXT_X0 + indent,
                                     MARGIN + 1.5 + (len(ROWS) - 1 - i) * EM_ROW * 1.25,
@@ -2453,22 +2480,22 @@ def build_content(layout):
 
     if layout == "terminal":
         parts.append(place_text("> Alperen Adatepe", EM_NAME * 0.88, TEXT_X0, NAME_Y,
-                                FONT_BOLD, TRACK_NAME))
+                                FONT_BOLD, TRACK_NAME, max_x=NAME_ROOM))
         for i, line in enumerate(TAGLINE):
             parts.append(place_text(f"# {line.lower()}", EM_SMALL, TEXT_X0,
-                                    TAG_Y - i * TAG_LEAD, FONT, TRACK_SMALL))
+                                    TAG_Y - i * TAG_LEAD, FONT, TRACK_SMALL, max_x=TEXT_X1))
         for i, (_, label) in enumerate(ROWS):
             parts.append(place_text(f"$ open {label}", EM_SMALL, TEXT_X0, row_y(i),
-                                    FONT, TRACK_SMALL))
+                                    FONT, TRACK_SMALL, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
-    parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME))
+    parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME, max_x=NAME_ROOM))
     for i, line in enumerate(TAGLINE):
-        parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+        parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG, max_x=TEXT_X1))
     for i, (icon_fn, label) in enumerate(ROWS):
         y = row_y(i)
         parts.append(icon_fn(ICON_X, y + ICON_DY))
-        parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW))
+        parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW, max_x=TEXT_X1))
     return unary_union(parts).buffer(0)
 
 

@@ -35,7 +35,10 @@ jobs:
         run: pytest -q
 
       - name: Build card
-        run: python build_card.py
+        run: |
+          python build_card.py
+          python build_card.py --corners square
+          python build_card.py --style code39
 
   meta:
     name: meta

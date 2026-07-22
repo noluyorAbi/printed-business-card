@@ -59,6 +59,30 @@ def test_text_stays_inside_the_column():
         assert y0 >= 2.0 and y1 <= build_card.CARD_H - 2.0, name
 
 
+def test_layouts_survive_the_fallback_font():
+    """CI has no Arial and falls back to DejaVu Sans, which is the wider face.
+
+    Every layout has to keep clear of the QR panel on both, otherwise the card
+    only looks right on the machine it was designed on.
+    """
+    from matplotlib.font_manager import FontProperties
+    from shapely.geometry import box
+
+    original = (build_card.FONT, build_card.FONT_BOLD)
+    build_card.FONT = FontProperties(family="DejaVu Sans")
+    build_card.FONT_BOLD = FontProperties(family="DejaVu Sans", weight="bold")
+    try:
+        for name, st in build_card.STYLES.items():
+            content = build_card.build_content(st.get("layout", "default"))
+            panel = box(*build_card.panel_box(st)).buffer(0.8)
+            assert content.intersection(panel).area < 0.01, name
+            x0, y0, x1, y1 = content.bounds
+            assert x0 >= 2.0, name
+            assert y0 >= 2.0 and y1 <= build_card.CARD_H - 2.0, name
+    finally:
+        build_card.FONT, build_card.FONT_BOLD = original
+
+
 def test_printable_feature_sizes():
     """Type and QR modules stay above what a 0.2 mm nozzle holds.
 
