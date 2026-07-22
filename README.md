@@ -19,7 +19,7 @@
 <br>
 <br>
 
-<a href="https://github.com/noluyorAbi/printed-business-card/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-3a3a3a?style=for-the-badge&labelColor=0b0b0b" alt="license: Apache-2.0"></a>
+<a href="https://github.com/noluyorAbi/printed-business-card/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-3a3a3a?style=for-the-badge&labelColor=0b0b0b" alt="license: MIT"></a>
 <a href="https://github.com/noluyorAbi/printed-business-card/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/noluyorAbi/printed-business-card/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=ci&labelColor=0b0b0b" alt="ci"></a>
 
 </div>
@@ -141,11 +141,6 @@ dashes as punctuation.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/lock.svg" width="16" align="center"> License
 
-printed-business-card is open source under the
-[Apache License 2.0](https://github.com/noluyorAbi/printed-business-card/blob/main/LICENSE).
-
-Use it, modify it, ship it, commercially or otherwise. Keep the notices, state
-what you changed, and note that the license comes with an express patent grant
-from every contributor.
+MIT. See [LICENSE](https://github.com/noluyorAbi/printed-business-card/blob/main/LICENSE).
 
 Copyright 2026 Alperen Adatepe.

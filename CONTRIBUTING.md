@@ -29,9 +29,9 @@ new font paths without a fallback.
 
 ## Licensing of contributions
 
-This project is licensed under Apache-2.0. By submitting a pull request you
-agree that your contribution is licensed under Apache-2.0 as described in
-Section 5 of the license. No separate contributor agreement is required.
+This project is licensed under the MIT License. By submitting a pull request
+you agree that your contribution is licensed under the same terms. No separate
+contributor agreement is required.
 
 ## House rules
 
