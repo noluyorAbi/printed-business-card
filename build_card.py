@@ -252,6 +252,295 @@ STYLES = {
         "base_name": "Basis Creme",
         "feature_name": "Schrift Rot",
     },
+    "terrazzo": {
+        "label": "Terrazzo: scattered chips, teal on cream",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "terrazzo",
+        "base_color": "#f6f1e7",
+        "feature_color": "#3a7d6c",
+        "base_name": "Basis Creme",
+        "feature_name": "Schrift Petrol",
+    },
+    "hex": {
+        "label": "Hex: honeycomb outlines, gold on forest",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "hex",
+        "decor_keepout": True,
+        "base_color": "#12261f",
+        "feature_color": "#e7c86a",
+        "base_name": "Basis Dunkelgruen",
+        "feature_name": "Schrift Gold",
+    },
+    "chevron": {
+        "label": "Chevron: zigzag rows, amber on plum",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "chevron",
+        "decor_keepout": True,
+        "base_color": "#2b1b3d",
+        "feature_color": "#ffd166",
+        "base_name": "Basis Pflaume",
+        "feature_name": "Schrift Amber",
+    },
+    "polka": {
+        "label": "Polka: even dot grid, plum on rose",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "polka",
+        "decor_keepout": True,
+        "base_color": "#ffd9e8",
+        "feature_color": "#7a1f4b",
+        "base_name": "Basis Rose",
+        "feature_name": "Schrift Pflaume",
+    },
+    "bullseye": {
+        "label": "Bullseye: concentric rings, red on black",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "bullseye",
+        "decor_keepout": True,
+        "base_color": "#0f0f10",
+        "feature_color": "#ff5252",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Rot",
+    },
+    "sunburst": {
+        "label": "Sunburst: rays from the top left, amber on umber",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "sunburst",
+        "decor_keepout": True,
+        "base_color": "#1b1200",
+        "feature_color": "#ffb703",
+        "base_name": "Basis Umbra",
+        "feature_name": "Schrift Amber",
+    },
+    "mountains": {
+        "label": "Mountains: layered ridges along the bottom",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "mountains",
+        "base_color": "#0e2233",
+        "feature_color": "#9fd0e0",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Eisblau",
+    },
+    "city": {
+        "label": "City: skyline with lit windows",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "city",
+        "base_color": "#06070f",
+        "feature_color": "#f2f2f2",
+        "base_name": "Basis Nachtschwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "waveform": {
+        "label": "Waveform: audio bars along the bottom",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "waveform",
+        "base_color": "#101010",
+        "feature_color": "#00e5ff",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Cyan",
+    },
+    "helix": {
+        "label": "Helix: double strand with rungs",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "helix",
+        "base_color": "#071a2b",
+        "feature_color": "#59d9a4",
+        "base_name": "Basis Tiefblau",
+        "feature_name": "Schrift Mint",
+    },
+    "spiral": {
+        "label": "Spiral: one archimedean coil, slate on bone",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "spiral",
+        "decor_keepout": True,
+        "base_color": "#efeae3",
+        "feature_color": "#21303d",
+        "base_name": "Basis Bone",
+        "feature_name": "Schrift Schiefer",
+    },
+    "hatch": {
+        "label": "Hatch: 45 degree hatching, ink on solar",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "hatch",
+        "decor_keepout": True,
+        "base_color": "#fdf6e3",
+        "feature_color": "#073642",
+        "base_name": "Basis Solar",
+        "feature_name": "Schrift Tinte",
+    },
+    "brick": {
+        "label": "Brick: running bond wall, clay on oxblood",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "brick",
+        "decor_keepout": True,
+        "base_color": "#2a120c",
+        "feature_color": "#d98b5f",
+        "base_name": "Basis Oxblood",
+        "feature_name": "Schrift Ton",
+    },
+    "plus": {
+        "label": "Plus: grid of plus marks, blue on paper",
+        "frame": "band",
+        "qr": "relief",
+        "decor": "plus",
+        "decor_keepout": True,
+        "base_color": "#f5f5f7",
+        "feature_color": "#2b6cb0",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Blau",
+    },
+    "stitch": {
+        "label": "Stitch: dashed seam inside the edge",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "stitch",
+        "base_color": "#163020",
+        "feature_color": "#ede0c8",
+        "base_name": "Basis Waldgruen",
+        "feature_name": "Schrift Leinen",
+    },
+    "tape": {
+        "label": "Tape: two strips across the top corners",
+        "frame": "none",
+        "qr": "relief",
+        "layout": "bauhaus",
+        "decor": "tape",
+        "base_color": "#ece7dd",
+        "feature_color": "#b3452f",
+        "base_name": "Basis Leinen",
+        "feature_name": "Schrift Ziegel",
+    },
+    "glitch": {
+        "label": "Glitch: torn scanline slabs, magenta on ink",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "terminal",
+        "decor": "glitch",
+        "base_color": "#0b0b12",
+        "feature_color": "#ff2e88",
+        "base_name": "Basis Tinte",
+        "feature_name": "Schrift Magenta",
+    },
+    "moire": {
+        "label": "Moire: two grids at a small angle",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "moire",
+        "decor_keepout": True,
+        "base_color": "#101010",
+        "feature_color": "#c0c0c0",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Silber",
+    },
+    "checker": {
+        "label": "Checker: board fading out to the left",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "checker",
+        "decor_keepout": True,
+        "base_color": "#f2f2f2",
+        "feature_color": "#111111",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Schwarz",
+    },
+    "matrix": {
+        "label": "Matrix: digital rain in columns",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "terminal",
+        "decor": "matrix",
+        "base_color": "#030b03",
+        "feature_color": "#22ff88",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gruen",
+    },
+    "starfield": {
+        "label": "Starfield: four pointed stars, denser up top",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "starfield",
+        "base_color": "#060a1a",
+        "feature_color": "#ffffff",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Weiss",
+    },
+    "snake": {
+        "label": "Snake: one serpentine path folding across",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "snake",
+        "decor_keepout": True,
+        "base_color": "#101418",
+        "feature_color": "#ffd166",
+        "base_name": "Basis Schiefer",
+        "feature_name": "Schrift Amber",
+    },
+    "brackets": {
+        "label": "Brackets: camera framing marks in the corners",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "brutal",
+        "decor": "brackets",
+        "base_color": "#0d0d0d",
+        "feature_color": "#f5f5f5",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "ticket": {
+        "label": "Ticket: perforation holes and a tear rule",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "ticket",
+        "base_color": "#f7f3e8",
+        "feature_color": "#8a2b2b",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Bordeaux",
+    },
+    "knit": {
+        "label": "Knit: fair isle rows of V stitches and dots",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "knit",
+        "decor_keepout": True,
+        "base_color": "#33203a",
+        "feature_color": "#f0e4d0",
+        "base_name": "Basis Aubergine",
+        "feature_name": "Schrift Wolle",
+    },
+    "lattice": {
+        "label": "Lattice: square kufic interlock, gold on teal",
+        "frame": "double",
+        "qr": "recess",
+        "decor": "lattice",
+        "decor_keepout": True,
+        "base_color": "#0d2b2b",
+        "feature_color": "#e0b354",
+        "base_name": "Basis Petrol",
+        "feature_name": "Schrift Gold",
+    },
+    "mesh": {
+        "label": "Mesh: low poly triangle net, blue on graphite",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "mesh",
+        "decor_keepout": True,
+        "base_color": "#10131a",
+        "feature_color": "#8ab4f8",
+        "base_name": "Basis Graphit",
+        "feature_name": "Schrift Blau",
+    },
 }
 DEFAULT_STYLE = "classic"
 
@@ -589,6 +878,337 @@ def decor_bauhaus(base):
     return unary_union([ring, quarter, dot, bar]).intersection(base.buffer(-1.2))
 
 
+BOTTOM = (0.0, 1.5, CARD_W, 8.6)   # strip below the contact rows
+
+
+def _band(shapes, base, bounds=BOTTOM):
+    return unary_union(shapes).intersection(box(*bounds)).intersection(base.buffer(-1.0))
+
+
+def _all(shapes, base, inset=1.2):
+    return unary_union(shapes).intersection(base.buffer(-inset))
+
+
+def decor_terrazzo(base):
+    """Scattered chips, like a terrazzo floor."""
+    rng = np.random.default_rng(5)
+    chips = []
+    for _ in range(120):
+        cx, cy = rng.uniform(2, CARD_W - 2), rng.uniform(2, CARD_H - 2)
+        r = rng.uniform(0.45, 1.15)
+        n = int(rng.integers(3, 6))
+        ang = rng.uniform(0, 6.28) + np.linspace(0, 6.28, n, endpoint=False)
+        pts = [(cx + r * np.cos(a), cy + r * np.sin(a) * 0.8) for a in ang]
+        chips.append(Polygon(pts))
+    return _all(chips, base)
+
+
+def decor_hex(base):
+    """Honeycomb outlines on a 5 mm pitch."""
+    cells, r = [], 2.6
+    for row, y in enumerate(np.arange(1.0, CARD_H + 4.0, 3.9)):
+        for x in np.arange(1.0 + (2.25 if row % 2 else 0.0), CARD_W + 4.0, 4.5):
+            hexa = Point(x, y).buffer(r, 6)
+            cells.append(hexa.difference(hexa.buffer(-0.45)))
+    return _all(cells, base)
+
+
+def decor_chevron(base):
+    """Chevron zigzag rows across the card."""
+    from shapely.geometry import LineString
+
+    rows = []
+    for y in np.arange(2.5, CARD_H, 4.5):
+        pts = []
+        for i, x in enumerate(np.arange(0.0, CARD_W + 4.0, 4.0)):
+            pts.append((x, y + (2.0 if i % 2 else 0.0)))
+        rows.append(LineString(pts).buffer(0.28, cap_style=2, join_style=1))
+    return _all(rows, base)
+
+
+def decor_polka(base):
+    """Even dot grid."""
+    dots = []
+    for i, x in enumerate(np.arange(2.5, CARD_W - 1.0, 3.6)):
+        for y in np.arange(2.5 + (1.8 if i % 2 else 0.0), CARD_H - 1.0, 3.6):
+            dots.append(Point(x, y).buffer(0.62, 20))
+    return _all(dots, base)
+
+
+def decor_bullseye(base):
+    """Concentric rings around the middle of the text side."""
+    rings = []
+    for r in np.arange(3.0, 60.0, 4.0):
+        disc = Point(26.0, 22.5).buffer(r, 96)
+        rings.append(disc.difference(disc.buffer(-0.55)))
+    return _all(rings, base)
+
+
+def decor_sunburst(base):
+    """Rays fanning out of the top left corner."""
+    rays = []
+    for a in np.linspace(-1.45, 0.05, 22):
+        tip = (2.0 + 130.0 * np.cos(a), 43.0 + 130.0 * np.sin(a))
+        rays.append(Polygon([(2.0, 43.4), (2.0, 42.4), tip]))
+    return _all(rays, base)
+
+
+def decor_mountains(base):
+    """Two layered ridge lines along the bottom."""
+    rng = np.random.default_rng(19)
+    shapes = []
+    for k, (baseline, height) in enumerate(((2.0, 4.5), (2.0, 7.0))):
+        pts = [(0.0, baseline)]
+        x = 0.0
+        while x < CARD_W:
+            x += float(rng.uniform(4.0, 9.0))
+            pts.append((x, baseline + float(rng.uniform(1.5, height))))
+        pts += [(CARD_W + 2.0, baseline), (CARD_W + 2.0, baseline - 2.0), (0.0, baseline - 2.0)]
+        poly = Polygon(pts)
+        shapes.append(poly if k else poly.difference(poly.buffer(-0.6)))
+    return _band(shapes, base, (0.0, 1.5, CARD_W, 9.5))
+
+
+def decor_city(base):
+    """Skyline blocks with lit windows."""
+    rng = np.random.default_rng(31)
+    blocks, x = [], 2.0
+    while x < CARD_W - 2.0:
+        w = float(rng.uniform(2.5, 5.0))
+        h = float(rng.uniform(2.0, 6.0))
+        tower = box(x, 1.8, x + w, 1.8 + h)
+        windows = [box(wx, wy, wx + 0.6, wy + 0.6)
+                   for wx in np.arange(x + 0.7, x + w - 0.6, 1.4)
+                   for wy in np.arange(2.6, 1.8 + h - 0.7, 1.4)]
+        blocks.append(tower.difference(unary_union(windows)) if windows else tower)
+        x += w + 0.7
+    return _band(blocks, base, (0.0, 1.5, CARD_W, 9.5))
+
+
+def decor_waveform(base):
+    """Audio bars along the bottom."""
+    rng = np.random.default_rng(41)
+    bars = []
+    for x in np.arange(3.0, CARD_W - 2.0, 1.8):
+        h = 0.8 + 3.0 * abs(float(rng.normal()))
+        bars.append(box(x, 5.0 - h / 2, x + 1.0, 5.0 + h / 2))
+    return _band(bars, base)
+
+
+def decor_helix(base):
+    """Double helix with rungs, running along the bottom."""
+    from shapely.geometry import LineString
+
+    xs = np.linspace(0, CARD_W, 200)
+    a = LineString(list(zip(xs, 5.0 + 2.6 * np.sin(xs / 5.0))))
+    b = LineString(list(zip(xs, 5.0 - 2.6 * np.sin(xs / 5.0))))
+    shapes = [a.buffer(0.28, cap_style=2), b.buffer(0.28, cap_style=2)]
+    for x in np.arange(1.0, CARD_W, 2.5):
+        y = 2.6 * np.sin(x / 5.0)
+        shapes.append(box(x - 0.2, 5.0 - y, x + 0.2, 5.0 + y))
+    return _band(shapes, base)
+
+
+def decor_spiral(base):
+    """One archimedean coil in the bottom strip."""
+    from shapely.geometry import LineString
+
+    t = np.linspace(0.0, 7.0 * np.pi, 700)
+    r = 0.26 * t
+    pts = list(zip(12.0 + r * np.cos(t), 5.4 + r * np.sin(t)))
+    return _band([LineString(pts).buffer(0.3, cap_style=2)], base)
+
+
+def decor_hatch(base):
+    """Single direction 45 degree hatching."""
+    from shapely.affinity import rotate
+
+    lines = [rotate(box(x, -40, x + 0.45, 90), 45, origin=(x, 22.5))
+             for x in np.arange(-60.0, CARD_W + 60.0, 3.2)]
+    return _all(lines, base, 1.4)
+
+
+def decor_brick(base):
+    """Running bond brick wall."""
+    bricks = []
+    for row, y in enumerate(np.arange(2.0, CARD_H - 1.0, 2.6)):
+        offset = 3.0 if row % 2 else 0.0
+        for x in np.arange(1.0 + offset - 6.0, CARD_W + 6.0, 6.0):
+            b = box(x, y, x + 5.4, y + 2.2)
+            bricks.append(b.difference(b.buffer(-0.35)))
+    return _all(bricks, base)
+
+
+def decor_plus(base):
+    """Grid of plus signs."""
+    marks = []
+    for x in np.arange(3.0, CARD_W - 1.0, 4.2):
+        for y in np.arange(3.0, CARD_H - 1.0, 4.2):
+            marks.append(unary_union([box(x - 0.9, y - 0.25, x + 0.9, y + 0.25),
+                                      box(x - 0.25, y - 0.9, x + 0.25, y + 0.9)]))
+    return _all(marks, base)
+
+
+def decor_stitch(base):
+    """Dashed sewing stitch just inside the edge."""
+    ring = base.buffer(-2.2)
+    ring = ring.difference(ring.buffer(-0.5))
+    dashes = [box(x, -5, x + 1.6, 60) for x in np.arange(-2.0, CARD_W + 4.0, 2.8)]
+    dashes += [box(-5, y, 60, y + 1.6) for y in np.arange(-2.0, CARD_H + 4.0, 2.8)]
+    return ring.intersection(unary_union(dashes))
+
+
+def decor_tape(base):
+    """Two strips of tape across the top corners."""
+    from shapely.affinity import rotate
+
+    a = rotate(box(-8.0, 36.5, 16.0, 41.5), -45, origin=(4.0, 39.0))
+    b = rotate(box(CARD_W - 16.0, 36.5, CARD_W + 8.0, 41.5), 45, origin=(CARD_W - 4.0, 39.0))
+    return _all([a, b], base, 0.6)
+
+
+def decor_glitch(base):
+    """Displaced slabs, like a torn scanline."""
+    rng = np.random.default_rng(13)
+    slabs = []
+    for y in np.arange(2.5, CARD_H - 2.0, 2.4):
+        x0 = float(rng.uniform(0.0, CARD_W * 0.55))
+        w = float(rng.uniform(6.0, 26.0))
+        slabs.append(box(x0, y, x0 + w, y + float(rng.uniform(0.5, 1.2))))
+    return _all(slabs, base)
+
+
+def decor_moire(base):
+    """Two line grids at a small angle, which beat against each other."""
+    from shapely.affinity import rotate
+
+    lines = []
+    for angle in (0, 7):
+        for x in np.arange(-60.0, CARD_W + 60.0, 2.0):
+            lines.append(rotate(box(x, -40, x + 0.4, 90), angle, origin=(40.0, 22.5)))
+    return _all(lines, base, 1.4)
+
+
+def decor_checker(base):
+    """Checkerboard that fades out towards the left."""
+    rng = np.random.default_rng(2)
+    cells, size = [], 3.0
+    for x in np.arange(2.0, CARD_W - 1.0, size):
+        for y in np.arange(2.0, CARD_H - 1.0, size):
+            if (int(x / size) + int(y / size)) % 2:
+                if rng.random() < 0.15 + 0.9 * (x / CARD_W):
+                    cells.append(box(x, y, x + size - 0.3, y + size - 0.3))
+    return _all(cells, base)
+
+
+def decor_matrix(base):
+    """Digital rain: dashes falling in columns."""
+    rng = np.random.default_rng(29)
+    marks = []
+    for x in np.arange(3.0, CARD_W - 2.0, 3.0):
+        y = float(rng.uniform(CARD_H - 12.0, CARD_H - 2.0))
+        while y > 2.0:
+            marks.append(box(x, y, x + 1.1, y + 1.1))
+            y -= float(rng.uniform(1.8, 4.5))
+    return _all(marks, base)
+
+
+def decor_starfield(base):
+    """Four pointed stars, denser towards the top."""
+    rng = np.random.default_rng(17)
+    stars = []
+    for _ in range(70):
+        x, y = rng.uniform(2, CARD_W - 2), rng.uniform(2, CARD_H - 2)
+        if rng.random() > (y / CARD_H) ** 1.5:
+            continue
+        r = float(rng.uniform(0.7, 1.6))
+        stars.append(Polygon([(x - r, y), (x, y + 0.25 * r), (x + r, y),
+                              (x, y - 0.25 * r)]))
+        stars.append(Polygon([(x, y - r), (x + 0.25 * r, y), (x, y + r),
+                              (x - 0.25 * r, y)]))
+    return _all(stars, base)
+
+
+def decor_snake(base):
+    """One serpentine path folding across the card."""
+    from shapely.geometry import LineString
+
+    pts, left = [], True
+    for y in np.arange(2.8, CARD_H - 1.5, 2.6):
+        pts += [(3.0 if left else CARD_W - 3.0, y),
+                (CARD_W - 3.0 if left else 3.0, y)]
+        left = not left
+    return _all([LineString(pts).buffer(0.3, join_style=1)], base)
+
+
+def decor_brackets(base):
+    """Camera framing marks in the four corners."""
+    marks, arm, w = [], 7.0, 0.7
+    for cx, cy, sx, sy in ((3.0, 42.0, 1, -1), (CARD_W - 3.0, 42.0, -1, -1),
+                           (3.0, 3.0, 1, 1), (CARD_W - 3.0, 3.0, -1, 1)):
+        marks.append(box(min(cx, cx + sx * arm), min(cy, cy + sy * w),
+                         max(cx, cx + sx * arm), max(cy, cy + sy * w)))
+        marks.append(box(min(cx, cx + sx * w), min(cy, cy + sy * arm),
+                         max(cx, cx + sx * w), max(cy, cy + sy * arm)))
+    return _all(marks, base)
+
+
+def decor_ticket(base):
+    """Perforation line and a row of punch holes."""
+    holes = [Point(x, 5.6).buffer(0.55, 20) for x in np.arange(3.0, CARD_W, 3.0)]
+    rule = box(2.0, 7.4, CARD_W - 2.0, 7.9)
+    notches = [Point(x, 2.6).buffer(0.5, 20) for x in np.arange(3.0, CARD_W, 2.4)]
+    return _all(holes + [rule] + notches, base)
+
+
+def decor_knit(base):
+    """Fair isle rows: alternating V stitches and dot bands."""
+    from shapely.geometry import LineString
+
+    rows = []
+    for i, y in enumerate(np.arange(2.5, CARD_H - 1.0, 3.4)):
+        if i % 2:
+            rows += [Point(x, y).buffer(0.45, 16) for x in np.arange(2.5, CARD_W, 2.4)]
+        else:
+            for x in np.arange(2.0, CARD_W, 3.0):
+                rows.append(LineString([(x, y + 1.1), (x + 1.5, y), (x + 3.0, y + 1.1)])
+                            .buffer(0.26, cap_style=2, join_style=1))
+    return _all(rows, base)
+
+
+def decor_lattice(base):
+    """Square kufic lattice: interlocking L shapes."""
+    tiles = []
+    for i, x in enumerate(np.arange(2.0, CARD_W - 1.0, 5.0)):
+        for j, y in enumerate(np.arange(2.0, CARD_H - 1.0, 5.0)):
+            arm = unary_union([box(x, y, x + 3.6, y + 0.6),
+                               box(x, y, x + 0.6, y + 3.6)])
+            if (i + j) % 2:
+                arm = unary_union([box(x + 1.0, y + 4.0, x + 4.6, y + 4.6),
+                                   box(x + 4.0, y + 1.0, x + 4.6, y + 4.6)])
+            tiles.append(arm)
+    return _all(tiles, base)
+
+
+def decor_mesh(base):
+    """Low poly mesh: a jittered triangle grid, edges only."""
+    from shapely.geometry import LineString
+
+    rng = np.random.default_rng(37)
+    step = 6.5
+    pts = {}
+    for i, x in enumerate(np.arange(-2.0, CARD_W + 6.0, step)):
+        for j, y in enumerate(np.arange(-2.0, CARD_H + 6.0, step)):
+            pts[(i, j)] = (x + float(rng.uniform(-1.6, 1.6)),
+                           y + float(rng.uniform(-1.6, 1.6)))
+    edges = []
+    for (i, j), p in pts.items():
+        for nb in ((i + 1, j), (i, j + 1), (i + 1, j - 1)):
+            if nb in pts:
+                edges.append(LineString([p, pts[nb]]).buffer(0.22, cap_style=2))
+    return _all(edges, base, 1.4)
+
+
 def despeckle(geom, min_area=0.4, min_half_width=0.15):
     """Drop crumbs left behind when decor is carved around text.
 
@@ -617,6 +1237,33 @@ DECOR = {
     "pixel": decor_pixel,
     "iso": decor_iso,
     "bauhaus": decor_bauhaus,
+    "terrazzo": decor_terrazzo,
+    "hex": decor_hex,
+    "chevron": decor_chevron,
+    "polka": decor_polka,
+    "bullseye": decor_bullseye,
+    "sunburst": decor_sunburst,
+    "mountains": decor_mountains,
+    "city": decor_city,
+    "waveform": decor_waveform,
+    "helix": decor_helix,
+    "spiral": decor_spiral,
+    "hatch": decor_hatch,
+    "brick": decor_brick,
+    "plus": decor_plus,
+    "stitch": decor_stitch,
+    "tape": decor_tape,
+    "glitch": decor_glitch,
+    "moire": decor_moire,
+    "checker": decor_checker,
+    "matrix": decor_matrix,
+    "starfield": decor_starfield,
+    "snake": decor_snake,
+    "brackets": decor_brackets,
+    "ticket": decor_ticket,
+    "knit": decor_knit,
+    "lattice": decor_lattice,
+    "mesh": decor_mesh,
 }
 
 

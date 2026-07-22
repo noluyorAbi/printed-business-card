@@ -92,7 +92,7 @@ plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
-Twenty layouts ship with the script. A style only changes the 2D layout and
+47 layouts ship with the script. A style only changes the 2D layout and
 which filament is base and which is feature, so every one of them still prints
 as two parts with a single filament change.
 
@@ -101,38 +101,64 @@ as two parts with a single filament change.
 .venv/bin/python build_card.py --all             # preview of every style
 ```
 
-| Style | Frame | QR | Filaments |
-| --- | --- | --- | --- |
-| `classic` | band | recessed | black base, white features |
-| `inverse` | band | raised | white base, black features |
-| `minimal` | none | recessed | black base, white features |
-| `outline` | two hairlines | recessed | black base, white features |
-| `blueprint` | two hairlines | raised | white base, blue features |
-| `terminal` | window chrome | recessed | black base, green features |
-| `circuit` | two hairlines | recessed | board green base, gold features |
-| `topo` | band | recessed | navy base, sand features |
-| `neon` | none | recessed | deep purple base, pink features |
-| `brutal` | none | recessed | black base, cream features |
-| `carbon` | none | recessed | graphite base, silver features |
-| `graph` | band | raised | paper white base, green features |
-| `hazard` | none | recessed | black base, yellow features |
-| `maze` | none | recessed | black base, red features |
-| `constellation` | band | recessed | navy base, white features |
-| `radar` | none | recessed | dark green base, turquoise features |
-| `barcode` | none | raised | white base, black features |
-| `pixel` | none | recessed | violet base, yellow features |
-| `iso` | two hairlines | recessed | slate base, blue features |
-| `bauhaus` | none | raised | cream base, red features |
+| Style | Frame | QR | Decor | Look |
+| --- | --- | --- | --- | --- |
+| `classic` | band | recessed | none | black base, white features |
+| `inverse` | band | raised | none | white base, black features |
+| `minimal` | none | recessed | none | no frame, black base |
+| `outline` | two hairlines | recessed | none | two hairlines instead of a band |
+| `blueprint` | two hairlines | raised | none | white base, blue features |
+| `terminal` | none | recessed | `scanlines` | shell prompt lines on scanlines |
+| `circuit` | two hairlines | recessed | `circuit` | PCB traces and pads, gold on board green |
+| `topo` | band | recessed | `topo` | contour rings behind the card, sand on navy |
+| `neon` | none | recessed | `wave` | sine ribbons, pink on deep purple |
+| `brutal` | none | recessed | `halftone` | oversized name over a halftone gradient |
+| `carbon` | none | recessed | `carbon` | woven bundles, silver on graphite |
+| `graph` | band | raised | `graph` | 5 mm engineering paper, green ink on paper white |
+| `hazard` | none | recessed | `hazard` | diagonal warning stripes along the bottom |
+| `maze` | none | recessed | `maze` | a labyrinth of unit segments, red on black |
+| `constellation` | band | recessed | `constellation` | star map with linked neighbours |
+| `radar` | none | recessed | `radar` | rings sweeping from the bottom left corner |
+| `barcode` | none | raised | `barcode` | bars along the bottom, black on white |
+| `pixel` | none | recessed | `pixel` | dither ramp out of the top right corner |
+| `iso` | two hairlines | recessed | `iso` | isometric graph paper, blue on slate |
+| `bauhaus` | none | raised | `bauhaus` | ring, quarter disc and dot, red on cream |
+| `terrazzo` | band | raised | `terrazzo` | scattered chips, teal on cream |
+| `hex` | none | recessed | `hex` | honeycomb outlines, gold on forest |
+| `chevron` | none | recessed | `chevron` | zigzag rows, amber on plum |
+| `polka` | band | raised | `polka` | even dot grid, plum on rose |
+| `bullseye` | none | recessed | `bullseye` | concentric rings, red on black |
+| `sunburst` | none | recessed | `sunburst` | rays from the top left, amber on umber |
+| `mountains` | none | recessed | `mountains` | layered ridges along the bottom |
+| `city` | none | recessed | `city` | skyline with lit windows |
+| `waveform` | none | recessed | `waveform` | audio bars along the bottom |
+| `helix` | band | recessed | `helix` | double strand with rungs |
+| `spiral` | none | raised | `spiral` | one archimedean coil, slate on bone |
+| `hatch` | band | raised | `hatch` | 45 degree hatching, ink on solar |
+| `brick` | none | recessed | `brick` | running bond wall, clay on oxblood |
+| `plus` | band | raised | `plus` | grid of plus marks, blue on paper |
+| `stitch` | none | recessed | `stitch` | dashed seam inside the edge |
+| `tape` | none | raised | `tape` | two strips across the top corners |
+| `glitch` | none | recessed | `glitch` | torn scanline slabs, magenta on ink |
+| `moire` | none | recessed | `moire` | two grids at a small angle |
+| `checker` | none | raised | `checker` | board fading out to the left |
+| `matrix` | none | recessed | `matrix` | digital rain in columns |
+| `starfield` | band | recessed | `starfield` | four pointed stars, denser up top |
+| `snake` | none | recessed | `snake` | one serpentine path folding across |
+| `brackets` | none | recessed | `brackets` | camera framing marks in the corners |
+| `ticket` | none | raised | `ticket` | perforation holes and a tear rule |
+| `knit` | band | recessed | `knit` | fair isle rows of V stitches and dots |
+| `lattice` | two hairlines | recessed | `lattice` | square kufic interlock, gold on teal |
+| `mesh` | none | recessed | `mesh` | low poly triangle net, blue on graphite |
 
 The QR mode follows the base color. On a dark base the dark modules are cut
 out of a light panel (`recess`); on a light base the dark modules themselves
 are the raised feature (`relief`). Either way the code decodes, which the test
 suite checks with OpenCV for every style.
 
-The last fifteen carry background decor: window chrome, PCB traces, contour
-rings, sine ribbons, a halftone gradient, a fibre weave, engineering paper,
-hazard stripes, a labyrinth, a star map, radar rings, barcode bars, a dither
-ramp, isometric paper, and Bauhaus primitives. Decor is generated as its own
+Most of them carry background decor, listed in the table above: everything
+from PCB traces and contour rings to a skyline, a double helix, a terrazzo
+floor and a kufic lattice. Decor is generated as its own
 geometry, then carved back out of the text and the QR quiet zone, and finally
 despeckled, so leftover crumbs never reach the print. Styles with
 `decor_keepout` also keep the texture out of the whole text bounding box.
@@ -145,40 +171,96 @@ prints cleanly.
 <td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/inverse.png" alt="inverse style preview"><br><b>inverse</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/minimal.png" alt="minimal style preview"><br><b>minimal</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/outline.png" alt="outline style preview"><br><b>outline</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/minimal.png" alt="minimal style preview"><br><b>minimal</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/outline.png" alt="outline style preview"><br><b>outline</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/blueprint.png" alt="blueprint style preview"><br><b>blueprint</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/terminal.png" alt="terminal style preview"><br><b>terminal</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/blueprint.png" alt="blueprint style preview"><br><b>blueprint</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/terminal.png" alt="terminal style preview"><br><b>terminal</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/circuit.png" alt="circuit style preview"><br><b>circuit</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/topo.png" alt="topo style preview"><br><b>topo</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/circuit.png" alt="circuit style preview"><br><b>circuit</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/topo.png" alt="topo style preview"><br><b>topo</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/neon.png" alt="neon style preview"><br><b>neon</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/brutal.png" alt="brutal style preview"><br><b>brutal</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/neon.png" alt="neon style preview"><br><b>neon</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/brutal.png" alt="brutal style preview"><br><b>brutal</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/carbon.png" alt="carbon style preview"><br><b>carbon</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/graph.png" alt="graph style preview"><br><b>graph</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/carbon.png" alt="carbon style preview"><br><b>carbon</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/graph.png" alt="graph style preview"><br><b>graph</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hazard.png" alt="hazard style preview"><br><b>hazard</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/maze.png" alt="maze style preview"><br><b>maze</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hazard.png" alt="hazard style preview"><br><b>hazard</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/maze.png" alt="maze style preview"><br><b>maze</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/constellation.png" alt="constellation style preview"><br><b>constellation</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/radar.png" alt="radar style preview"><br><b>radar</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/constellation.png" alt="constellation style preview"><br><b>constellation</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/radar.png" alt="radar style preview"><br><b>radar</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/barcode.png" alt="barcode style preview"><br><b>barcode</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/pixel.png" alt="pixel style preview"><br><b>pixel</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/barcode.png" alt="barcode style preview"><br><b>barcode</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/pixel.png" alt="pixel style preview"><br><b>pixel</b></td>
 </tr>
 <tr>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/iso.png" alt="iso style preview"><br><b>iso</b></td>
-<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/bauhaus.png" alt="bauhaus style preview"><br><b>bauhaus</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/iso.png" alt="iso style preview"><br><b>iso</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/bauhaus.png" alt="bauhaus style preview"><br><b>bauhaus</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/terrazzo.png" alt="terrazzo style preview"><br><b>terrazzo</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hex.png" alt="hex style preview"><br><b>hex</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/chevron.png" alt="chevron style preview"><br><b>chevron</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/polka.png" alt="polka style preview"><br><b>polka</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/bullseye.png" alt="bullseye style preview"><br><b>bullseye</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/sunburst.png" alt="sunburst style preview"><br><b>sunburst</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/mountains.png" alt="mountains style preview"><br><b>mountains</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/city.png" alt="city style preview"><br><b>city</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/waveform.png" alt="waveform style preview"><br><b>waveform</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/helix.png" alt="helix style preview"><br><b>helix</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/spiral.png" alt="spiral style preview"><br><b>spiral</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hatch.png" alt="hatch style preview"><br><b>hatch</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/brick.png" alt="brick style preview"><br><b>brick</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/plus.png" alt="plus style preview"><br><b>plus</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/stitch.png" alt="stitch style preview"><br><b>stitch</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/tape.png" alt="tape style preview"><br><b>tape</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/glitch.png" alt="glitch style preview"><br><b>glitch</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/moire.png" alt="moire style preview"><br><b>moire</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/checker.png" alt="checker style preview"><br><b>checker</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/matrix.png" alt="matrix style preview"><br><b>matrix</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/starfield.png" alt="starfield style preview"><br><b>starfield</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/snake.png" alt="snake style preview"><br><b>snake</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/brackets.png" alt="brackets style preview"><br><b>brackets</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/ticket.png" alt="ticket style preview"><br><b>ticket</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/knit.png" alt="knit style preview"><br><b>knit</b></td>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/lattice.png" alt="lattice style preview"><br><b>lattice</b></td>
+</tr>
+<tr>
+<td width="50%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/mesh.png" alt="mesh style preview"><br><b>mesh</b></td>
+<td width="50%"></td>
 </tr>
 </table>
 

@@ -25,6 +25,10 @@ and this project adheres to
   `radar`, `barcode`, `pixel`, `iso`, `bauhaus`), a `bauhaus` text layout, and
   a `decor_keepout` flag that keeps dense textures off the text block.
 - Decor is despeckled after carving, so no crumb below 0.4 mm2 survives.
+- Twenty seven more styles (terrazzo, hex, chevron, polka, bullseye, sunburst,
+  mountains, city, waveform, helix, spiral, hatch, brick, plus, stitch, tape,
+  glitch, moire, checker, matrix, starfield, snake, brackets, ticket, knit,
+  lattice, mesh), bringing the set to 47.
 
 ### Fixed
 
