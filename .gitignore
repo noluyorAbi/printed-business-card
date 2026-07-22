@@ -36,3 +36,10 @@ Thumbs.db
 # ------------------------------------------------------- regenerated preview
 # committed copy for the README lives in assets/preview.png
 visitenkarte_preview.png
+
+# per-style output from --style <name>; only the default card is committed
+visitenkarte_*_preview.png
+visitenkarte_*_base.stl
+visitenkarte_*_top.stl
+visitenkarte_*.3mf
+!visitenkarte.3mf

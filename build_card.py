@@ -92,6 +92,58 @@ STYLES = {
         "base_name": "Basis Weiss",
         "feature_name": "Schrift Blau",
     },
+    "terminal": {
+        "label": "Terminal: shell prompt lines on scanlines",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "terminal",
+        "decor": "scanlines",
+        "base_color": "#0a0f0a",
+        "feature_color": "#35ff6a",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Gruen",
+    },
+    "circuit": {
+        "label": "Circuit: PCB traces and pads, gold on board green",
+        "frame": "double",
+        "qr": "recess",
+        "decor": "circuit",
+        "base_color": "#0b3d2e",
+        "feature_color": "#d9b45b",
+        "base_name": "Basis Platinengruen",
+        "feature_name": "Schrift Gold",
+    },
+    "topo": {
+        "label": "Topo: contour rings behind the card, sand on navy",
+        "frame": "band",
+        "qr": "recess",
+        "decor": "topo",
+        "base_color": "#10202b",
+        "feature_color": "#e6d5b8",
+        "base_name": "Basis Navy",
+        "feature_name": "Schrift Sand",
+    },
+    "neon": {
+        "label": "Neon: sine ribbons, pink on deep purple",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "wave",
+        "base_color": "#1a0b2e",
+        "feature_color": "#ff7ad9",
+        "base_name": "Basis Violett",
+        "feature_name": "Schrift Pink",
+    },
+    "brutal": {
+        "label": "Brutal: oversized name over a halftone gradient",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "brutal",
+        "decor": "halftone",
+        "base_color": "#151515",
+        "feature_color": "#f5f1e6",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Creme",
+    },
 }
 DEFAULT_STYLE = "classic"
 
@@ -192,29 +244,142 @@ def build_frame(base, kind, qr_mode="recess"):
     return base.buffer(-FRAME_OUT).difference(base.buffer(-FRAME_IN))
 
 
+ROWS = [
+    (icon_globe, "www.adatepe.dev", 20.6),
+    (icon_linkedin, "in.adatepe.dev", 15.4),
+    (icon_github, "git.adatepe.dev", 10.2),
+]
+
+
+def build_content(layout):
+    """Name, tagline and contact rows as one polygon, per layout variant."""
+    parts = []
+    if layout == "brutal":
+        # name owns the card, tagline drops, contact lines shrink to one block
+        parts.append(place_text("ALPEREN", 7.6, 4.5, 30.5, FONT_BOLD))
+        parts.append(place_text("ADATEPE", 7.6, 4.5, 21.5, FONT_BOLD))
+        for i, (_, label, _) in enumerate(ROWS):
+            parts.append(place_text(label, 2.6, 4.8, 15.0 - i * 3.6))
+        return unary_union(parts).buffer(0)
+
+    if layout == "terminal":
+        parts.append(place_text("> Alperen Adatepe", 5.0, 5.5, 35.5, FONT_BOLD))
+        parts.append(place_text("# creating powerful digital experiences", 2.7, 5.5, 31.4))
+        parts.append(place_text("# through modern solutions.", 2.7, 5.5, 27.7))
+        for i, (_, label, y) in enumerate(ROWS):
+            parts.append(place_text(f"$ open {label}", 2.9, 5.5, y))
+        return unary_union(parts).buffer(0)
+
+    parts.append(place_text("Alperen Adatepe", 5.6, 5.5, 35.5))
+    parts.append(place_text("Creating powerful digital experiences", 3.0, 5.5, 31.4))
+    parts.append(place_text("through modern solutions.", 3.0, 5.5, 27.5))
+    for icon_fn, label, y in ROWS:
+        parts.append(icon_fn(7.3, y + 1.1))
+        parts.append(place_text(label, 3.1, 10.6, y))
+    return unary_union(parts).buffer(0)
+
+
+# ---------------------------------------------------------------- decor
+# A decor builder returns background texture in feature color. It is always
+# carved away from the text and the QR panel afterwards, so it never touches
+# legibility or scannability.
+def decor_scanlines(base):
+    """Window chrome bar, a block cursor and a few scanlines at the bottom."""
+    bar = box(2.0, 40.6, CARD_W - 2.0, 42.8).intersection(base.buffer(-1.0))
+    dots = unary_union([Point(x, 41.7).buffer(0.55, 24) for x in (4.6, 6.6, 8.6)])
+    cursor = box(40.4, 9.9, 42.0, 12.6)
+    lines = [box(0, y, CARD_W, y + 0.5) for y in (2.6, 5.0)]
+    floor = unary_union(lines).intersection(base.buffer(-1.2))
+    return unary_union([bar.difference(dots), cursor, floor])
+
+
+def decor_circuit(base):
+    """PCB-ish traces: horizontal runs with 45 degree elbows, plus round pads."""
+    w = 0.45
+    shapes = []
+    for i, y in enumerate((6.0, 13.5, 24.0, 33.0, 40.0)):
+        run = box(3.0, y - w / 2, 46.0 - i * 3.0, y + w / 2)
+        elbow = Polygon([
+            (46.0 - i * 3.0, y - w / 2), (46.0 - i * 3.0, y + w / 2),
+            (52.0 - i * 3.0, y + 6.0 + w / 2), (52.0 - i * 3.0, y + 6.0 - w / 2),
+        ])
+        shapes += [run, elbow]
+        shapes.append(Point(3.0, y).buffer(1.0, 24).difference(
+            Point(3.0, y).buffer(0.45, 24)))
+    for x in np.arange(6.0, CARD_W - 6.0, 6.0):
+        shapes.append(Point(x, 2.6).buffer(0.55, 16))
+    return unary_union(shapes).intersection(base.buffer(-1.0))
+
+
+def decor_topo(base):
+    """Contour rings, like a topographic map, offset inward from a seed blob."""
+    seed = unary_union([
+        Point(58.0, 34.0).buffer(9.0, 48),
+        Point(48.0, 26.0).buffer(7.5, 48),
+        Point(62.0, 20.0).buffer(6.0, 48),
+    ])
+    rings = []
+    for i in range(9):
+        grown = seed.buffer(i * 3.0, 48)
+        ring = grown.difference(grown.buffer(-0.3))
+        rings.append(ring)
+    return unary_union(rings).intersection(base.buffer(-1.0))
+
+
+def decor_wave(base):
+    """Sine ribbons sweeping across the bottom of the card."""
+    from shapely.geometry import LineString
+
+    # kept in the bottom band, where the layout leaves room
+    xs = np.linspace(0, CARD_W, 240)
+    ribbons = []
+    for k, phase in enumerate(np.linspace(0.0, 2.2, 4)):
+        ys = 5.2 + 2.4 * np.sin(xs / 7.0 + phase)
+        line = LineString(list(zip(xs, ys)))
+        ribbons.append(line.buffer(0.30 + 0.12 * k, cap_style=2, join_style=1))
+    return unary_union(ribbons).intersection(base.buffer(-1.0))
+
+
+def decor_halftone(base):
+    """Dot gradient: dots grow from left to right."""
+    dots = []
+    for x in np.arange(3.0, CARD_W - 2.0, 2.3):
+        for j, y in enumerate(np.arange(3.0, CARD_H - 2.0, 2.3)):
+            offset = 1.15 if j % 2 else 0.0
+            # never below 0.25 mm radius, otherwise a 0.2 mm nozzle skips it
+            r = 0.25 + 0.72 * (x / CARD_W) ** 2
+            dots.append(Point(x + offset, y).buffer(r, 12))
+    return unary_union(dots).intersection(base.buffer(-1.2))
+
+
+DECOR = {
+    "scanlines": decor_scanlines,
+    "circuit": decor_circuit,
+    "topo": decor_topo,
+    "wave": decor_wave,
+    "halftone": decor_halftone,
+}
+
+
 def build_shapes(style=DEFAULT_STYLE):
     """2D layout for a style: returns (base polygon, feature polygon)."""
     st = STYLES[style] if isinstance(style, str) else style
     base = box(CORNER_R, CORNER_R, CARD_W - CORNER_R, CARD_H - CORNER_R).buffer(CORNER_R, 32)
+    panel = box(*PANEL)
 
     white = [build_frame(base, st["frame"], st["qr"])]
     if st["qr"] == "recess":
-        white.append(box(*PANEL))
+        white.append(panel)
 
-    # Name
-    white.append(place_text("Alperen Adatepe", 5.6, 5.5, 35.5))
-    # Tagline
-    white.append(place_text("Creating powerful digital experiences", 3.0, 5.5, 31.4))
-    white.append(place_text("through modern solutions.", 3.0, 5.5, 27.5))
-    # Contact rows: (icon builder, text, baseline y)
-    rows = [
-        (icon_globe, "www.adatepe.dev", 20.6),
-        (icon_linkedin, "in.adatepe.dev", 15.4),
-        (icon_github, "git.adatepe.dev", 10.2),
-    ]
-    for icon_fn, label, y in rows:
-        white.append(icon_fn(7.3, y + 1.1))
-        white.append(place_text(label, 3.1, 10.6, y))
+    content = build_content(st.get("layout", "default"))
+
+    white.append(content)
+
+    if st.get("decor"):
+        texture = DECOR[st["decor"]](base)
+        # keep the texture clear of text and of the QR quiet zone
+        texture = texture.difference(content.buffer(1.1)).difference(panel.buffer(1.2))
+        white.append(texture)
 
     modules = qr_dark_modules()
     white_union = unary_union(white).buffer(0)
@@ -227,6 +392,9 @@ def build_shapes(style=DEFAULT_STYLE):
     # drop collinear T-vertices left over from module-grid unions; 5 µm tolerance
     # is invisible but required for watertight extrusion
     white_union = white_union.simplify(0.005).buffer(0)
+    # close-then-open by 10 um: removes point-touching contacts between decor
+    # and frame, which shapely accepts but extrusion cannot make watertight
+    white_union = white_union.buffer(0.01).buffer(-0.01).buffer(0)
     return base, white_union
 
 

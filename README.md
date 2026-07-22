@@ -92,7 +92,7 @@ plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
-Five layouts ship with the script. A style only changes the 2D layout and
+Ten layouts ship with the script. A style only changes the 2D layout and
 which filament is base and which is feature, so every one of them still prints
 as two parts with a single filament change.
 
@@ -108,11 +108,22 @@ as two parts with a single filament change.
 | `minimal` | none | recessed | black base, white features |
 | `outline` | two hairlines | recessed | black base, white features |
 | `blueprint` | two hairlines | raised | white base, blue features |
+| `terminal` | window chrome | recessed | black base, green features |
+| `circuit` | two hairlines | recessed | board green base, gold features |
+| `topo` | band | recessed | navy base, sand features |
+| `neon` | none | recessed | deep purple base, pink features |
+| `brutal` | none | recessed | black base, cream features |
 
 The QR mode follows the base color. On a dark base the dark modules are cut
 out of a light panel (`recess`); on a light base the dark modules themselves
 are the raised feature (`relief`). Either way the code decodes, which the test
-suite checks with OpenCV for all five styles.
+suite checks with OpenCV for every style.
+
+The last five carry background decor: scanline chrome, PCB traces, contour
+rings, sine ribbons, a halftone gradient. Decor is generated as its own
+geometry and then carved back out of the text and the QR quiet zone, so it can
+never eat legibility or a scan. Nothing in it drops below roughly 0.5 mm, the
+smallest feature a 0.2 mm nozzle prints cleanly.
 
 <table>
 <tr>
@@ -124,12 +135,23 @@ suite checks with OpenCV for all five styles.
 <td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/outline.png" alt="outline style preview"><br><b>outline</b></td>
 </tr>
 <tr>
-<td colspan="2"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/blueprint.png" alt="blueprint style preview"><br><b>blueprint</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/blueprint.png" alt="blueprint style preview"><br><b>blueprint</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/terminal.png" alt="terminal style preview"><br><b>terminal</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/circuit.png" alt="circuit style preview"><br><b>circuit</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/topo.png" alt="topo style preview"><br><b>topo</b></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/neon.png" alt="neon style preview"><br><b>neon</b></td>
+<td><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/brutal.png" alt="brutal style preview"><br><b>brutal</b></td>
 </tr>
 </table>
 
 To add a style, copy an entry in the `STYLES` dict at the top of
-`build_card.py` and change `frame`, `qr` and the two colors.
+`build_card.py` and change `frame`, `qr`, the two colors, and optionally
+`layout` (`default`, `terminal`, `brutal`) and `decor` (any key in the `DECOR`
+table).
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/folder.svg" width="16" align="center"> How it works
 
