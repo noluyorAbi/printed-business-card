@@ -1,0 +1,93 @@
+# Template for .gitattributes at the repository root.
+# Copy to ".gitattributes" (with the leading dot). No tokens to replace.
+#
+# Two jobs here.
+#
+# 1. LINE ENDINGS. "text=auto eol=lf" normalises to LF in the repository and
+#    checks out LF everywhere, including Windows. Without it, a Windows clone
+#    rewrites shell scripts to CRLF, and a CRLF shell script fails with the
+#    memorable error "bad interpreter: no such file or directory".
+#
+# 2. LANGUAGE STATS. GitHub guesses the repository's primary language by
+#    easily outweigh the actual source. "linguist-vendored" keeps those files
+#    in the repository, still diffable and still reviewed, but out of the
+#    language bar at the top of the page.
+#
+# After changing this file, the statistics update on the next push. To refresh
+# them locally in a test clone: "git add --renormalize ." then commit.
+
+# ---------------------------------------------------------------- defaults
+* text=auto eol=lf
+
+# --------------------------------------------------------------- binaries
+# "binary" is shorthand for "-text -diff". Git stops trying to normalise line
+# endings and stops printing a useless diff of the bytes.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.mp4   binary
+*.mov   binary
+*.webm  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.zip   binary
+*.gz    binary
+*.pdf   binary
+
+# SVG is text, so it stays diffable, but a diff of a path with two thousand
+# points helps nobody. Keep it out of review noise while keeping it mergeable.
+*.svg   text eol=lf -diff
+
+# ----------------------------------------------------------- generated assets
+# Rendered by the video pipeline, committed on purpose because the README and
+# the landing page reference them. Not written by hand, so not counted.
+assets/**            linguist-generated=true
+assets/*.png         binary linguist-generated=true
+assets/*.gif         binary linguist-generated=true
+assets/*.mp4         binary linguist-generated=true
+
+# video/ is a self contained TypeScript project whose only output is the demo
+# recording. Marked vendored so its React and TypeScript do not become the
+# repository's headline language.
+
+# The landing page, if it lives in this repository. Delete these two lines when
+# the landing page is the repository, rather than an extra in the corner of it.
+
+# ------------------------------------------------------------------- lockfiles
+# Committed, reviewed by machines, never counted as source.
+package-lock.json    linguist-generated=true -diff
+pnpm-lock.yaml       linguist-generated=true -diff
+yarn.lock            linguist-generated=true -diff
+poetry.lock          linguist-generated=true -diff
+uv.lock              linguist-generated=true -diff
+
+# ------------------------------------------------------------- documentation
+# Documentation is excluded from the language bar by default. This makes it
+# explicit, and it keeps a docs heavy repository honest about what it is.
+docs/**              linguist-documentation=true
+*.md                 text eol=lf
+
+# ---------------------------------------------------------- export excludes
+# Files that do not belong in the tarball GitHub builds for a release.
+.github/             export-ignore
+.gitattributes       export-ignore
+.gitignore           export-ignore
+video/               export-ignore
+tests/               export-ignore
+
+# ------------------------------------------------------------------ scripts
+# Executable text, LF enforced whatever the contributor's platform does.
+*.sh                 text eol=lf
+*.bash               text eol=lf
+install.sh           text eol=lf
+
+# Windows batch files are the one exception: they need CRLF.
+*.bat                text eol=crlf
+*.cmd                text eol=crlf
+*.stl    binary
+*.3mf    binary

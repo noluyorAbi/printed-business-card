@@ -1,0 +1,38 @@
+# ---------------------------------------------------------------- launch tool
+.launch/
+
+# ------------------------------------------------------------------ python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ------------------------------------------------------------------ node
+node_modules/
+
+# ------------------------------------------------------------------ secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ------------------------------------------------------------- editors and os
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# --------------------------------------------------------------- agent state
+.claude/
+
+# ------------------------------------------------------- regenerated preview
+# committed copy for the README lives in assets/preview.png
+visitenkarte_preview.png
