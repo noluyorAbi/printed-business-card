@@ -26,7 +26,7 @@
 
 <br>
 
-A business card you print instead of ordering: 80 x 45 mm, fits a wallet's
+A business card you print instead of ordering: 84 x 52 mm, fits a wallet's
 card slot, and costs a few cents of filament. The card is generated entirely
 from one Python script, so changing the name, the links or the QR target is a
 one-line edit followed by one command. The QR code is not an afterthought
@@ -61,8 +61,20 @@ Design decisions that matter for printing:
   exposing the black base 0.4 mm below. The contrast stays high without
   spending a third color, and the test suite verifies with OpenCV that the
   rendered card still decodes.
-- **Sized for a 0.2 mm nozzle.** The finest strokes (tagline, contact lines)
-  are around 0.3 mm wide. A 0.4 mm nozzle will blur the small text.
+- **Sized for a 0.2 mm nozzle.** Type sizes, letter tracking and icon sizes
+  come from measuring the real glyph outlines: every stroke is at least
+  0.45 mm and every gap between neighbouring letters at least 0.38 mm, because
+  below that the letters bleed into each other on the print. A test asserts
+  it, so the type can never quietly shrink back under the limit.
+- **Wallet sized with clearance.** 84 x 52 mm sits inside ISO/IEC 7810 ID-1
+  (85.60 x 53.98 mm, the bank card format wallet slots are cut for) with
+  1.6 mm of width and 2.0 mm of height to spare. A printed card is rigid and
+  cannot flex into a tight slot the way a 0.76 mm bank card does, and FDM adds
+  a few tenths per edge, which is what that clearance is for.
+- **QR sized for the nozzle, not for looks.** 22 mm over a 25 x 25 matrix is a
+  0.88 mm module, above the roughly 0.8 mm floor a 0.2 mm nozzle holds, and
+  the quiet zone is 3 modules wide (expressed in modules, so it survives any
+  change of QR size).
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/download.svg" width="16" align="center"> Install
 

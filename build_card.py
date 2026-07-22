@@ -2,9 +2,15 @@
 """Generate a 3D-printable business card (black base + white raised features).
 
 Output: STL for each color part, a combined Bambu Studio 3MF, and a top-view
-preview PNG. Card: 80 x 45 mm. Base 0.0-0.6 mm (black), features 0.6-1.0 mm
-(white). The QR code is recessed through the white panel so the black base
+preview PNG. The card is CARD_W x CARD_H mm (84 x 52, inside the ID-1 bank
+card format so it still fits a wallet slot). Base 0.0-0.6 mm (black), features
+0.6-1.0 mm (white), plus optional 0.3 mm engraved grooves and 0.3 mm of
+emboss. The QR code is recessed through the white panel so the black base
 shows, which keeps the whole print at a single filament change.
+
+Type sizes, tracking and icon sizes are set from measurements against a 0.2 mm
+nozzle: strokes and inter-letter gaps stay at or above roughly 0.45 mm, which
+is what stops letters from bleeding into each other on the print.
 """
 
 from collections import namedtuple
@@ -21,24 +27,77 @@ from shapely.geometry import Point, Polygon, box
 from shapely.ops import unary_union
 
 # ---------------------------------------------------------------- constants
-CARD_W, CARD_H = 80.0, 45.0   # compact wallet card, 80 mm long x 45 mm wide
-CORNER_R = 2.5
+# Card. ISO/IEC 7810 ID-1 (bank card) is 85.60 x 53.98 mm, so 84 x 52 leaves
+# 1.6 mm of width and 2.0 mm of height clearance. A printed card is rigid and
+# cannot cam itself into a tight wallet slot the way a 0.76 mm bank card does,
+# and FDM adds a few tenths per edge, so that clearance is the point.
+CARD_W, CARD_H = 84.0, 52.0
+CORNER_R = 3.0        # matches the ID-1 corner family (2.88 to 3.48 mm)
 BASE_Z = 0.6          # black base thickness
 TOP_Z = 0.4           # white feature height
 HIGH_Z = 0.3          # extra height for embossed features (feels raised)
 ENGRAVE_Z = 0.3       # groove depth cut into the top of the base
 FRAME_IN, FRAME_OUT = 1.8, 1.0   # frame band: inset 1.0..1.8 mm from edge
 
-QR_SIZE = 25.0
-QR_QUIET = 2.0        # white margin around the QR (2 modules, kept tight)
+CX, CY = CARD_W / 2, CARD_H / 2
+DIAG = (CARD_W ** 2 + CARD_H ** 2) ** 0.5
+MARGIN = 5.0          # text column starts here
+EDGE_SAFE = 2.0       # decor never comes closer than this to the card edge
+GUTTER = 3.0          # clear space between the text column and the QR panel
+
+# QR. 22 mm over a 25 x 25 matrix is a 0.88 mm module, comfortably above the
+# ~0.8 mm floor a 0.2 mm nozzle prints reliably. The quiet zone is expressed
+# in modules, not millimetres, so it survives any change of QR_SIZE.
+QR_SIZE = 22.0
+QR_MODULES = 25
+QR_QUIET = 3.0 * QR_SIZE / QR_MODULES   # 3 modules
+PANEL_SIDE = QR_SIZE + 2 * QR_QUIET
 PANEL = (
-    CARD_W - FRAME_OUT - QR_SIZE - 2 * QR_QUIET,
-    1.0,
+    CARD_W - FRAME_OUT - PANEL_SIDE,
+    CY - PANEL_SIDE / 2,
     CARD_W - FRAME_OUT,
-    1.0 + QR_SIZE + 2 * QR_QUIET,
+    CY + PANEL_SIDE / 2,
 )  # x0, y0, x1, y1
 QR_CENTER = ((PANEL[0] + PANEL[2]) / 2, (PANEL[1] + PANEL[3]) / 2)
 QR_DATA = "https://www.adatepe.dev"
+
+# Text column. Everything the layouts draw lives between TEXT_X0 and TEXT_X1;
+# a test asserts it, so type can never creep under the QR panel again.
+TEXT_X0 = MARGIN
+TEXT_X1 = PANEL[0] - GUTTER
+TEXT_CX = (TEXT_X0 + TEXT_X1) / 2
+
+# Type. Sizes and tracking come from measuring the real Arial outlines against
+# what a 0.2 mm nozzle holds: strokes want 0.45 mm or more, and the gap between
+# neighbouring letters wants 0.45 mm or it bleeds shut on the print. Tracking
+# buys the gap without making the card a poster.
+EM_NAME, TRACK_NAME = 6.0, 0.20     # stroke 1.13 mm, gap 0.43 mm, width 51.5
+EM_TAG, TRACK_TAG = 4.2, 0.28       # stroke 0.50 mm, gap 0.39 mm
+EM_ROW, TRACK_ROW = 4.8, 0.25       # stroke 0.56 mm, gap 0.46 mm
+EM_HERO, TRACK_HERO = 8.7, 0.10     # oversized name in the brutal layouts
+EM_SMALL, TRACK_SMALL = 4.2, 0.20   # prompt lines and other dense variants
+
+# Baseline grid
+NAME_Y = CARD_H - MARGIN - EM_NAME * 0.75
+TAG_Y = NAME_Y - EM_TAG * 1.10
+TAG_LEAD = EM_TAG * 1.15
+ROW_Y0 = 11.0                        # bottom contact row
+ROW_LEAD = EM_ROW * 1.55
+BOTTOM = (0.0, EDGE_SAFE * 0.8, CARD_W, ROW_Y0 - 2.0)   # strip for bottom decor
+BOTTOM_CY = (BOTTOM[1] + BOTTOM[3]) / 2
+
+# Icon column. The printed icons were the least legible part of the card, so
+# they grow with the type instead of staying at their old 3.4 mm.
+ICON_R = 2.4
+ICON_X = TEXT_X0 + ICON_R
+LABEL_X = ICON_X + ICON_R + 1.6
+ICON_DY = EM_ROW * 0.35
+
+
+def row_y(i):
+    """Baseline of contact row i, counted from the top of the block."""
+    return ROW_Y0 + (len(ROWS) - 1 - i) * ROW_LEAD
+
 
 # Every style resolves to these four 2D layers. base and feature are the two
 # filaments; engrave is cut ENGRAVE_Z deep into the top of the base, high sits
@@ -1160,9 +1219,8 @@ FONT_BOLD = _font(["/System/Library/Fonts/Supplemental/Arial Bold.ttf"], weight=
 
 
 # ---------------------------------------------------------------- text -> shapely
-def text_shape(s, em, fp=FONT):
-    """Render text at em size, even-odd fill via cumulative symmetric difference."""
-    tp = TextPath((0, 0), s, size=em, prop=fp)
+def _outline(tp):
+    """Even-odd fill of a TextPath: cumulative symmetric difference."""
     polys = [Polygon(p) for p in tp.to_polygons() if len(p) >= 3]
     polys = [p if p.is_valid else p.buffer(0) for p in polys]
     if not polys:
@@ -1170,12 +1228,45 @@ def text_shape(s, em, fp=FONT):
     return reduce(lambda a, b: a.symmetric_difference(b), polys).buffer(0)
 
 
-def place_text(s, em, x, y, fp=FONT):
-    return shp_translate(text_shape(s, em, fp), xoff=x, yoff=y)
+def text_shape(s, em, fp=FONT, track=0.0):
+    """Text as a polygon at em size.
+
+    track adds letterspacing in mm. On a 0.2 mm nozzle the gap between glyphs
+    matters as much as the stroke width: below roughly 0.45 mm neighbouring
+    letters bleed into each other on the print. Tracking buys that gap without
+    making the type bigger, so it is the cheaper half of the fix.
+    """
+    if not track:
+        return _outline(TextPath((0, 0), s, size=em, prop=fp))
+
+    # Position glyph i at the prefix advance plus i tracking steps. The prefix
+    # advance is measured with a sentinel glyph appended, which is what makes
+    # trailing spaces count; measuring the prefix bounding box alone drops them
+    # and the word spacing collapses.
+    ref = TextPath((0, 0), "H", size=em, prop=fp).get_extents().x1
+
+    def advance(prefix):
+        if not prefix:
+            return 0.0
+        return TextPath((0, 0), prefix + "H", size=em, prop=fp).get_extents().x1 - ref
+
+    glyphs = []
+    for i, ch in enumerate(s):
+        if ch == " ":
+            continue
+        glyph = _outline(TextPath((0, 0), ch, size=em, prop=fp))
+        glyphs.append(shp_translate(glyph, xoff=advance(s[:i]) + i * track))
+    return unary_union(glyphs).buffer(0) if glyphs else Polygon()
+
+
+def place_text(s, em, x, y, fp=FONT, track=0.0):
+    return shp_translate(text_shape(s, em, fp, track), xoff=x, yoff=y)
 
 
 # ---------------------------------------------------------------- icons
-def icon_globe(cx, cy, r=1.7, stroke=0.40):
+def icon_globe(cx, cy, r=None, stroke=None):
+    r = ICON_R if r is None else r
+    stroke = r * 0.26 if stroke is None else stroke
     disk = Point(cx, cy).buffer(r, 64)
     ring = Point(cx, cy).buffer(r, 64).exterior.buffer(stroke / 2)
     equator = box(cx - r, cy - stroke / 2, cx + r, cy + stroke / 2)
@@ -1183,21 +1274,29 @@ def icon_globe(cx, cy, r=1.7, stroke=0.40):
     return unary_union([ring, equator.intersection(disk), meridian.intersection(disk)])
 
 
-def icon_linkedin(cx, cy, size=3.4):
+def icon_linkedin(cx, cy, size=None):
+    size = ICON_R * 2.1 if size is None else size
     half = size / 2
-    sq = box(cx - half, cy - half, cx + half, cy + half).buffer(-0.7).buffer(0.7)
-    txt = text_shape("in", 2.6, FONT_BOLD)
+    sq = box(cx - half, cy - half, cx + half, cy + half).buffer(-size * 0.2).buffer(size * 0.2)
+    # the recessed "in" was the worst offender on the print: 0.18 mm between
+    # the two glyphs. Bigger, and tracked apart.
+    txt = text_shape("in", size * 0.78, FONT_BOLD, track=size * 0.05)
     b = txt.bounds
     txt = shp_translate(txt, xoff=cx - (b[0] + b[2]) / 2, yoff=cy - (b[1] + b[3]) / 2)
     return sq.difference(txt)
 
 
-def icon_github(cx, cy, r=1.8):
-    disk = Point(cx, cy).buffer(r, 64)
-    head = Point(cx, cy + 0.22).buffer(0.95, 32)
-    ear_l = Polygon([(cx - 0.9, cy + 0.45), (cx - 1.05, cy + 1.4), (cx - 0.22, cy + 1.05)])
-    ear_r = Polygon([(cx + 0.9, cy + 0.45), (cx + 1.05, cy + 1.4), (cx + 0.22, cy + 1.05)])
-    body = box(cx - 0.68, cy - 1.55, cx + 0.68, cy - 0.45).buffer(-0.3).buffer(0.3)
+def icon_github(cx, cy, r=None):
+    r = ICON_R if r is None else r
+    k = r / 1.8 * 0.92   # scale of the old drawing, cat pulled in 8 percent so
+    disk = Point(cx, cy).buffer(r, 64)          # the thinnest ring stays >= 0.5 mm
+    head = Point(cx, cy + 0.22 * k).buffer(0.95 * k, 32)
+    ear_l = Polygon([(cx - 0.9 * k, cy + 0.45 * k), (cx - 1.05 * k, cy + 1.4 * k),
+                     (cx - 0.22 * k, cy + 1.05 * k)])
+    ear_r = Polygon([(cx + 0.9 * k, cy + 0.45 * k), (cx + 1.05 * k, cy + 1.4 * k),
+                     (cx + 0.22 * k, cy + 1.05 * k)])
+    body = box(cx - 0.68 * k, cy - 1.55 * k, cx + 0.68 * k, cy - 0.45 * k) \
+        .buffer(-0.3 * k).buffer(0.3 * k)
     cat = unary_union([head, ear_l, ear_r, body])
     return disk.difference(cat)
 
@@ -1274,102 +1373,125 @@ def build_frame(base, kind, qr_mode="recess"):
     return base.buffer(-FRAME_OUT).difference(base.buffer(-FRAME_IN))
 
 
+# "www." can never print: the w-w pair measures 0.03 mm of gap at any size a
+# business card can hold, so it fuses into a block. The domain reads fine
+# without it.
 ROWS = [
-    (icon_globe, "www.adatepe.dev", 20.6),
-    (icon_linkedin, "in.adatepe.dev", 15.4),
-    (icon_github, "git.adatepe.dev", 10.2),
+    (icon_globe, "adatepe.dev"),
+    (icon_linkedin, "in.adatepe.dev"),
+    (icon_github, "git.adatepe.dev"),
 ]
 
 
+TAGLINE = ("Creating powerful", "digital experiences")
+
+
+def _centered(txt, em, y, fp=FONT, track=0.0, cx=None):
+    shape = text_shape(txt, em, fp, track)
+    b = shape.bounds
+    return shp_translate(shape, (TEXT_CX if cx is None else cx) - (b[0] + b[2]) / 2, y)
+
+
 def build_content(layout):
-    """Name, tagline and contact rows as one polygon, per layout variant."""
+    """Name, tagline and contact rows as one polygon, per layout variant.
+
+    Every branch places type on the shared grid (TEXT_X0, NAME_Y, row_y), so a
+    change of card size or type scale moves all nine layouts at once.
+    """
     parts = []
+
     if layout == "centered":
-        for txt, em, y, fp in (("Alperen Adatepe", 5.4, 33.0, FONT_BOLD),
-                               ("Creating powerful digital experiences", 2.8, 28.5, FONT),
-                               ("through modern solutions.", 2.8, 25.0, FONT)):
-            shape = text_shape(txt, em, fp)
-            b = shape.bounds
-            parts.append(shp_translate(shape, 25.0 - (b[0] + b[2]) / 2, y))
-        for i, (_, label, _) in enumerate(ROWS):
-            shape = text_shape(label, 2.9, FONT)
-            b = shape.bounds
-            parts.append(shp_translate(shape, 25.0 - (b[0] + b[2]) / 2, 18.0 - i * 4.0))
+        parts.append(_centered("Alperen Adatepe", EM_NAME, NAME_Y, FONT_BOLD, TRACK_NAME))
+        for i, line in enumerate(TAGLINE):
+            parts.append(_centered(line, EM_TAG, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+        for i, (_, label) in enumerate(ROWS):
+            parts.append(_centered(label, EM_ROW, row_y(i), FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
     if layout == "monogram":
-        parts.append(place_text("AA", 15.0, 4.0, 16.0, FONT_BOLD))
-        parts.append(place_text("Alperen Adatepe", 3.4, 4.5, 10.0, FONT_BOLD))
-        for i, (_, label, _) in enumerate(ROWS):
-            parts.append(place_text(label, 2.6, 27.5, 16.0 + i * 3.6))
+        parts.append(place_text("AA", EM_NAME * 2.7, TEXT_X0, CY - 3.0, FONT_BOLD))
+        parts.append(place_text("Alperen Adatepe", EM_ROW * 0.85, TEXT_X0, MARGIN + 1.0,
+                                FONT_BOLD, TRACK_ROW))
+        for i, (_, label) in enumerate(ROWS):
+            parts.append(place_text(label, EM_ROW * 0.68, TEXT_X0 + 24.0,
+                                    CY + 4.0 - i * ROW_LEAD * 0.75, FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
     if layout == "vertical":
         from shapely.affinity import rotate
 
-        name = rotate(text_shape("ALPEREN ADATEPE", 3.4, FONT_BOLD), 90, origin=(0, 0))
+        name = rotate(text_shape("ALPEREN ADATEPE", EM_ROW * 0.8, FONT_BOLD, TRACK_ROW),
+                      90, origin=(0, 0))
         b = name.bounds
-        parts.append(shp_translate(name, 8.0 - b[0], 4.0 - b[1]))
-        parts.append(place_text("Creating powerful digital", 2.8, 13.0, 33.0))
-        parts.append(place_text("experiences through", 2.8, 13.0, 29.4))
-        parts.append(place_text("modern solutions.", 2.8, 13.0, 25.8))
-        for i, (icon_fn, label, _) in enumerate(ROWS):
-            y = 19.0 - i * 4.4
-            parts.append(icon_fn(15.0, y + 1.1))
-            parts.append(place_text(label, 2.9, 18.4, y))
+        parts.append(shp_translate(name, TEXT_X0 + EM_ROW - b[0], MARGIN - b[1]))
+        col = TEXT_X0 + EM_ROW * 2.0
+        for i, line in enumerate(TAGLINE):
+            parts.append(place_text(line, EM_TAG * 0.85, col, TAG_Y - i * TAG_LEAD,
+                                    FONT, TRACK_TAG))
+        for i, (icon_fn, label) in enumerate(ROWS):
+            y = row_y(i)
+            parts.append(icon_fn(col + ICON_R, y + ICON_DY))
+            parts.append(place_text(label, EM_ROW * 0.78, col + 2 * ICON_R + 1.4, y,
+                                    FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
     if layout == "outline":
         # letters as hollow rings: less filament, and a sharper tactile edge
-        solid = [place_text("Alperen Adatepe", 5.0, 5.0, 34.5, FONT_BOLD)]
-        rings = unary_union(solid).buffer(0)
-        parts.append(rings.difference(rings.buffer(-0.45)))
-        parts.append(place_text("Creating powerful digital experiences", 3.0, 5.5, 30.0))
-        parts.append(place_text("through modern solutions.", 3.0, 5.5, 26.2))
-        for icon_fn, label, y in ROWS:
-            parts.append(icon_fn(7.3, y + 1.1))
-            parts.append(place_text(label, 3.1, 10.6, y))
+        solid = text_shape("Alperen Adatepe", EM_NAME, FONT_BOLD, TRACK_NAME)
+        solid = shp_translate(solid, TEXT_X0, NAME_Y)
+        parts.append(solid.difference(solid.buffer(-EM_NAME * 0.085)))
+        for i, line in enumerate(TAGLINE):
+            parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+        for i, (icon_fn, label) in enumerate(ROWS):
+            y = row_y(i)
+            parts.append(icon_fn(ICON_X, y + ICON_DY))
+            parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
     if layout == "ticker":
         # one long line per row, like a departure board
-        parts.append(place_text("ALPEREN  ADATEPE", 5.2, 4.5, 35.0, FONT_BOLD))
-        parts.append(place_text("DIGITAL  EXPERIENCES", 2.3, 4.5, 30.8))
-        parts.append(place_text("MODERN  SOLUTIONS", 2.3, 4.5, 27.0))
-        for i, (_, label, _) in enumerate(ROWS):
-            parts.append(place_text(label.upper(), 2.3, 4.5, 22.0 - i * 4.4, FONT_BOLD))
+        parts.append(place_text("ALPEREN  ADATEPE", EM_NAME * 0.9, TEXT_X0, NAME_Y,
+                                FONT_BOLD, TRACK_NAME))
+        for i, line in enumerate(TAGLINE):
+            parts.append(place_text(line.upper(), EM_TAG * 0.8, TEXT_X0,
+                                    TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+        for i, (_, label) in enumerate(ROWS):
+            parts.append(place_text(label.upper(), EM_ROW * 0.78, TEXT_X0, row_y(i),
+                                    FONT_BOLD, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
-    if layout == "bauhaus":
-        # same oversized name, but the contact block clears the quarter disc
-        parts.append(place_text("ALPEREN", 7.6, 4.5, 32.0, FONT_BOLD))
-        parts.append(place_text("ADATEPE", 7.6, 4.5, 23.0, FONT_BOLD))
-        for i, (_, label, _) in enumerate(ROWS):
-            parts.append(place_text(label, 2.6, 16.0, 14.0 - i * 3.6))
-        return unary_union(parts).buffer(0)
-
-    if layout == "brutal":
-        # name owns the card, tagline drops, contact lines shrink to one block
-        parts.append(place_text("ALPEREN", 7.6, 4.5, 30.5, FONT_BOLD))
-        parts.append(place_text("ADATEPE", 7.6, 4.5, 21.5, FONT_BOLD))
-        for i, (_, label, _) in enumerate(ROWS):
-            parts.append(place_text(label, 2.6, 4.8, 15.0 - i * 3.6))
+    if layout in ("bauhaus", "brutal"):
+        # the name owns the card: two hero lines up top, a tight contact block
+        # underneath. bauhaus indents the block to clear the quarter disc.
+        indent = 12.0 if layout == "bauhaus" else 0.0
+        parts.append(place_text("ALPEREN", EM_HERO, TEXT_X0, CARD_H - MARGIN - EM_HERO,
+                                FONT_BOLD, TRACK_HERO))
+        parts.append(place_text("ADATEPE", EM_HERO, TEXT_X0,
+                                CARD_H - MARGIN - EM_HERO * 2.2, FONT_BOLD, TRACK_HERO))
+        for i, (_, label) in enumerate(ROWS):
+            parts.append(place_text(label, EM_ROW * 0.75, TEXT_X0 + indent,
+                                    MARGIN + 1.5 + (len(ROWS) - 1 - i) * EM_ROW * 1.25,
+                                    FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
     if layout == "terminal":
-        parts.append(place_text("> Alperen Adatepe", 5.0, 5.5, 35.5, FONT_BOLD))
-        parts.append(place_text("# creating powerful digital experiences", 2.7, 5.5, 31.4))
-        parts.append(place_text("# through modern solutions.", 2.7, 5.5, 27.7))
-        for i, (_, label, y) in enumerate(ROWS):
-            parts.append(place_text(f"$ open {label}", 2.9, 5.5, y))
+        parts.append(place_text("> Alperen Adatepe", EM_NAME * 0.88, TEXT_X0, NAME_Y,
+                                FONT_BOLD, TRACK_NAME))
+        for i, line in enumerate(TAGLINE):
+            parts.append(place_text(f"# {line.lower()}", EM_SMALL, TEXT_X0,
+                                    TAG_Y - i * TAG_LEAD, FONT, TRACK_SMALL))
+        for i, (_, label) in enumerate(ROWS):
+            parts.append(place_text(f"$ open {label}", EM_SMALL, TEXT_X0, row_y(i),
+                                    FONT, TRACK_SMALL))
         return unary_union(parts).buffer(0)
 
-    parts.append(place_text("Alperen Adatepe", 5.6, 5.5, 35.5))
-    parts.append(place_text("Creating powerful digital experiences", 3.0, 5.5, 31.4))
-    parts.append(place_text("through modern solutions.", 3.0, 5.5, 27.5))
-    for icon_fn, label, y in ROWS:
-        parts.append(icon_fn(7.3, y + 1.1))
-        parts.append(place_text(label, 3.1, 10.6, y))
+    parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME))
+    for i, line in enumerate(TAGLINE):
+        parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
+    for i, (icon_fn, label) in enumerate(ROWS):
+        y = row_y(i)
+        parts.append(icon_fn(ICON_X, y + ICON_DY))
+        parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW))
     return unary_union(parts).buffer(0)
 
 
@@ -1379,9 +1501,13 @@ def build_content(layout):
 # legibility or scannability.
 def decor_scanlines(base):
     """Window chrome bar, a block cursor and a few scanlines at the bottom."""
-    bar = box(2.0, 40.6, CARD_W - 2.0, 42.8).intersection(base.buffer(-1.0))
-    dots = unary_union([Point(x, 41.7).buffer(0.55, 24) for x in (4.6, 6.6, 8.6)])
-    cursor = box(40.4, 9.9, 42.0, 12.6)
+    bar_y = CARD_H - EDGE_SAFE - 3.4
+    bar = box(EDGE_SAFE, bar_y, CARD_W - EDGE_SAFE, bar_y + 2.2).intersection(base.buffer(-1.0))
+    dots = unary_union([Point(x, bar_y + 1.1).buffer(0.55, 24)
+                        for x in (EDGE_SAFE + 2.6, EDGE_SAFE + 4.6, EDGE_SAFE + 6.6)])
+    # block cursor after the last prompt line, wherever that line now ends
+    last = build_content("terminal").bounds[2] + 0.8
+    cursor = box(last, row_y(2) - 0.6, last + 1.6, row_y(2) + EM_SMALL * 0.75)
     lines = [box(0, y, CARD_W, y + 0.5) for y in (2.6, 5.0)]
     floor = unary_union(lines).intersection(base.buffer(-1.2))
     return unary_union([bar.difference(dots), cursor, floor])
@@ -1391,26 +1517,27 @@ def decor_circuit(base):
     """PCB-ish traces: horizontal runs with 45 degree elbows, plus round pads."""
     w = 0.45
     shapes = []
-    for i, y in enumerate((6.0, 13.5, 24.0, 33.0, 40.0)):
-        run = box(3.0, y - w / 2, 46.0 - i * 3.0, y + w / 2)
+    for i, y in enumerate(np.linspace(CARD_H * 0.13, CARD_H * 0.88, 5)):
+        end = TEXT_X1 - 6.0 - i * 3.0
+        run = box(3.0, y - w / 2, end, y + w / 2)
         elbow = Polygon([
-            (46.0 - i * 3.0, y - w / 2), (46.0 - i * 3.0, y + w / 2),
-            (52.0 - i * 3.0, y + 6.0 + w / 2), (52.0 - i * 3.0, y + 6.0 - w / 2),
+            (end, y - w / 2), (end, y + w / 2),
+            (end + 6.0, y + 6.0 + w / 2), (end + 6.0, y + 6.0 - w / 2),
         ])
         shapes += [run, elbow]
         shapes.append(Point(3.0, y).buffer(1.0, 24).difference(
             Point(3.0, y).buffer(0.45, 24)))
     for x in np.arange(6.0, CARD_W - 6.0, 6.0):
-        shapes.append(Point(x, 2.6).buffer(0.55, 16))
+        shapes.append(Point(x, EDGE_SAFE + 0.6).buffer(0.55, 16))
     return unary_union(shapes).intersection(base.buffer(-1.0))
 
 
 def decor_topo(base):
     """Contour rings, like a topographic map, offset inward from a seed blob."""
     seed = unary_union([
-        Point(58.0, 34.0).buffer(9.0, 48),
-        Point(48.0, 26.0).buffer(7.5, 48),
-        Point(62.0, 20.0).buffer(6.0, 48),
+        Point(CARD_W * 0.70, CARD_H * 0.74).buffer(9.0, 48),
+        Point(CARD_W * 0.58, CARD_H * 0.56).buffer(7.5, 48),
+        Point(CARD_W * 0.76, CARD_H * 0.42).buffer(6.0, 48),
     ])
     rings = []
     for i in range(9):
@@ -1428,7 +1555,7 @@ def decor_wave(base):
     xs = np.linspace(0, CARD_W, 240)
     ribbons = []
     for k, phase in enumerate(np.linspace(0.0, 2.2, 4)):
-        ys = 5.2 + 2.4 * np.sin(xs / 7.0 + phase)
+        ys = BOTTOM_CY + 2.4 * np.sin(xs / 7.0 + phase)
         line = LineString(list(zip(xs, ys)))
         ribbons.append(line.buffer(0.30 + 0.12 * k, cap_style=2, join_style=1))
     return unary_union(ribbons).intersection(base.buffer(-1.0))
@@ -1474,7 +1601,7 @@ def decor_hazard(base):
     """Diagonal hazard stripes in the bottom band."""
     from shapely.affinity import rotate
 
-    band = box(0, 1.5, CARD_W, 8.0)
+    band = box(*BOTTOM)
     stripes = [
         rotate(box(x, -20, x + 2.4, 60), -45, origin=(x, 0))
         for x in np.arange(-40.0, CARD_W + 40.0, 5.4)
@@ -1515,7 +1642,7 @@ def decor_constellation(base):
 def decor_radar(base):
     """Radar sweep: rings around the bottom left corner."""
     rings = []
-    for r in np.arange(6.0, 90.0, 5.0):
+    for r in np.arange(6.0, DIAG, 5.0):
         disc = Point(3.0, 2.0).buffer(r, 96)
         rings.append(disc.difference(disc.buffer(-0.5)))
     return unary_union(rings).intersection(base.buffer(-1.2))
@@ -1527,7 +1654,7 @@ def decor_barcode(base):
     bars, x = [], 3.0
     while x < CARD_W - 3.0:
         w = float(rng.choice([0.5, 0.8, 1.3]))
-        bars.append(box(x, 2.2, x + w, 7.4))
+        bars.append(box(x, BOTTOM[1] + 0.6, x + w, BOTTOM[3] - 0.6))
         x += w + float(rng.choice([0.6, 0.9]))
     return unary_union(bars).intersection(base.buffer(-1.2))
 
@@ -1553,21 +1680,19 @@ def decor_iso(base):
     lines = []
     for angle in (30, -30):
         for x in np.arange(-60.0, CARD_W + 60.0, 4.5):
-            lines.append(rotate(box(x, -40, x + 0.4, 90), angle, origin=(x, 22.5)))
+            lines.append(rotate(box(x, -40, x + 0.4, 90), angle, origin=(x, CY)))
     return unary_union(lines).intersection(base.buffer(-1.4))
 
 
 def decor_bauhaus(base):
     """Three primitives: a ring, a quarter disc and a solid dot."""
-    ring = Point(64.0, 37.5).buffer(6.0, 64)
+    ring = Point(CARD_W * 0.80, CARD_H * 0.80).buffer(6.0, 64)
     ring = ring.difference(ring.buffer(-1.2))
-    quarter = Point(2.0, 2.0).buffer(11.0, 64).intersection(box(2.0, 2.0, 13.0, 13.0))
-    dot = Point(44.5, 39.0).buffer(2.4, 48)
-    bar = box(2.0, 18.4, 46.0, 19.4)
+    quarter = Point(EDGE_SAFE, EDGE_SAFE).buffer(11.0, 64).intersection(
+        box(EDGE_SAFE, EDGE_SAFE, EDGE_SAFE + 11.0, EDGE_SAFE + 11.0))
+    dot = Point(CARD_W * 0.56, CARD_H * 0.83).buffer(2.4, 48)
+    bar = box(EDGE_SAFE, CY - 4.6, TEXT_X1 - 4.0, CY - 3.6)
     return unary_union([ring, quarter, dot, bar]).intersection(base.buffer(-1.2))
-
-
-BOTTOM = (0.0, 1.5, CARD_W, 8.6)   # strip below the contact rows
 
 
 def _band(shapes, base, bounds=BOTTOM):
@@ -1627,8 +1752,8 @@ def decor_polka(base):
 def decor_bullseye(base):
     """Concentric rings around the middle of the text side."""
     rings = []
-    for r in np.arange(3.0, 60.0, 4.0):
-        disc = Point(26.0, 22.5).buffer(r, 96)
+    for r in np.arange(3.0, DIAG, 4.0):
+        disc = Point(CARD_W * 0.31, CY).buffer(r, 96)
         rings.append(disc.difference(disc.buffer(-0.55)))
     return _all(rings, base)
 
@@ -1637,8 +1762,9 @@ def decor_sunburst(base):
     """Rays fanning out of the top left corner."""
     rays = []
     for a in np.linspace(-1.45, 0.05, 22):
-        tip = (2.0 + 130.0 * np.cos(a), 43.0 + 130.0 * np.sin(a))
-        rays.append(Polygon([(2.0, 43.4), (2.0, 42.4), tip]))
+        tip = (EDGE_SAFE + 2 * DIAG * np.cos(a), CARD_H - EDGE_SAFE + 2 * DIAG * np.sin(a))
+        rays.append(Polygon([(EDGE_SAFE, CARD_H - EDGE_SAFE - 0.6),
+                             (EDGE_SAFE, CARD_H - EDGE_SAFE - 1.6), tip]))
     return _all(rays, base)
 
 
@@ -1646,7 +1772,7 @@ def decor_mountains(base):
     """Two layered ridge lines along the bottom."""
     rng = np.random.default_rng(19)
     shapes = []
-    for k, (baseline, height) in enumerate(((2.0, 4.5), (2.0, 7.0))):
+    for k, (baseline, height) in enumerate(((BOTTOM[1] + 0.5, 4.5), (BOTTOM[1] + 0.5, 7.0))):
         pts = [(0.0, baseline)]
         x = 0.0
         while x < CARD_W:
@@ -1655,7 +1781,7 @@ def decor_mountains(base):
         pts += [(CARD_W + 2.0, baseline), (CARD_W + 2.0, baseline - 2.0), (0.0, baseline - 2.0)]
         poly = Polygon(pts)
         shapes.append(poly if k else poly.difference(poly.buffer(-0.6)))
-    return _band(shapes, base, (0.0, 1.5, CARD_W, 9.5))
+    return _band(shapes, base)
 
 
 def decor_city(base):
@@ -1665,13 +1791,13 @@ def decor_city(base):
     while x < CARD_W - 2.0:
         w = float(rng.uniform(2.5, 5.0))
         h = float(rng.uniform(2.0, 6.0))
-        tower = box(x, 1.8, x + w, 1.8 + h)
+        tower = box(x, BOTTOM[1] + 0.3, x + w, BOTTOM[1] + 0.3 + h)
         windows = [box(wx, wy, wx + 0.6, wy + 0.6)
                    for wx in np.arange(x + 0.7, x + w - 0.6, 1.4)
-                   for wy in np.arange(2.6, 1.8 + h - 0.7, 1.4)]
+                   for wy in np.arange(BOTTOM[1] + 1.1, BOTTOM[1] + 0.3 + h - 0.7, 1.4)]
         blocks.append(tower.difference(unary_union(windows)) if windows else tower)
         x += w + 0.7
-    return _band(blocks, base, (0.0, 1.5, CARD_W, 9.5))
+    return _band(blocks, base)
 
 
 def decor_waveform(base):
@@ -1680,7 +1806,7 @@ def decor_waveform(base):
     bars = []
     for x in np.arange(3.0, CARD_W - 2.0, 1.8):
         h = 0.8 + 3.0 * abs(float(rng.normal()))
-        bars.append(box(x, 5.0 - h / 2, x + 1.0, 5.0 + h / 2))
+        bars.append(box(x, BOTTOM_CY - h / 2, x + 1.0, BOTTOM_CY + h / 2))
     return _band(bars, base)
 
 
@@ -1689,12 +1815,12 @@ def decor_helix(base):
     from shapely.geometry import LineString
 
     xs = np.linspace(0, CARD_W, 200)
-    a = LineString(list(zip(xs, 5.0 + 2.6 * np.sin(xs / 5.0))))
-    b = LineString(list(zip(xs, 5.0 - 2.6 * np.sin(xs / 5.0))))
+    a = LineString(list(zip(xs, BOTTOM_CY + 2.6 * np.sin(xs / 5.0))))
+    b = LineString(list(zip(xs, BOTTOM_CY - 2.6 * np.sin(xs / 5.0))))
     shapes = [a.buffer(0.28, cap_style=2), b.buffer(0.28, cap_style=2)]
     for x in np.arange(1.0, CARD_W, 2.5):
         y = 2.6 * np.sin(x / 5.0)
-        shapes.append(box(x - 0.2, 5.0 - y, x + 0.2, 5.0 + y))
+        shapes.append(box(x - 0.2, BOTTOM_CY - y, x + 0.2, BOTTOM_CY + y))
     return _band(shapes, base)
 
 
@@ -1704,7 +1830,7 @@ def decor_spiral(base):
 
     t = np.linspace(0.0, 7.0 * np.pi, 700)
     r = 0.26 * t
-    pts = list(zip(12.0 + r * np.cos(t), 5.4 + r * np.sin(t)))
+    pts = list(zip(12.0 + r * np.cos(t), BOTTOM_CY + r * np.sin(t)))
     return _band([LineString(pts).buffer(0.3, cap_style=2)], base)
 
 
@@ -1751,8 +1877,10 @@ def decor_tape(base):
     """Two strips of tape across the top corners."""
     from shapely.affinity import rotate
 
-    a = rotate(box(-8.0, 36.5, 16.0, 41.5), -45, origin=(4.0, 39.0))
-    b = rotate(box(CARD_W - 16.0, 36.5, CARD_W + 8.0, 41.5), 45, origin=(CARD_W - 4.0, 39.0))
+    top = CARD_H - 10.0
+    a = rotate(box(-8.0, top, 16.0, top + 5.0), -45, origin=(4.0, top + 2.5))
+    b = rotate(box(CARD_W - 16.0, top, CARD_W + 8.0, top + 5.0), 45,
+               origin=(CARD_W - 4.0, top + 2.5))
     return _all([a, b], base, 0.6)
 
 
@@ -1774,7 +1902,7 @@ def decor_moire(base):
     lines = []
     for angle in (0, 7):
         for x in np.arange(-60.0, CARD_W + 60.0, 2.0):
-            lines.append(rotate(box(x, -40, x + 0.4, 90), angle, origin=(40.0, 22.5)))
+            lines.append(rotate(box(x, -40, x + 0.4, 90), angle, origin=(CX, CY)))
     return _all(lines, base, 1.4)
 
 
@@ -1833,8 +1961,9 @@ def decor_snake(base):
 def decor_brackets(base):
     """Camera framing marks in the four corners."""
     marks, arm, w = [], 7.0, 0.7
-    for cx, cy, sx, sy in ((3.0, 42.0, 1, -1), (CARD_W - 3.0, 42.0, -1, -1),
-                           (3.0, 3.0, 1, 1), (CARD_W - 3.0, 3.0, -1, 1)):
+    top, bot = CARD_H - 3.0, 3.0
+    for cx, cy, sx, sy in ((3.0, top, 1, -1), (CARD_W - 3.0, top, -1, -1),
+                           (3.0, bot, 1, 1), (CARD_W - 3.0, bot, -1, 1)):
         marks.append(box(min(cx, cx + sx * arm), min(cy, cy + sy * w),
                          max(cx, cx + sx * arm), max(cy, cy + sy * w)))
         marks.append(box(min(cx, cx + sx * w), min(cy, cy + sy * arm),
@@ -1844,9 +1973,9 @@ def decor_brackets(base):
 
 def decor_ticket(base):
     """Perforation line and a row of punch holes."""
-    holes = [Point(x, 5.6).buffer(0.55, 20) for x in np.arange(3.0, CARD_W, 3.0)]
-    rule = box(2.0, 7.4, CARD_W - 2.0, 7.9)
-    notches = [Point(x, 2.6).buffer(0.5, 20) for x in np.arange(3.0, CARD_W, 2.4)]
+    holes = [Point(x, BOTTOM_CY).buffer(0.55, 20) for x in np.arange(3.0, CARD_W, 3.0)]
+    rule = box(2.0, BOTTOM[3] - 0.5, CARD_W - 2.0, BOTTOM[3])
+    notches = [Point(x, BOTTOM[1] + 0.6).buffer(0.5, 20) for x in np.arange(3.0, CARD_W, 2.4)]
     return _all(holes + [rule] + notches, base)
 
 
@@ -1912,8 +2041,8 @@ def decor_scales(base):
 def decor_squares(base):
     """Concentric squares, like a ripple in a pond with corners."""
     rings = []
-    for r in np.arange(2.0, 46.0, 3.2):
-        sq = box(20.0 - r, 22.5 - r, 20.0 + r, 22.5 + r)
+    for r in np.arange(2.0, DIAG, 3.2):
+        sq = box(CARD_W * 0.24 - r, CY - r, CARD_W * 0.24 + r, CY + r)
         rings.append(sq.difference(sq.buffer(-0.5)))
     return _all(rings, base)
 
@@ -2012,7 +2141,8 @@ def decor_radiate(base):
     for i, a in enumerate(np.linspace(0, 360, 48, endpoint=False)):
         length = 6.0 + 5.0 * abs(np.sin(i * 1.7))
         bar = box(3.0, -0.35, 3.0 + length, 0.35)
-        bars.append(rotate(shp_translate(bar, 24.0, 22.5), a, origin=(24.0, 22.5)))
+        bars.append(rotate(shp_translate(bar, CARD_W * 0.29, CY), a,
+                           origin=(CARD_W * 0.29, CY)))
     return _all(bars, base)
 
 
@@ -2032,7 +2162,7 @@ def decor_perspective(base):
     from shapely.geometry import LineString
 
     lines = []
-    vp = (40.0, 24.0)
+    vp = (CX, CY * 1.06)
     for x in np.arange(-30.0, CARD_W + 30.0, 6.0):
         lines.append(LineString([(x, -2.0), vp]).buffer(0.22, cap_style=2))
     for k in range(1, 12):
@@ -2186,8 +2316,8 @@ def build_shapes(style=DEFAULT_STYLE):
     else:
         if st.get("shadow"):
             # only the name casts the ghost; doubling the small type is mush
-            name = content.intersection(box(0, 33.0, CARD_W, CARD_H))
-            feature.append(shp_translate(name, 0.6, -0.6))
+            name = content.intersection(box(0, NAME_Y - 0.5, CARD_W, CARD_H))
+            feature.append(shp_translate(name, EM_NAME * 0.11, -EM_NAME * 0.11))
         feature.append(content)
 
     if qr_mode in PANEL_MODES:
@@ -2377,7 +2507,7 @@ def preview(card, path, style=DEFAULT_STYLE):
             ax.add_patch(PathPatch(MplPath(verts, codes), **kw))
 
     st = STYLES[style] if isinstance(style, str) else style
-    fig, ax = plt.subplots(figsize=(10, 6.5))
+    fig, ax = plt.subplots(figsize=(10, 10 * CARD_H / CARD_W))
     fig.patch.set_facecolor("#3a3a3a")
     patch(card.base, facecolor=st["base_color"], edgecolor="none")
     if not card.engrave.is_empty:
@@ -2386,9 +2516,9 @@ def preview(card, path, style=DEFAULT_STYLE):
     patch(card.feature, facecolor=st["feature_color"], edgecolor="none")
     if not card.high.is_empty:
         # embossed geometry catches more light than the rest of the feature
-        patch(shp_translate(card.high, 0.25, -0.25),
-              facecolor=_shade(st["feature_color"], -0.35), edgecolor="none")
-        patch(card.high, facecolor=_shade(st["feature_color"], 0.35), edgecolor="none")
+        patch(shp_translate(card.high, 0.15, -0.15),
+              facecolor=_shade(st["feature_color"], -0.22), edgecolor="none")
+        patch(card.high, facecolor=_shade(st["feature_color"], 0.22), edgecolor="none")
     ax.set_xlim(-3, CARD_W + 3)
     ax.set_ylim(-3, CARD_H + 3)
     ax.set_aspect("equal")
