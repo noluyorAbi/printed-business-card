@@ -1,0 +1,4 @@
+-r requirements.txt
+networkx>=3.0
+opencv-python-headless>=4.9
+pytest>=8.0
