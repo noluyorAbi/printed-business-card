@@ -102,6 +102,21 @@ def test_printable_feature_sizes():
         assert gap >= 0.34, (text, gap)
 
 
+def test_corner_option():
+    """Both corner shapes build, and square really is square."""
+    square = build_card.card_outline("square")
+    assert abs(square.area - build_card.CARD_W * build_card.CARD_H) < 1e-6
+    assert build_card.card_outline("round").area < square.area
+
+    card = build_card.build_shapes("classic", corners="square")
+    assert abs(card.base.area - square.area) < 1e-6
+    assert card.feature.within(card.base.buffer(0.01))
+    base_mesh, feature_mesh = build_card.card_meshes(card)
+    for mesh in (base_mesh, feature_mesh):
+        for body in mesh.split(only_watertight=False):
+            assert body.is_watertight
+
+
 def test_card_fits_a_wallet():
     """ID-1 (bank card) is 85.60 x 53.98 mm; stay inside it with clearance."""
     assert build_card.CARD_W <= 85.6 - 1.0

@@ -33,6 +33,8 @@ from shapely.ops import unary_union
 # and FDM adds a few tenths per edge, so that clearance is the point.
 CARD_W, CARD_H = 84.0, 52.0
 CORNER_R = 3.0        # matches the ID-1 corner family (2.88 to 3.48 mm)
+CORNERS = "round"     # "round" or "square"; a style may override it, and so
+                      # may --corners on the command line
 BASE_Z = 0.6          # black base thickness
 TOP_Z = 0.4           # white feature height
 HIGH_Z = 0.3          # extra height for embossed features (feels raised)
@@ -59,7 +61,8 @@ PANEL_MARGIN = 2.6    # equal gap to the right and bottom edge
 # code in the bottom right corner, which reads cleaner.
 BOTTOM_DECORS = {"wave", "waveform", "helix", "spiral", "mountains", "city",
                  "barcode", "hazard", "ticket", "scanlines", "gitgraph",
-                 "diffnote", "vimchrome"}
+                 "diffnote", "vimchrome", "ledmatrix", "railroad",
+                 "keycaps", "turingtape"}
 
 
 def panel_box(st=None):
@@ -106,6 +109,14 @@ ICON_R = 2.4
 ICON_X = TEXT_X0 + ICON_R
 LABEL_X = ICON_X + ICON_R + 1.6
 ICON_DY = EM_ROW * 0.35
+
+
+def card_outline(corners=CORNERS):
+    """The card blank. Rounded corners follow the ID-1 radius; square corners
+    print just as well and read harder, which some styles want."""
+    if corners == "square":
+        return box(0.0, 0.0, CARD_W, CARD_H)
+    return box(CORNER_R, CORNER_R, CARD_W - CORNER_R, CARD_H - CORNER_R).buffer(CORNER_R, 32)
 
 
 def row_y(i):
@@ -1326,6 +1337,284 @@ STYLES = {
         "base_name": "Basis Nachtschwarz",
         "feature_name": "Schrift Weiss",
     },
+    "hexdump": {
+        "label": "Hexdump: the card as xxd output",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "hexdump",
+        "base_color": "#0b0f14",
+        "feature_color": "#9ad1ff",
+        "base_name": "Basis Tinte",
+        "feature_name": "Schrift Hellblau",
+    },
+    "makefile": {
+        "label": "Makefile: targets, a phony and one variable",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "makefile",
+        "base_color": "#101210",
+        "feature_color": "#e8c07d",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Sand",
+    },
+    "dockerfile": {
+        "label": "Dockerfile: FROM, LABEL, EXPOSE, CMD",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "dockerfile",
+        "base_color": "#0d1b2a",
+        "feature_color": "#7fd3f7",
+        "base_name": "Basis Docker-Blau",
+        "feature_name": "Schrift Hellblau",
+    },
+    "manpage": {
+        "label": "Manpage: NAME, SYNOPSIS, SEE ALSO",
+        "frame": "band",
+        "qr": "relief",
+        "layout": "manpage",
+        "base_color": "#f4f1e8",
+        "feature_color": "#1f1c18",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Tinte",
+    },
+    "stacktrace": {
+        "label": "Stacktrace: a NameError that resolves to a contact",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "stacktrace",
+        "base_color": "#1a1114",
+        "feature_color": "#ff8080",
+        "base_name": "Basis Dunkelrot",
+        "feature_name": "Schrift Rot",
+    },
+    "rustc": {
+        "label": "Rustc: a borrow checker error with carets",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "rustc",
+        "base_color": "#12100e",
+        "feature_color": "#ffb454",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Rost",
+    },
+    "sql": {
+        "label": "SQL: a SELECT over the developers table",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "sql",
+        "base_color": "#0f1a14",
+        "feature_color": "#8fe3b0",
+        "base_name": "Basis Dunkelgruen",
+        "feature_name": "Schrift Mint",
+    },
+    "haskell": {
+        "label": "Haskell: a record type and its one value",
+        "frame": "band",
+        "qr": "relief",
+        "layout": "haskell",
+        "base_color": "#f7f4fb",
+        "feature_color": "#5e5086",
+        "base_name": "Basis Weiss",
+        "feature_name": "Schrift Violett",
+    },
+    "roguelike": {
+        "label": "Roguelike: an ASCII dungeon with the name in a vault",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "roguelike",
+        "base_color": "#0a0a0a",
+        "feature_color": "#d8c98a",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Pergament",
+    },
+    "tracker": {
+        "label": "Tracker: a ProTracker pattern, notes and volumes",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "tracker",
+        "base_color": "#1b1030",
+        "feature_color": "#8ce0ff",
+        "base_name": "Basis Violett",
+        "feature_name": "Schrift Cyan",
+    },
+    "ledmatrix": {
+        "label": "LED matrix: the domain lit on a dot panel",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "ledmatrix",
+        "base_color": "#121212",
+        "feature_color": "#ff5a3c",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift LED-Rot",
+    },
+    "railroad": {
+        "label": "Railroad: a syntax diagram with a bypass",
+        "frame": "none",
+        "qr": "relief",
+        "decor": "railroad",
+        "base_color": "#f6f6f2",
+        "feature_color": "#24333d",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Schiefer",
+    },
+    "logicgates": {
+        "label": "Logic: an AND gate with an inverted output",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "logicgates",
+        "base_color": "#0e1420",
+        "feature_color": "#cfe8ff",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Eisblau",
+    },
+    "keycaps": {
+        "label": "Keycaps: the surname on a row of embossed caps",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "keycaps",
+        "emboss": "decor",
+        "base_color": "#16181d",
+        "feature_color": "#e9e6de",
+        "base_name": "Basis Anthrazit",
+        "feature_name": "Schrift Creme",
+    },
+    "turingtape": {
+        "label": "Turing tape: cells and a read head",
+        "frame": "none",
+        "qr": "recess",
+        "decor": "turingtape",
+        "base_color": "#101014",
+        "feature_color": "#f2e6c4",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Sand",
+    },
+    "treeplate": {
+        "label": "Treeplate: tree output knocked out of a full bleed slab",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "tree",
+        "plate": True,
+        "base_color": "#101010",
+        "feature_color": "#ececec",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
+    "treeblind": {
+        "label": "Treeblind: tree output debossed, depth instead of colour",
+        "frame": "band",
+        "qr": "recess",
+        "layout": "tree",
+        "text_mode": "engrave",
+        "base_color": "#4c4c55",
+        "feature_color": "#e8e8ec",
+        "base_name": "Basis Graphit",
+        "feature_name": "Schrift Weiss",
+    },
+    "jsonplate": {
+        "label": "Jsonplate: object literal knocked out of a slab",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "json",
+        "plate": True,
+        "base_color": "#24292f",
+        "feature_color": "#f6f8fa",
+        "base_name": "Basis Schiefer",
+        "feature_name": "Schrift Weiss",
+    },
+    "jsonblind": {
+        "label": "Jsonblind: object literal debossed into a warm base",
+        "frame": "band",
+        "qr": "relief",
+        "layout": "json",
+        "text_mode": "engrave",
+        "base_color": "#e8e4dc",
+        "feature_color": "#2b2b2b",
+        "base_name": "Basis Leinen",
+        "feature_name": "Schrift Schwarz",
+    },
+    "devtag": {
+        "label": "Devtag: the </> glyph over the name",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "devtag",
+        "base_color": "#0f1117",
+        "feature_color": "#7ee787",
+        "base_name": "Basis Nacht",
+        "feature_name": "Schrift Gruen",
+    },
+    "tags": {
+        "label": "Tags: the card wrapped in a dev element",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "tags",
+        "corners": "square",
+        "base_color": "#1d1f21",
+        "feature_color": "#f0c674",
+        "base_name": "Basis Anthrazit",
+        "feature_name": "Schrift Gelb",
+    },
+    "commit": {
+        "label": "Commit: author, date and a one line message",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "commit",
+        "base_color": "#101418",
+        "feature_color": "#e6edf3",
+        "base_name": "Basis Tinte",
+        "feature_name": "Schrift Weiss",
+    },
+    "readme": {
+        "label": "Readme: the card as markdown source",
+        "frame": "band",
+        "qr": "relief",
+        "layout": "readme",
+        "base_color": "#f8f8f7",
+        "feature_color": "#24292f",
+        "base_name": "Basis Papier",
+        "feature_name": "Schrift Tinte",
+    },
+    "env": {
+        "label": "Env: a dotenv file that should not be committed",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "env",
+        "base_color": "#12140f",
+        "feature_color": "#d7ff8a",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Limette",
+    },
+    "curl": {
+        "label": "Curl: the response headers of a developer",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "curl",
+        "base_color": "#0b1020",
+        "feature_color": "#9fe0ff",
+        "base_name": "Basis Nachtblau",
+        "feature_name": "Schrift Hellblau",
+    },
+    "todo": {
+        "label": "Todo: two things done, three left",
+        "frame": "band",
+        "qr": "relief",
+        "layout": "todo",
+        "base_color": "#fdf6e3",
+        "feature_color": "#073642",
+        "base_name": "Basis Solarized",
+        "feature_name": "Schrift Tinte",
+    },
+    "manifesto": {
+        "label": "Manifesto: three words, square corners",
+        "frame": "none",
+        "qr": "recess",
+        "layout": "manifesto",
+        "corners": "square",
+        "emboss": "text",
+        "base_color": "#111111",
+        "feature_color": "#fafafa",
+        "base_name": "Basis Schwarz",
+        "feature_name": "Schrift Weiss",
+    },
 }
 DEFAULT_STYLE = "classic"
 
@@ -1551,6 +1840,7 @@ CODE_BLOCKS = {
         ("adatepe.dev/", 1),
         ("\u251c\u2500 Alperen Adatepe", 0),
         ("\u251c\u2500 links/", 0),
+        ("\u2502  \u251c\u2500 adatepe.dev", 0),
         ("\u2502  \u251c\u2500 in.adatepe.dev", 0),
         ("\u2502  \u2514\u2500 git.adatepe.dev", 0),
         ("\u2514\u2500 card.3mf", 0),
@@ -1560,9 +1850,152 @@ CODE_BLOCKS = {
         (' "name":', 0),
         ('   "Alperen Adatepe",', 1),
         (' "links": [', 0),
+        ('   "adatepe.dev",', 0),
         ('   "in.adatepe.dev",', 0),
         ('   "git.adatepe.dev" ]', 0),
         ("}", 0),
+    ],
+    "hexdump": [
+        ("$ xxd adatepe.card", 1),
+        ("00000000 41 6c 70 65", 0),
+        ("00000004 72 65 6e 20", 0),
+        ("00000008 41 64 61 74", 0),
+        ("0000000c 65 70 65 0a", 0),
+        ("|Alperen Adatepe|", 0),
+        ("adatepe.dev", 1),
+    ],
+    "makefile": [
+        ("SITE = adatepe.dev", 1),
+        ("LINKS = in git", 0),
+        ("", 0),
+        ("card.3mf: card.py", 0),
+        ("    python card.py", 0),
+        (".PHONY: contact", 0),
+        ("contact:", 0),
+        ("    open $(SITE)", 0),
+    ],
+    "dockerfile": [
+        ("FROM alpine:3.20", 0),
+        ('LABEL dev="Alperen"', 0),
+        ("LABEL url=adatepe.dev", 1),
+        ("COPY card.3mf /card", 0),
+        ("EXPOSE 443", 0),
+        ('CMD ["open","/card"]', 0),
+    ],
+    "manpage": [
+        ("ADATEPE(1)     CARD", 1),
+        ("NAME", 1),
+        ("  alperen - builds", 0),
+        ("SYNOPSIS", 1),
+        ("  adatepe.dev [--in]", 0),
+        ("SEE ALSO", 1),
+        ("  git.adatepe.dev", 0),
+    ],
+    "stacktrace": [
+        ("Traceback (most", 0),
+        ("  recent call last):", 0),
+        (' File "you.py", l.42', 0),
+        ("   hire(alperen)", 0),
+        ("NameError: contact", 1),
+        (" at adatepe.dev", 1),
+    ],
+    "rustc": [
+        ("error[E0499]: hire", 1),
+        (" --> alperen.rs:1:5", 0),
+        ("  |", 0),
+        ("1 | let dev = Alperen", 0),
+        ("  |     ^^^ found me", 0),
+        ("  = note: adatepe.dev", 1),
+    ],
+    "sql": [
+        ("SELECT name, site", 1),
+        ("  FROM developers", 0),
+        (" WHERE handle =", 0),
+        ("   'noluyorAbi';", 0),
+        ("-- adatepe.dev", 0),
+        ("-- git.adatepe.dev", 0),
+    ],
+    "haskell": [
+        ("data Dev = Dev", 0),
+        ("  { name :: String", 0),
+        ("  , site :: URL }", 0),
+        ("", 0),
+        ("alperen :: Dev", 1),
+        ("alperen = Dev", 0),
+        ('  "Alperen Adatepe"', 0),
+        ('  "adatepe.dev"', 0),
+    ],
+    "roguelike": [
+        ("####################", 0),
+        ("#@..............>..#", 0),
+        ("#.####.#####.####..#", 0),
+        ("#.#  ALPEREN   #...#", 1),
+        ("#.#  ADATEPE   #.$.#", 1),
+        ("#.##############...#", 0),
+        ("#....adatepe.dev...#", 0),
+        ("####################", 0),
+    ],
+    "tracker": [
+        ("PAT 01      SPD 06", 1),
+        ("00 C-4 01 v40 ---", 0),
+        ("01 E-4 01 v3C ---", 0),
+        ("02 G-4 01 v38 ---", 0),
+        ("03 --- -- --- OFF", 0),
+        ("04 A-4 02 v40 ---", 0),
+        ("-- adatepe.dev  --", 1),
+    ],
+    "tags": [
+        ("<dev>", 1),
+        ("  Alperen Adatepe", 0),
+        ("  digital experiences", 0),
+        ("  adatepe.dev", 0),
+        ("  in.adatepe.dev", 0),
+        ("  git.adatepe.dev", 0),
+        ("</dev>", 1),
+    ],
+    "commit": [
+        ("commit 8f3a2b1c9d4e", 1),
+        ("Author: Alperen", 0),
+        ("  <hi@adatepe.dev>", 0),
+        ("Date:   available", 0),
+        ("", 0),
+        ("    feat: hire me", 1),
+        ("    adatepe.dev", 0),
+    ],
+    "readme": [
+        ("# Alperen Adatepe", 1),
+        ("> digital experiences", 0),
+        ("", 0),
+        ("## links", 1),
+        ("- adatepe.dev", 0),
+        ("- in.adatepe.dev", 0),
+        ("- git.adatepe.dev", 0),
+    ],
+    "env": [
+        ("NAME=Alperen Adatepe", 1),
+        ("ROLE=developer", 0),
+        ("SITE=adatepe.dev", 0),
+        ("IN=in.adatepe.dev", 0),
+        ("GIT=git.adatepe.dev", 0),
+        ("", 0),
+        ("# do not commit ;)", 0),
+    ],
+    "curl": [
+        ("$ curl adatepe.dev", 1),
+        ("HTTP/1.1 200 OK", 1),
+        ("Server: alperen", 0),
+        ("X-Role: developer", 0),
+        ("Link: in.adatepe.dev", 0),
+        ("Link: git.adatepe.dev", 0),
+    ],
+    "todo": [
+        ("TODO  adatepe.dev", 1),
+        ("", 0),
+        ("[x] ship the card", 0),
+        ("[x] print it twice", 0),
+        ("[ ] hire Alperen", 1),
+        ("[ ] in.adatepe.dev", 0),
+        ("[ ] git.adatepe.dev", 0),
     ],
     "vim": [
         ("Alperen Adatepe", 1),
@@ -1608,6 +2041,31 @@ def build_content(layout):
 
     if layout in CODE_BLOCKS:
         return _code_block(layout)
+
+    if layout == "devtag":
+        # the one glyph every developer reads as "this person writes code"
+        parts.append(place_text("</>", 13.0, TEXT_X0, CARD_H - MARGIN - 9.6,
+                                FONT_MONO_BOLD))
+        parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, 31.6,
+                                FONT_BOLD, TRACK_NAME))
+        parts.append(place_text("digital experiences", EM_TAG, TEXT_X0, 25.0,
+                                FONT, TRACK_TAG))
+        for i, (icon_fn, label) in enumerate(ROWS):
+            y = 18.2 - i * 5.5
+            parts.append(icon_fn(ICON_X, y + ICON_DY))
+            parts.append(place_text(label, EM_ROW * 0.82, LABEL_X, y, FONT, TRACK_ROW))
+        return unary_union(parts).buffer(0)
+
+    if layout == "manifesto":
+        for i, word in enumerate(("BUILD.", "SHIP.", "REPEAT.")):
+            parts.append(place_text(word, EM_HERO, TEXT_X0,
+                                    CARD_H - MARGIN - EM_HERO - i * EM_HERO * 1.25,
+                                    FONT_BOLD, TRACK_HERO))
+        parts.append(place_text("Alperen Adatepe", EM_ROW * 0.9, TEXT_X0, 9.5,
+                                FONT_BOLD, TRACK_ROW))
+        parts.append(place_text("adatepe.dev  in  git", EM_ROW * 0.72, TEXT_X0, 4.6,
+                                FONT, TRACK_ROW))
+        return unary_union(parts).buffer(0)
 
     if layout == "centered":
         parts.append(_centered("Alperen Adatepe", EM_NAME, NAME_Y, FONT_BOLD, TRACK_NAME))
@@ -2536,6 +2994,96 @@ def decor_vimchrome(base):
     return _all(tildes + [bar, cursor], base, 0.6)
 
 
+def decor_ledmatrix(base):
+    """The domain rendered as a lit dot matrix panel in the bottom strip."""
+    # only the lit dots: an unlit dot small enough to read as "off" is below
+    # what a 0.2 mm nozzle prints, and the despeckle pass would drop it anyway
+    pitch, lit_r = 0.95, 0.42
+    label = text_shape("ADATEPE", 8.0, FONT_BOLD)
+    b = label.bounds
+    label = shp_translate(label, TEXT_X0 - b[0], BOTTOM_CY - (b[1] + b[3]) / 2)
+    dots = [Point(x, y).buffer(lit_r, 16)
+            for x in np.arange(b[0] + TEXT_X0 - b[0], CARD_W - 4.0, pitch)
+            for y in np.arange(BOTTOM[1] + 0.4, BOTTOM[3] + 0.6, pitch)
+            if label.contains(Point(x, y))]
+    return _band(dots, base, (0.0, BOTTOM[1], CARD_W, BOTTOM[3] + 1.0))
+
+
+def decor_railroad(base):
+    """A syntax diagram: two terms on the line and one bypass over them."""
+    from shapely.geometry import LineString
+
+    y = BOTTOM_CY
+    shapes = [box(4.0, y - 0.22, CARD_W - 6.0, y + 0.22),
+              Point(4.0, y).buffer(0.9, 24), Point(CARD_W - 6.0, y).buffer(0.9, 24)]
+    for x0, x1 in ((11.0, 27.0), (33.0, 49.0)):
+        term = box(x0, y - 2.4, x1, y + 2.4).buffer(-1.1).buffer(1.1)
+        shapes.append(term.difference(term.buffer(-0.45)))
+    bypass = LineString([(8.0, y), (9.6, y + 3.2), (52.0, y + 3.2), (53.6, y)])
+    shapes.append(bypass.buffer(0.22, join_style=1, cap_style=2))
+    return _band(shapes, base, (0.0, BOTTOM[1], CARD_W, BOTTOM[3] + 3.6))
+
+
+def decor_logicgates(base):
+    """A small gate schematic in the corner the QR panel leaves free."""
+    from shapely.geometry import LineString
+
+    x0, y0 = CARD_W - 28.0, CARD_H - 17.0
+    shapes = []
+    # AND gate: a box with a rounded output side
+    body = box(x0 + 5.0, y0 + 5.0, x0 + 10.0, y0 + 11.0)
+    nose = Point(x0 + 10.0, y0 + 8.0).buffer(3.0, 40).intersection(
+        box(x0 + 10.0, y0 + 5.0, x0 + 13.0, y0 + 11.0))
+    gate = unary_union([body, nose])
+    shapes.append(gate.difference(gate.buffer(-0.45)))
+    # inputs, output, and a NOT bubble
+    shapes.append(box(x0, y0 + 6.2, x0 + 5.0, y0 + 6.6))
+    shapes.append(box(x0, y0 + 9.4, x0 + 5.0, y0 + 9.8))
+    shapes.append(box(x0 + 13.6, y0 + 7.8, x0 + 22.0, y0 + 8.2))
+    bubble = Point(x0 + 13.3, y0 + 8.0).buffer(0.85, 24)
+    shapes.append(bubble.difference(bubble.buffer(-0.4)))
+    shapes.append(Point(x0, y0 + 6.4).buffer(0.6, 20))
+    shapes.append(Point(x0, y0 + 9.6).buffer(0.6, 20))
+    shapes.append(LineString([(x0 + 22.0, y0 + 8.0), (x0 + 22.0, y0 + 2.0),
+                              (x0 + 2.0, y0 + 2.0)]).buffer(0.2, cap_style=2))
+    return _all(shapes, base, 1.0)
+
+
+def decor_keycaps(base):
+    """A row of keycaps spelling the surname, letters knocked out of the cap."""
+    size, gap = 5.8, 0.9
+    caps = []
+    for i, ch in enumerate("ADATEPE"):
+        x = TEXT_X0 - 1.0 + i * (size + gap)
+        cap = box(x, BOTTOM_CY - size / 2, x + size, BOTTOM_CY + size / 2)
+        cap = cap.buffer(-0.9).buffer(0.9)
+        glyph = text_shape(ch, size * 0.55, FONT_BOLD)
+        gb = glyph.bounds
+        glyph = shp_translate(glyph, x + size / 2 - (gb[0] + gb[2]) / 2,
+                              BOTTOM_CY - (gb[1] + gb[3]) / 2)
+        caps.append(cap.difference(glyph.buffer(0.25)))
+    return _band(caps, base)
+
+
+def decor_turingtape(base):
+    """A tape of cells with a read head sitting over one of them."""
+    size = 6.0
+    shapes = []
+    for i, sym in enumerate("01101001"):
+        x = TEXT_X0 - 1.5 + i * size
+        cell = box(x, BOTTOM_CY - size / 2, x + size, BOTTOM_CY + size / 2)
+        shapes.append(cell.difference(cell.buffer(-0.4)))
+        glyph = text_shape(sym, size * 0.5, FONT_BOLD)
+        gb = glyph.bounds
+        shapes.append(shp_translate(glyph, x + size / 2 - (gb[0] + gb[2]) / 2,
+                                    BOTTOM_CY - (gb[1] + gb[3]) / 2))
+    head_x = TEXT_X0 - 1.5 + 3 * size + size / 2
+    shapes.append(Polygon([(head_x - 1.6, BOTTOM_CY + size / 2 + 3.0),
+                           (head_x + 1.6, BOTTOM_CY + size / 2 + 3.0),
+                           (head_x, BOTTOM_CY + size / 2 + 0.6)]))
+    return _band(shapes, base, (0.0, BOTTOM[1], CARD_W, BOTTOM[3] + 3.4))
+
+
 def despeckle(geom, min_area=0.4, min_half_width=0.15):
     """Drop crumbs left behind when decor is carved around text.
 
@@ -2613,6 +3161,11 @@ DECOR = {
     "scope": decor_scope,
     "conway": decor_conway,
     "vimchrome": decor_vimchrome,
+    "ledmatrix": decor_ledmatrix,
+    "railroad": decor_railroad,
+    "logicgates": decor_logicgates,
+    "keycaps": decor_keycaps,
+    "turingtape": decor_turingtape,
 }
 
 
@@ -2632,11 +3185,11 @@ def _clean(geom, base):
     return geom.buffer(0.01).buffer(-0.01).buffer(0).simplify(0.002).buffer(0)
 
 
-def build_shapes(style=DEFAULT_STYLE):
+def build_shapes(style=DEFAULT_STYLE, corners=None):
     """Resolve a style into the four 2D layers of a Card."""
     st = STYLES[style] if isinstance(style, str) else style
     qr_mode = st["qr"]
-    base = box(CORNER_R, CORNER_R, CARD_W - CORNER_R, CARD_H - CORNER_R).buffer(CORNER_R, 32)
+    base = card_outline(corners or st.get("corners", CORNERS))
     panel_rect = panel_box(st)
     panel = box(*panel_rect)
 
@@ -2661,9 +3214,12 @@ def build_shapes(style=DEFAULT_STYLE):
     if not engraved:
         feature.append(texture)
 
+    blind = st.get("text_mode") == "engrave"
     if st.get("plate"):
         # full bleed slab with the text knocked out of it
         feature.append(base.buffer(-FRAME_OUT).difference(content.buffer(0.0)))
+    elif blind:
+        pass    # blind deboss: the text is sunk into the base, see below
     else:
         if st.get("shadow"):
             # only the name casts the ghost; doubling the small type is mush
@@ -2684,17 +3240,26 @@ def build_shapes(style=DEFAULT_STYLE):
     feature = _clean(feature, base)
 
     # engrave layer: grooves cut into the top of the base
-    engrave = []
+    engrave, engrave_keep = [], Polygon()
+    if blind:
+        # the text becomes a groove instead of a raised feature: no colour
+        # contrast at all, only depth, which is what a blind deboss is
+        engrave_keep = content
     if engraved:
         engrave.append(texture)
     if qr_mode == "deep":
         engrave.append(modules.intersection(panel))
-    if engrave:
-        engrave = _clean(unary_union(engrave).buffer(0), base.buffer(-0.8))
-        # the grooves are subtracted from the base, so the same crumb and point
-        # contact cleanup applies here, otherwise the split base is not solid
-        engrave = despeckle(engrave.difference(feature.buffer(0.25)).buffer(0), 0.4, 0.12)
-        engrave = engrave.simplify(0.005).buffer(0.01).buffer(-0.01).buffer(0)
+    if engrave or not engrave_keep.is_empty:
+        grooves = Polygon()
+        if engrave:
+            grooves = _clean(unary_union(engrave).buffer(0), base.buffer(-0.8))
+            # decor crumbs get the same cleanup as the raised side
+            grooves = despeckle(grooves.difference(feature.buffer(0.25)).buffer(0),
+                                0.4, 0.12)
+        if not engrave_keep.is_empty:
+            kept = _clean(engrave_keep, base.buffer(-0.8))
+            grooves = unary_union([grooves, kept.difference(feature.buffer(0.25))])
+        engrave = grooves.buffer(0).simplify(0.005).buffer(0.01).buffer(-0.01).buffer(0)
     else:
         engrave = Polygon()
 
@@ -2878,9 +3443,9 @@ def preview(card, path, style=DEFAULT_STYLE):
     plt.close(fig)
 
 
-def build_style(style, prefix, preview_path, meshes=True):
+def build_style(style, prefix, preview_path, meshes=True, corners=None):
     st = STYLES[style]
-    card = build_shapes(style)
+    card = build_shapes(style, corners)
     if meshes:
         base_mesh, feature_mesh = card_meshes(card)
         print(f"{style} base: {len(base_mesh.faces)} faces")
@@ -2905,6 +3470,8 @@ def main():
                     help="render a preview for every style into --preview-dir")
     ap.add_argument("--preview-dir", default="assets/previews",
                     help="where --all writes its previews (default: %(default)s)")
+    ap.add_argument("--corners", choices=("round", "square"), default=None,
+                    help="override the card corners for this run")
     args = ap.parse_args()
 
     if args.all:
@@ -2913,13 +3480,14 @@ def main():
         os.makedirs(args.preview_dir, exist_ok=True)
         for name in sorted(STYLES):
             build_style(name, f"visitenkarte_{name}",
-                        os.path.join(args.preview_dir, f"{name}.png"), meshes=False)
+                        os.path.join(args.preview_dir, f"{name}.png"), meshes=False,
+                        corners=args.corners)
         print("done")
         return
 
     if args.style == DEFAULT_STYLE:
         # keep the historical filenames for the default card
-        card = build_shapes(DEFAULT_STYLE)
+        card = build_shapes(DEFAULT_STYLE, args.corners)
         base_mesh, white_mesh = card_meshes(card)
         print(f"base: {len(base_mesh.faces)} faces, watertight={base_mesh.is_watertight}")
         print(f"white: {len(white_mesh.faces)} faces, watertight={white_mesh.is_watertight}")
@@ -2932,7 +3500,7 @@ def main():
         preview(card, "visitenkarte_preview.png", DEFAULT_STYLE)
     else:
         build_style(args.style, f"visitenkarte_{args.style}",
-                    f"visitenkarte_{args.style}_preview.png")
+                    f"visitenkarte_{args.style}_preview.png", corners=args.corners)
     print("done")
 
 

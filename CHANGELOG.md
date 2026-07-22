@@ -54,6 +54,18 @@ and this project adheres to
 - Style keys `emboss`, `decor_mode`, `plate`, `shadow`, `qr_shape`, plus QR
   modes `deep` and `framed`, and five text layouts (`centered`, `monogram`,
   `vertical`, `outline`, `ticker`).
+- A corner option: `card_outline(corners)`, the `--corners round|square` flag
+  and a per style `"corners"` key. `tags` and `manifesto` ship square.
+- A blind deboss mode (`text_mode: engrave`): the type itself becomes a groove
+  in the base, so the card carries no colour contrast at all and reads only by
+  depth. Used by `treeblind` and `jsonblind`.
+- Twenty seven more styles, bringing the set to 137. Fifteen developer cards
+  (`hexdump`, `makefile`, `dockerfile`, `manpage`, `stacktrace`, `rustc`,
+  `sql`, `haskell`, `roguelike`, `tracker`, `ledmatrix`, `railroad`,
+  `logicgates`, `keycaps`, `turingtape`), four variants of the two layouts
+  that worked best (`treeplate`, `treeblind`, `jsonplate`, `jsonblind`), and
+  eight with new copy and layouts (`devtag` with the `</>` glyph, `tags`,
+  `commit`, `readme`, `env`, `curl`, `todo`, `manifesto`).
 - Ten developer styles, bringing the set to 110: `gitgraph` (commit graph),
   `diff` (added lines raised, removed lines engraved), `punchcard` (engraved
   80 column holes), `perfboard` (2.54 mm hole grid), `dip` (the card as a chip,
@@ -72,6 +84,13 @@ and this project adheres to
 
 ### Fixed
 
+- `tree` and `json` listed the two subdomains but not adatepe.dev itself.
+- Blind debossed type kept its full punctuation: the despeckle pass now only
+  runs on decor, where crumbs come from, not on type, whose dots and commas
+  are small but print fine as grooves.
+- The LED matrix panel dropped most of its dots, because an unlit dot small
+  enough to read as "off" is below the printable floor. It now draws only the
+  lit dots, at a pitch that spells the name.
 - Letterspacing used prefix bounding boxes to place glyphs, which drops side
   bearings and trailing spaces and produced random wide gaps between letter
   pairs. Glyph positions now come from the font's own advances and kerning.

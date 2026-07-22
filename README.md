@@ -111,14 +111,19 @@ plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
-110 styles ship with the script. A style only changes the 2D layout and
+137 styles ship with the script. A style only changes the 2D layout and
 which filament is base and which is feature, so every one of them still prints
 as two parts with a single filament change.
 
 ```bash
 .venv/bin/python build_card.py --style inverse   # one style, STL + 3MF + preview
 .venv/bin/python build_card.py --all             # preview of every style
+.venv/bin/python build_card.py --corners square  # square corners instead of round
 ```
+
+Corners are a card wide option: `--corners round` (the ID-1 radius, the
+default) or `--corners square`. A style can pin its own with
+`"corners": "square"`, which `tags` and `manifesto` do.
 
 | Style | Layout | Decor | QR | Depth | Look |
 | --- | --- | --- | --- | --- | --- |
@@ -232,6 +237,33 @@ as two parts with a single filament change.
 | `json` | json | none | raised | flat | the card as an object literal |
 | `scope` | default | `scope` | recessed | flat | graticule with a sine and a square trace |
 | `conway` | default | `conway` | recessed | emboss decor | gliders and still lifes, embossed |
+| `hexdump` | hexdump | none | recessed | flat | the card as xxd output |
+| `makefile` | makefile | none | recessed | flat | targets, a phony and one variable |
+| `dockerfile` | dockerfile | none | recessed | flat | FROM, LABEL, EXPOSE, CMD |
+| `manpage` | manpage | none | raised | flat | NAME, SYNOPSIS, SEE ALSO |
+| `stacktrace` | stacktrace | none | recessed | flat | a NameError that resolves to a contact |
+| `rustc` | rustc | none | recessed | flat | a borrow checker error with carets |
+| `sql` | sql | none | recessed | flat | a SELECT over the developers table |
+| `haskell` | haskell | none | raised | flat | a record type and its one value |
+| `roguelike` | roguelike | none | recessed | flat | an ASCII dungeon with the name in a vault |
+| `tracker` | tracker | none | recessed | flat | a ProTracker pattern, notes and volumes |
+| `ledmatrix` | default | `ledmatrix` | recessed | flat | the domain lit on a dot panel |
+| `railroad` | default | `railroad` | raised | flat | a syntax diagram with a bypass |
+| `logicgates` | default | `logicgates` | recessed | flat | an AND gate with an inverted output |
+| `keycaps` | default | `keycaps` | recessed | emboss decor | the surname on a row of embossed caps |
+| `turingtape` | default | `turingtape` | recessed | flat | cells and a read head |
+| `treeplate` | tree | none | recessed | plate | tree output knocked out of a full bleed slab |
+| `treeblind` | tree | none | recessed | blind deboss | tree output debossed, depth instead of colour |
+| `jsonplate` | json | none | recessed | plate | object literal knocked out of a slab |
+| `jsonblind` | json | none | raised | blind deboss | object literal debossed into a warm base |
+| `devtag` | devtag | none | recessed | flat | the </> glyph over the name |
+| `tags` | tags | none | recessed | square corners | the card wrapped in a dev element |
+| `commit` | commit | none | recessed | flat | author, date and a one line message |
+| `readme` | readme | none | raised | flat | the card as markdown source |
+| `env` | env | none | recessed | flat | a dotenv file that should not be committed |
+| `curl` | curl | none | recessed | flat | the response headers of a developer |
+| `todo` | todo | none | raised | flat | two things done, three left |
+| `manifesto` | manifesto | none | recessed | emboss text, square corners | three words, square corners |
 
 ### Depth, without a second color change
 
@@ -252,9 +284,11 @@ embossed style stacks a second solid on the features. Every one of those
 solids is verified watertight in the test suite.
 
 Style keys that drive it: `emboss` (`text`, `frame`, `panel`, `decor`, `qr`),
-`decor_mode: engrave` (the texture is sunk instead of raised), `plate` (the
-text is knocked out of a full bleed slab) and `shadow` (the name gets an
-offset ghost, so it reads as a drop shadow in real relief).
+`decor_mode: engrave` (the texture is sunk instead of raised), `text_mode:
+engrave` (blind deboss: the type itself becomes a groove, so the card carries
+no colour contrast at all and reads by depth alone), `plate` (the text is
+knocked out of a full bleed slab) and `shadow` (the name gets an offset ghost,
+so it reads as a drop shadow in real relief).
 
 ### QR variants
 
@@ -295,11 +329,15 @@ texture out of the whole text bounding box. Nothing drops below roughly
 `vertical` (name rotated along the edge), `outline` (hollow letters) and
 `ticker` (departure board caps).
 
-Four more are monospaced code blocks, set in DejaVu Sans Mono (which ships
+Sixteen more are monospaced code blocks, set in DejaVu Sans Mono (which ships
 with matplotlib, so they render the same everywhere): `diff` (added lines
 raised, removed lines engraved into the base), `tree` (the card as `tree`
-output, box drawing characters included), `json` (an object literal) and `vim`
-(a buffer with a tilde column, a block cursor and a filled status line). The
+output, box drawing characters included), `json` (an object literal), `vim` (a buffer with a
+tilde column, a block cursor and a filled status line), plus `hexdump`,
+`makefile`, `dockerfile`, `manpage`, `stacktrace`, `rustc`, `sql`, `haskell`,
+`roguelike`, `tracker`, `tags`, `commit`, `readme`, `env`, `curl` and `todo`.
+Two hand set layouts round it out: `devtag`, which leads with the `</>` glyph,
+and `manifesto`, three words and a name. The
 mono advance of 0.595 em is what sets the line budget: at `EM_CODE` the text
 column holds 21 characters, so every code line is written to fit it.
 
@@ -487,6 +525,51 @@ column holds 21 characters, so every code line is written to fit it.
 <tr>
 <td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/scope.png" alt="scope style preview"><br><b>scope</b></td>
 <td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/conway.png" alt="conway style preview"><br><b>conway</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/hexdump.png" alt="hexdump style preview"><br><b>hexdump</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/makefile.png" alt="makefile style preview"><br><b>makefile</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/dockerfile.png" alt="dockerfile style preview"><br><b>dockerfile</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/manpage.png" alt="manpage style preview"><br><b>manpage</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/stacktrace.png" alt="stacktrace style preview"><br><b>stacktrace</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/rustc.png" alt="rustc style preview"><br><b>rustc</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/sql.png" alt="sql style preview"><br><b>sql</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/haskell.png" alt="haskell style preview"><br><b>haskell</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/roguelike.png" alt="roguelike style preview"><br><b>roguelike</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/tracker.png" alt="tracker style preview"><br><b>tracker</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/ledmatrix.png" alt="ledmatrix style preview"><br><b>ledmatrix</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/railroad.png" alt="railroad style preview"><br><b>railroad</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/logicgates.png" alt="logicgates style preview"><br><b>logicgates</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/keycaps.png" alt="keycaps style preview"><br><b>keycaps</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/turingtape.png" alt="turingtape style preview"><br><b>turingtape</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/treeplate.png" alt="treeplate style preview"><br><b>treeplate</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/treeblind.png" alt="treeblind style preview"><br><b>treeblind</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/jsonplate.png" alt="jsonplate style preview"><br><b>jsonplate</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/jsonblind.png" alt="jsonblind style preview"><br><b>jsonblind</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/devtag.png" alt="devtag style preview"><br><b>devtag</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/tags.png" alt="tags style preview"><br><b>tags</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/commit.png" alt="commit style preview"><br><b>commit</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/readme.png" alt="readme style preview"><br><b>readme</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/env.png" alt="env style preview"><br><b>env</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/curl.png" alt="curl style preview"><br><b>curl</b></td>
+</tr>
+<tr>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/todo.png" alt="todo style preview"><br><b>todo</b></td>
+<td width="33%"><img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/previews/manifesto.png" alt="manifesto style preview"><br><b>manifesto</b></td>
 <td width="33%"></td>
 </tr>
 </table>
