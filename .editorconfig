@@ -1,8 +1,4 @@
-# Template for .editorconfig at the repository root.
-# Copy to ".editorconfig" (with the leading dot). No tokens to replace.
-#
-# EditorConfig is supported natively by most editors and through a plugin in
-# the rest. It settles indentation and whitespace before review has to.
+# EditorConfig settles indentation and whitespace before review has to.
 # Reference: https://editorconfig.org
 
 root = true
