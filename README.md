@@ -42,7 +42,7 @@ single filament change.
 
 - `visitenkarte.3mf`: a Bambu Studio project file. One object, two parts, each
   part already assigned to a filament slot (1 = black base, 2 = white
-  features). Open it and slice; no manual painting or part assignment.
+  features). Open it and slice; nothing has to be painted or assigned by hand.
 - `visitenkarte_base_black.stl` and `visitenkarte_top_white.stl`: the same two
   solids for any other slicer. Import together as one object with multiple
   parts.
@@ -55,8 +55,9 @@ Design decisions that matter for printing:
   feature occupies 0.6 to 1.0 mm. No layer ever mixes colors, so a printer
   without an AMS handles it with a single manual swap.
 - **Recessed QR code.** The QR panel is white; its dark modules are cutouts
-  exposing the black base 0.4 mm below. High contrast, no extra color, and
-  verified scannable by the test suite with OpenCV.
+  exposing the black base 0.4 mm below. The contrast stays high without
+  spending a third color, and the test suite verifies with OpenCV that the
+  rendered card still decodes.
 - **Sized for a 0.2 mm nozzle.** The finest strokes (tagline, contact lines)
   are around 0.3 mm wide. A 0.4 mm nozzle will blur the small text.
 
@@ -81,11 +82,13 @@ Then in Bambu Studio:
 1. Open `visitenkarte.3mf` (File > Open, not Import).
 2. Set filament slot 1 to black, slot 2 to white.
 3. Layer height 0.1 mm, first layer 0.1 mm. The color change lands at layer 7.
-4. No supports, no brim. Print it.
+4. Print without supports and without a brim; the flat base gives a clean
+   bottom face on its own.
 
 To make it your card, edit the constants and the text at the top of
 `build_card.py`: `QR_DATA` for the QR target, the `place_text` calls for name
-and tagline, the `rows` list for the contact lines. Everything else follows.
+and tagline, the `rows` list for the contact lines. Sizes and positions are
+plain constants in the same file.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/folder.svg" width="16" align="center"> How it works
 
