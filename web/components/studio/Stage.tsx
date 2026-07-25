@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 
 import type { Layer, RenderResult } from "@/lib/spec";
+import type { RenderError } from "@/lib/useRender";
 
 /**
  * The card in 2D, drawn from the worker's layer paths.
@@ -23,9 +24,11 @@ function shade(hex: string, amount: number): string {
 export function Stage({
   render,
   pending,
+  error,
 }: {
   render: RenderResult | null;
   pending: boolean;
+  error?: RenderError | null;
 }) {
   const fills = useMemo(() => {
     if (!render) return null;
@@ -77,7 +80,31 @@ export function Stage({
         </svg>
       )}
 
-      {!render && (
+      {/* Nothing has ever rendered and the service is unreachable. Say what
+          is missing rather than spinning forever: the gallery still works,
+          and this is the one page that genuinely needs the worker. */}
+      {!render && error?.offline && (
+        <div className="absolute inset-0 grid place-items-center p-6 text-center">
+          <div className="max-w-[42ch]">
+            <p className="num text-[13px]" style={{ color: "var(--flag)" }}>
+              Der Geometrie-Dienst ist nicht verbunden
+            </p>
+            <p className="mt-2 text-[13px]" style={{ color: "var(--muted)" }}>
+              Die Karten werden von einem Python-Worker gerechnet, nicht von
+              dieser Seite. Ohne ihn bleibt der Editor leer. Die Galerie
+              funktioniert weiterhin.
+            </p>
+            <a
+              href="https://github.com/noluyorAbi/printed-business-card/blob/main/DEPLOY.md"
+              className="num mt-3 inline-block text-[12px] underline underline-offset-4"
+            >
+              DEPLOY.md
+            </a>
+          </div>
+        </div>
+      )}
+
+      {!render && !error?.offline && (
         <div
           className="num absolute inset-0 grid place-items-center text-[12px]"
           style={{ color: "var(--muted)" }}

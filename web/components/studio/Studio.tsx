@@ -100,21 +100,34 @@ export function Studio({ initial }: { initial: CardSpec }) {
                 {mode}
               </button>
             ))}
-            {error && (
+            {/* when the service is down the stage says so at length, so this
+                line would just repeat it in smaller type */}
+            {error && !error.offline && (
               <span className="ml-auto text-[11px]" style={{ color: "var(--flag)" }}>
-                {error}
+                {error.message}
               </span>
             )}
           </div>
 
           {view === "2d" ? (
-            <Stage render={result} pending={pending} />
+            <Stage render={result} pending={pending} error={error} />
           ) : (
             <div
               className="overflow-hidden rounded-lg border rule"
               style={{ aspectRatio: "84 / 52", background: "var(--shade)" }}
             >
-              {result && <Card3D render={result} />}
+              {result ? (
+                <Card3D render={result} />
+              ) : (
+                <div
+                  className="num grid h-full place-items-center px-6 text-center text-[12px]"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {error?.offline
+                    ? "Ohne den Geometrie-Dienst gibt es nichts zu zeigen."
+                    : "wird gerechnet"}
+                </div>
+              )}
             </div>
           )}
 
