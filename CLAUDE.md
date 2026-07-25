@@ -4,8 +4,9 @@
 exportiert STL/3MF/PNG. Darauf entsteht gerade eine Web-App (Gallery, Editor,
 3D-Vorschau, Export) auf Vercel.
 
-Planung: [ROADMAP.md](ROADMAP.md), Aufgaben: [TODO.md](TODO.md).
-Vor Arbeit an der Web-App beide lesen.
+Ueberblick: [ROADMAP.md](ROADMAP.md), Bauplan mit Vertraegen und Designsystem:
+[PLAN.md](PLAN.md), Aufgaben: [TODO.md](TODO.md).
+Vor Arbeit an der Web-App alle drei lesen.
 
 ## Aufbau
 
@@ -57,5 +58,16 @@ Vor Arbeit an der Web-App beide lesen.
   Vercel proxied, cached und begrenzt.
 - **Caching ueber den Hash der kanonisierten Spec.** Gleiche Spec darf den Worker
   nur einmal kosten.
+- **Ein Zeichenweg.** `render_svg` erzeugt die Pfade aus denselben Shapely-Polygonen,
+  die in die Meshes gehen. Nie einen zweiten Renderer bauen, sonst driften Vorschau
+  und Druckdatei auseinander.
+- **Der Druck-Check ist Produktionscode.** `check_printability` liegt in
+  `build_card.py`, Editor und Tests rufen dieselbe Funktion. Die Messung wird nie
+  ein zweites Mal formuliert.
 - Der Editor kann keine Karte erzeugen, die den Print-Check verletzt, ohne dass die
   App es sichtbar macht. Warnen, nicht stumm reparieren.
+- **Die Oberflaeche traegt Graphit und Papier**, ein einziger Akzent (`--dye`, das
+  Blau von Anreisslack) und Orange nur fuer Warnungen. Grund: der Nutzer waehlt
+  selbst zwei kraeftige Kartenfarben, die App darf ihm dabei nicht in die Quere
+  kommen. Signaturelement ist der Profilstreifen, der die vier z-Ebenen von der
+  Kante zeigt. Details in [PLAN.md](PLAN.md), Abschnitt 6.

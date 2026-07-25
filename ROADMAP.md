@@ -6,6 +6,10 @@ Download als 3MF/STL, plus automatischer Druckbarkeits-Check.
 
 Frontend auf Vercel, Geometrie bleibt in Python.
 
+Dieses Dokument ist der Ueberblick. Die Vertraege, Signaturen, das Designsystem
+und die Akzeptanzkriterien stehen in [PLAN.md](PLAN.md), die Aufgabenliste in
+[TODO.md](TODO.md).
+
 ---
 
 ## 1. Architektur
