@@ -1,0 +1,44 @@
+# Card Studio geometry worker on Fly.io.
+#
+#   fly launch --no-deploy --copy-config
+#   fly secrets set WORKER_TOKEN=$(openssl rand -hex 32)
+#   fly deploy
+#
+# Then put the same token into Vercel as WORKER_TOKEN, and the machine URL as
+# WORKER_URL. The token is the only thing standing between the open internet
+# and a CPU bound geometry service, so it never goes into a NEXT_PUBLIC_ name.
+
+app = "card-studio-worker"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  RENDER_TIMEOUT = "20"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # A cold start costs several seconds because shapely, trimesh and matplotlib
+  # all have to import. The editor renders on every keystroke, so one machine
+  # stays up rather than paying that on the first edit of the day.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 8
+    hard_limit = 16
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  size = "shared-cpu-2x"
+  memory = "1gb"
