@@ -205,6 +205,36 @@ def test_every_issue_names_a_field_and_says_what_to_do():
         assert issue["field"] and issue["message"] and issue["hint"]
 
 
+def test_building_from_several_threads_does_not_take_the_process_down():
+    """matplotlib's font machinery is not thread safe, and it fails hard.
+
+    Without the lock in build_card this does not raise, it kills the
+    interpreter with SIGTRAP, which is how the worker died the first time a
+    parallel browser test hit it. A test that only checked results would have
+    passed right up until production.
+    """
+    import threading
+
+    errors = []
+
+    def work(i):
+        try:
+            spec = build_card.Spec(style="terminal", name=f"Thread {i}")
+            for _ in range(2):
+                card = build_card.build_shapes(spec=spec)
+                build_card.check_printability(card=card, spec=spec)
+        except BaseException as caught:      # noqa: BLE001
+            errors.append(repr(caught))
+
+    threads = [threading.Thread(target=work, args=(i,)) for i in range(6)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=180)
+        assert not thread.is_alive()
+    assert errors == []
+
+
 def test_catalog_describes_every_style():
     cat = build_card.catalog()
     assert len(cat["styles"]) == len(build_card.STYLES)

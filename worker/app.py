@@ -27,10 +27,13 @@ TOKEN = os.environ.get("WORKER_TOKEN", "")
 MAX_BODY = 8 * 1024                     # a spec is a few hundred bytes
 RENDER_TIMEOUT = float(os.environ.get("RENDER_TIMEOUT", "20"))
 
-# Geometry is CPU bound and releases the GIL only in parts, so requests run on
-# a small pool rather than the event loop. One worker per core, minus the one
-# serving HTTP.
-POOL = ThreadPoolExecutor(max_workers=max(1, (os.cpu_count() or 2) - 1))
+# Geometry runs off the event loop so slow builds cannot stall the server.
+# The pool is deliberately small: build_card serialises everything that
+# touches type, because matplotlib's font machinery is not thread safe and
+# fails by killing the process rather than by returning something wrong. Extra
+# threads here would only queue behind that lock. Parallelism comes from
+# running more than one worker process.
+POOL = ThreadPoolExecutor(max_workers=2, thread_name_prefix="render")
 
 app = FastAPI(title="Card Studio worker", docs_url=None, redoc_url=None)
 bearer = HTTPBearer(auto_error=False)

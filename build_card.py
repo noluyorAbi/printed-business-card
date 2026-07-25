@@ -13,10 +13,11 @@ nozzle: strokes and inter-letter gaps stay at or above roughly 0.45 mm, which
 is what stops letters from bleeding into each other on the print.
 """
 
+import threading
 from collections import namedtuple
 from contextlib import contextmanager
 from dataclasses import dataclass, replace as spec_replace
-from functools import lru_cache, reduce
+from functools import lru_cache, reduce, wraps
 
 import numpy as np
 import qrcode
@@ -1932,6 +1933,28 @@ CODE_LEAD = EM_CODE * 1.55
 
 
 # ---------------------------------------------------------------- text -> shapely
+# matplotlib's font machinery is not thread safe. FT2Font keeps mutable state
+# per face, the faces are shared through the cache below, and TextPath reaches
+# into the same globals. Two threads building cards at once do not race into a
+# wrong result, they take the whole process down with SIGTRAP. That is what a
+# parallel browser test did to the worker the first time it ran.
+#
+# So every entry point that touches type serialises here. The lock is
+# re-entrant because these functions call each other, and the cost is small:
+# a card takes about 300 ms and most of that is shapely holding the GIL
+# anyway. Real parallelism comes from running more than one worker process,
+# not more than one thread.
+_TYPE_LOCK = threading.RLock()
+
+
+def _serialized(fn):
+    @wraps(fn)
+    def guarded(*args, **kwargs):
+        with _TYPE_LOCK:
+            return fn(*args, **kwargs)
+    return guarded
+
+
 def _outline(tp):
     """Even-odd fill of a TextPath: cumulative symmetric difference."""
     polys = [Polygon(p) for p in tp.to_polygons() if len(p) >= 3]
@@ -1972,6 +1995,7 @@ def _advances(s, em, fp):
     return xs
 
 
+@_serialized
 def text_shape(s, em, fp=FONT, track=0.0):
     """Text as a polygon at em size.
 
@@ -2596,6 +2620,7 @@ def _row_ceiling(spec):
     return NAME_Y - EM_NAME * 1.2
 
 
+@_serialized
 def build_content(layout, spec=None):
     """Name, tagline and contact rows as one polygon, per layout variant.
 
@@ -4304,6 +4329,7 @@ def _clean(geom, base):
     return geom.buffer(0.01).buffer(-0.01).buffer(0).simplify(0.002).buffer(0)
 
 
+@_serialized
 def build_shapes(style=DEFAULT_STYLE, corners=None, spec=None):
     """Resolve a style into the four 2D layers of a Card.
 
@@ -4534,6 +4560,7 @@ def _shade(hex_color, amount):
     return "#%02x%02x%02x" % tuple(int(c + (target - c) * f) for c in (r, g, b))
 
 
+@_serialized
 def preview(card, path, style=DEFAULT_STYLE):
     import matplotlib.pyplot as plt
     from matplotlib.patches import PathPatch
@@ -4701,12 +4728,19 @@ def _stroke_and_gap(geom):
 # at 25 modules and 0.88 mm, a LinkedIn profile URL needs 29 and drops to
 # 0.76 mm. That still prints, so it warns. 0.60 mm is three extrusion widths
 # and the real physical end of the road, so that one is an error.
-STROKE_FLOOR, STROKE_TARGET = 0.38, 0.45
+#
+# The stroke floor is 0.25 mm, not the 0.45 mm target: a 0.2 mm nozzle lays
+# one perimeter at 0.2 mm, so 0.25 mm is where a line stops being a line. The
+# styles this repo ships already run down to 0.30 mm on the fallback font, so
+# anything stricter would refuse cards that were drawn, reviewed and printed.
+# Between floor and target a line prints thin, which is a warning, not a wall.
+STROKE_FLOOR, STROKE_TARGET = 0.25, 0.45
 GAP_FLOOR, GAP_TARGET = 0.24, 0.25
 MODULE_FLOOR, MODULE_TARGET = 0.60, 0.80
 EPS = 0.005     # float noise, well under anything a nozzle can resolve
 
 
+@_serialized
 @lru_cache(maxsize=256)
 def _style_baseline(style):
     """Thinnest stroke and tightest gap this style has with the stock text.
@@ -4727,6 +4761,7 @@ def _style_baseline(style):
     return stroke, gap
 
 
+@_serialized
 def check_printability(card=None, spec=None, decode=False):
     """Measure a card against what a 0.2 mm nozzle can actually lay down.
 

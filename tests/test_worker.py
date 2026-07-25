@@ -177,6 +177,21 @@ def test_a_warning_does_not_block_the_download(client):
     assert r.status_code == 200
 
 
+def test_parallel_renders_do_not_kill_the_service(client):
+    """The endpoint has to survive what a browser test actually does to it."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def once(i):
+        spec = default_spec("terminal")
+        spec.text.name = f"Client {i}"
+        return client.post("/render", json=body(spec), headers=AUTH).status_code
+
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        codes = list(pool.map(once, range(6)))
+    assert codes == [200] * 6
+    assert client.get("/health").json()["ok"] is True
+
+
 def test_overrides_reach_the_generator(client):
     spec = default_spec("circuit")
     with_decor = client.post("/render", json=body(spec), headers=AUTH).json()
