@@ -7,6 +7,10 @@
 <br>
 <br>
 
+<a href="https://printed-business-card.vercel.app?utm_source=readme&utm_medium=hero">
+  <img src="https://img.shields.io/badge/Open%20Card%20Studio-2b2fe0?style=for-the-badge&logoColor=white&labelColor=2b2fe0" height="54" alt="Open Card Studio, the web editor">
+</a>
+&nbsp;
 <a href="https://github.com/noluyorAbi/printed-business-card/stargazers">
   <img src="https://img.shields.io/badge/%E2%98%85%20Star%20this%20repo-0b0b0b?style=for-the-badge&logo=github&logoColor=white&labelColor=0b0b0b" height="54" alt="Star printed-business-card on GitHub">
 </a>
@@ -33,6 +37,13 @@ one-line edit followed by one command. The QR code is not an afterthought
 sticker: its dark modules are recessed through the white panel so the black
 base shows through, which makes it scannable and keeps the whole print at a
 single filament change.
+
+There is a browser version too:
+**[Card Studio](https://printed-business-card.vercel.app?utm_source=readme&utm_medium=intro)**
+shows all 163 styles, lets you put your own name and QR target on one, previews
+it in 2D and 3D, and hands you the 3MF. The editor is live; the geometry
+service behind it is not deployed yet, so the gallery works and the editor
+tells you what is missing. See [DEPLOY.md](DEPLOY.md).
 
 ---
 

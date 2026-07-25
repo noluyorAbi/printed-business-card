@@ -1,0 +1,12 @@
+# Uploaded to Vercel only so the build can copy assets/previews into
+# web/public. Everything else here is either the generator's own output or
+# irrelevant to the site.
+.venv
+.git
+node_modules
+graphify-out
+__pycache__
+.pytest_cache
+*.stl
+*.3mf
+visitenkarte_preview.png
