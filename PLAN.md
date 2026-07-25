@@ -4,6 +4,24 @@ Der strategische Ueberblick steht in [ROADMAP.md](ROADMAP.md), die Aufgabenliste
 [TODO.md](TODO.md). Dieses Dokument ist der Bauplan: Vertraege, Signaturen,
 Dateibaum, Designsystem, Akzeptanzkriterien. Wer eine Phase umsetzt, liest hier.
 
+**Stand.** Phase 0 bis 6 sind gebaut und laufen lokal als ganze Kette
+(`./scripts/e2e.sh`). Was noch aussteht, steht in [TODO.md](TODO.md): das
+Vercel-Projekt und die Fly-App muessen mit den Konten des Nutzers tatsaechlich
+angelegt werden ([DEPLOY.md](DEPLOY.md)), und Exporte streamen heute durch den
+Worker, statt zusaetzlich in Vercel Blob zu landen.
+
+Drei Dinge sind beim Bauen anders entschieden worden als hier zuerst geplant.
+Sie stehen unten an ihrer Stelle, hier nur als Liste, damit niemand nach der
+alten Fassung sucht:
+
+1. Der Druck-Check misst **gegen die Basislinie des jeweiligen Styles**, nicht
+   gegen feste Zahlen (Abschnitt 3).
+2. Der Render liefert **zwei Sichten**, `layers` fuer 2D und `solids` fuer 3D,
+   weil eine Gravur weggenommenes Material ist (Abschnitt 3).
+3. Alles, was Schrift anfasst, ist **serialisiert**. matplotlib ist nicht
+   thread-safe und stuerzt den Prozess ab, statt falsch zu rechnen
+   (Abschnitt 4).
+
 ---
 
 ## 1. Was gebaut wird
@@ -105,30 +123,68 @@ Millimetern, Ursprung unten links (also y aufwaerts wie im Generator; der
 Viewer dreht per Transform). Leere Ebenen liefern `d: ""` und werden vom
 Client uebersprungen.
 
+Neben `layers` liefert `/render` auch `solids`: dieselben Polygone, aber als
+die Koerper, die `card_meshes` extrudiert. Das ist noetig, weil `layers` eine
+Malreihenfolge fuer die flache Vorschau ist, in der die Gravur als dunkle
+Einlage obenauf gezeichnet wird. In 3D waere das falsch herum: eine Gravur ist
+weggenommenes Material, ein gestapelter Block zeigte einen Grat, wo der Druck
+eine Nut hat. Also wird die Aufteilung, die der Mesh-Bauer ohnehin vornimmt,
+mitveroeffentlicht, und beide Ansichten kommen aus einem Satz Polygone.
+
+```jsonc
+"solids": [
+  { "id": "base-lower", "filament": "base",    "z0": 0.0, "z1": 0.3, "d": "M..." },
+  { "id": "base-top",   "filament": "base",    "z0": 0.3, "z1": 0.6, "d": "M..." },
+  { "id": "feature",    "filament": "feature", "z0": 0.6, "z1": 1.0, "d": "M..." },
+  { "id": "high",       "filament": "feature", "z0": 1.0, "z1": 1.3, "d": "M..." }
+]
+```
+
 `PrintCheck`:
 
 ```jsonc
 {
   "ok": true,
   "metrics": {
-    "min_stroke_mm": 0.52,
-    "min_gap_mm": 0.41,
+    "min_stroke_mm": 0.49,
+    "min_gap_mm": 0.26,
     "qr_module_mm": 0.88,
+    "qr_modules": 25,
     "qr_quiet_modules": 3,
-    "qr_decoded": true,
+    "qr_decoded": null,
     "text_within_column": true
   },
   "issues": [
-    { "level": "warn", "code": "gap_tight", "field": "text.name",
-      "message": "Name ist lang, der Buchstabenabstand faellt auf 0.41 mm.",
-      "hint": "Bis 0.45 mm bleibt der Druck sauber. Kuerze den Namen oder nimm ein Layout ohne Tagline." }
+    { "level": "warn", "code": "qr_small", "field": "qr.data",
+      "message": "QR-Modul 0.76 mm, unter dem Zielwert von 0.80 mm.",
+      "hint": "Scannt weiterhin, verzeiht aber weniger beim Druck. Ein kuerzeres Ziel bringt groessere Module." }
   ]
 }
 ```
 
-Schweregrade: `error` (Geometrie waere unbrauchbar, Export wird verweigert),
-`warn` (druckbar, aber unter Zielwert), `info`. Der Editor blockiert nie
-stumm; er zeigt jede Meldung an der Stelle, die sie ausgeloest hat.
+Schweregrade: `error` (Export wird verweigert), `warn` (druckbar, aber unter
+Zielwert), `info`. Der Editor blockiert nie stumm; er zeigt jede Meldung an
+der Stelle, die sie ausgeloest hat.
+
+**Die Schwellwerte sind relativ, nicht absolut.** Der urspruengliche Plan sah
+feste Zahlen vor. Beim Messen stellte sich heraus, dass ein Drittel der 163
+Styles bewusst darunter liegt: `signet` setzt zwei Initialen 0.06 mm
+auseinander, die `tree`-Layouts zeichnen Rahmenzeichen, die sich beruehren
+sollen, `rustc` laeuft auf 0.30 mm Strichstaerke. Diese Karten wurden
+gerendert, angesehen und eine davon gedruckt. Ein Check, der die eigenen
+Karten des Projekts beanstandet, bringt Leute nur dazu, ihn zu ignorieren.
+
+Also lautet die Frage nicht "liegt das ueber einer Zahl", sondern "hat dein
+Text diesen Style schlechter gemacht, als er ohnehin ist". Die absoluten Boeden
+gelten weiter, sie duerfen nur nie mehr verlangen als die Basislinie des Styles:
+
+| | Fehler | Warnung |
+| --- | --- | --- |
+| Strich | 0.25 mm, darunter zieht eine 0.2er Duese keine Linie mehr | 0.45 mm |
+| Abstand | 0.24 mm, der gemessene Wert der Karte, die zulief | 0.25 mm |
+| QR-Modul | 0.60 mm, drei Extrusionsbreiten | 0.80 mm |
+
+`test_check_passes_every_style_with_its_own_text` haelt das fest.
 
 `format` bei `/export`: `"3mf" | "stl-base" | "stl-top"`. Antwort mit
 `Content-Type: model/3mf` beziehungsweise `model/stl` und
