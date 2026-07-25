@@ -4600,10 +4600,34 @@ def _svg_path(geom, precision=3):
     return "".join(out)
 
 
-def render_svg(card, colors=None, corners=None):
-    """The four layers as SVG paths, with the z range each one occupies.
+def card_solids(card):
+    """The card as stacked solids, exactly the ones `card_meshes` extrudes.
 
-    Built from the same polygons that go into the meshes, so the preview can
+    `layers` below is a painting order for a flat preview, where the engraved
+    grooves are drawn as a darker inlay on top of the base. A 3D view cannot
+    use that: a groove is material taken away, and stacking it as a block
+    would show a ridge where the print has a notch. So the split the mesh
+    builder performs is published too, and both views come from one set of
+    polygons.
+    """
+    out = []
+    if card.engrave.is_empty:
+        out.append(("base", "base", 0.0, BASE_Z, card.base))
+    else:
+        out.append(("base-lower", "base", 0.0, BASE_Z - ENGRAVE_Z, card.base))
+        out.append(("base-top", "base", BASE_Z - ENGRAVE_Z, BASE_Z,
+                    card.base.difference(card.engrave)))
+    out.append(("feature", "feature", BASE_Z, BASE_Z + TOP_Z, card.feature))
+    if not card.high.is_empty:
+        out.append(("high", "feature", BASE_Z + TOP_Z, BASE_Z + TOP_Z + HIGH_Z,
+                    card.high))
+    return out
+
+
+def render_svg(card, colors=None, corners=None):
+    """The card as SVG paths, both as flat layers and as printable solids.
+
+    Built from the same polygons that go into the meshes, so a preview can
     never show something the print file does not have.
     """
     colors = colors or {"base": "#111111", "feature": "#ffffff"}
@@ -4618,6 +4642,9 @@ def render_svg(card, colors=None, corners=None):
         "layers": [{"id": name, "z0": z0, "z1": z1, "cut": cut,
                     "d": _svg_path(geom)}
                    for name, z0, z1, cut, geom in layers],
+        "solids": [{"id": name, "filament": filament, "z0": z0, "z1": z1,
+                    "d": _svg_path(geom)}
+                   for name, filament, z0, z1, geom in card_solids(card)],
         "colors": dict(colors),
     }
 
@@ -4918,7 +4945,9 @@ def main():
 
     if args.dump_catalog:
         import json
+        import os
 
+        os.makedirs(os.path.dirname(args.dump_catalog) or ".", exist_ok=True)
         with open(args.dump_catalog, "w") as fh:
             json.dump(catalog(), fh, indent=2, sort_keys=True)
             fh.write("\n")

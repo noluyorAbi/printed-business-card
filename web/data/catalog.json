@@ -1,0 +1,3974 @@
+{
+  "card": {
+    "base_z": 0.6,
+    "corner_r": 3.0,
+    "engrave_z": 0.3,
+    "h": 52.0,
+    "high_z": 0.3,
+    "top_z": 0.4,
+    "w": 84.0
+  },
+  "decors": [
+    {
+      "bottom": false,
+      "id": "arrows"
+    },
+    {
+      "bottom": false,
+      "id": "bamboo"
+    },
+    {
+      "bottom": true,
+      "id": "barcode"
+    },
+    {
+      "bottom": false,
+      "id": "bauhaus"
+    },
+    {
+      "bottom": false,
+      "id": "blocks"
+    },
+    {
+      "bottom": false,
+      "id": "brackets"
+    },
+    {
+      "bottom": false,
+      "id": "braille"
+    },
+    {
+      "bottom": false,
+      "id": "brick"
+    },
+    {
+      "bottom": false,
+      "id": "bubbles"
+    },
+    {
+      "bottom": false,
+      "id": "bullseye"
+    },
+    {
+      "bottom": false,
+      "id": "carbon"
+    },
+    {
+      "bottom": false,
+      "id": "checker"
+    },
+    {
+      "bottom": false,
+      "id": "chevron"
+    },
+    {
+      "bottom": false,
+      "id": "circuit"
+    },
+    {
+      "bottom": true,
+      "id": "city"
+    },
+    {
+      "bottom": true,
+      "id": "code39"
+    },
+    {
+      "bottom": false,
+      "id": "constellation"
+    },
+    {
+      "bottom": false,
+      "id": "conway"
+    },
+    {
+      "bottom": false,
+      "id": "coremem"
+    },
+    {
+      "bottom": false,
+      "id": "crosses"
+    },
+    {
+      "bottom": true,
+      "id": "diffnote"
+    },
+    {
+      "bottom": false,
+      "id": "dip"
+    },
+    {
+      "bottom": false,
+      "id": "dragon"
+    },
+    {
+      "bottom": false,
+      "id": "dsky"
+    },
+    {
+      "bottom": false,
+      "id": "fibonacci"
+    },
+    {
+      "bottom": true,
+      "id": "flamegraph"
+    },
+    {
+      "bottom": true,
+      "id": "frontpanel"
+    },
+    {
+      "bottom": true,
+      "id": "gitgraph"
+    },
+    {
+      "bottom": false,
+      "id": "glitch"
+    },
+    {
+      "bottom": false,
+      "id": "graph"
+    },
+    {
+      "bottom": false,
+      "id": "graycode"
+    },
+    {
+      "bottom": false,
+      "id": "halftone"
+    },
+    {
+      "bottom": false,
+      "id": "hatch"
+    },
+    {
+      "bottom": true,
+      "id": "hazard"
+    },
+    {
+      "bottom": true,
+      "id": "helix"
+    },
+    {
+      "bottom": false,
+      "id": "hex"
+    },
+    {
+      "bottom": false,
+      "id": "hilbert"
+    },
+    {
+      "bottom": false,
+      "id": "iso"
+    },
+    {
+      "bottom": true,
+      "id": "keycaps"
+    },
+    {
+      "bottom": false,
+      "id": "knit"
+    },
+    {
+      "bottom": false,
+      "id": "lattice"
+    },
+    {
+      "bottom": true,
+      "id": "ledmatrix"
+    },
+    {
+      "bottom": false,
+      "id": "lissajous"
+    },
+    {
+      "bottom": false,
+      "id": "logicgates"
+    },
+    {
+      "bottom": true,
+      "id": "magstripe"
+    },
+    {
+      "bottom": false,
+      "id": "mandelbrot"
+    },
+    {
+      "bottom": false,
+      "id": "matrix"
+    },
+    {
+      "bottom": false,
+      "id": "maze"
+    },
+    {
+      "bottom": false,
+      "id": "mesh"
+    },
+    {
+      "bottom": false,
+      "id": "moire"
+    },
+    {
+      "bottom": false,
+      "id": "monoscope"
+    },
+    {
+      "bottom": true,
+      "id": "morse"
+    },
+    {
+      "bottom": true,
+      "id": "mountains"
+    },
+    {
+      "bottom": false,
+      "id": "perfboard"
+    },
+    {
+      "bottom": false,
+      "id": "perspective"
+    },
+    {
+      "bottom": false,
+      "id": "phyllotaxis"
+    },
+    {
+      "bottom": false,
+      "id": "pixel"
+    },
+    {
+      "bottom": false,
+      "id": "plus"
+    },
+    {
+      "bottom": false,
+      "id": "polka"
+    },
+    {
+      "bottom": false,
+      "id": "punchcard"
+    },
+    {
+      "bottom": true,
+      "id": "punchtape"
+    },
+    {
+      "bottom": false,
+      "id": "radar"
+    },
+    {
+      "bottom": false,
+      "id": "radiate"
+    },
+    {
+      "bottom": true,
+      "id": "railroad"
+    },
+    {
+      "bottom": false,
+      "id": "rain"
+    },
+    {
+      "bottom": false,
+      "id": "rule30"
+    },
+    {
+      "bottom": false,
+      "id": "scales"
+    },
+    {
+      "bottom": true,
+      "id": "scanlines"
+    },
+    {
+      "bottom": false,
+      "id": "scope"
+    },
+    {
+      "bottom": false,
+      "id": "sierpinski"
+    },
+    {
+      "bottom": false,
+      "id": "snake"
+    },
+    {
+      "bottom": true,
+      "id": "spiral"
+    },
+    {
+      "bottom": false,
+      "id": "squares"
+    },
+    {
+      "bottom": false,
+      "id": "starfield"
+    },
+    {
+      "bottom": false,
+      "id": "stitch"
+    },
+    {
+      "bottom": false,
+      "id": "sunburst"
+    },
+    {
+      "bottom": false,
+      "id": "sunset"
+    },
+    {
+      "bottom": false,
+      "id": "tape"
+    },
+    {
+      "bottom": true,
+      "id": "teletext"
+    },
+    {
+      "bottom": false,
+      "id": "terrazzo"
+    },
+    {
+      "bottom": true,
+      "id": "ticket"
+    },
+    {
+      "bottom": false,
+      "id": "topo"
+    },
+    {
+      "bottom": false,
+      "id": "tri"
+    },
+    {
+      "bottom": false,
+      "id": "truchet"
+    },
+    {
+      "bottom": true,
+      "id": "turingtape"
+    },
+    {
+      "bottom": true,
+      "id": "vimchrome"
+    },
+    {
+      "bottom": true,
+      "id": "wave"
+    },
+    {
+      "bottom": true,
+      "id": "waveform"
+    },
+    {
+      "bottom": false,
+      "id": "wireglobe"
+    },
+    {
+      "bottom": false,
+      "id": "workbench"
+    },
+    {
+      "bottom": false,
+      "id": "zebra"
+    }
+  ],
+  "frames": [
+    "band",
+    "double",
+    "none"
+  ],
+  "icons": [
+    "github",
+    "globe",
+    "linkedin",
+    "mail",
+    "none"
+  ],
+  "layouts": [
+    {
+      "id": "ansi",
+      "mono": true
+    },
+    {
+      "id": "asm",
+      "mono": true
+    },
+    {
+      "id": "bauhaus",
+      "mono": false
+    },
+    {
+      "id": "brutal",
+      "mono": false
+    },
+    {
+      "id": "centered",
+      "mono": false
+    },
+    {
+      "id": "commit",
+      "mono": true
+    },
+    {
+      "id": "curl",
+      "mono": true
+    },
+    {
+      "id": "default",
+      "mono": false
+    },
+    {
+      "id": "devtag",
+      "mono": false
+    },
+    {
+      "id": "diff",
+      "mono": true
+    },
+    {
+      "id": "dockerfile",
+      "mono": true
+    },
+    {
+      "id": "env",
+      "mono": true
+    },
+    {
+      "id": "haskell",
+      "mono": true
+    },
+    {
+      "id": "hexdump",
+      "mono": true
+    },
+    {
+      "id": "json",
+      "mono": true
+    },
+    {
+      "id": "konami",
+      "mono": true
+    },
+    {
+      "id": "makefile",
+      "mono": true
+    },
+    {
+      "id": "manifesto",
+      "mono": false
+    },
+    {
+      "id": "manpage",
+      "mono": true
+    },
+    {
+      "id": "monogram",
+      "mono": false
+    },
+    {
+      "id": "outline",
+      "mono": false
+    },
+    {
+      "id": "readme",
+      "mono": true
+    },
+    {
+      "id": "roguelike",
+      "mono": true
+    },
+    {
+      "id": "rustc",
+      "mono": true
+    },
+    {
+      "id": "sql",
+      "mono": true
+    },
+    {
+      "id": "stacktrace",
+      "mono": true
+    },
+    {
+      "id": "tags",
+      "mono": true
+    },
+    {
+      "id": "terminal",
+      "mono": false
+    },
+    {
+      "id": "ticker",
+      "mono": false
+    },
+    {
+      "id": "todo",
+      "mono": true
+    },
+    {
+      "id": "tracker",
+      "mono": true
+    },
+    {
+      "id": "tree",
+      "mono": true
+    },
+    {
+      "id": "vcard",
+      "mono": true
+    },
+    {
+      "id": "vertical",
+      "mono": false
+    },
+    {
+      "id": "vim",
+      "mono": true
+    }
+  ],
+  "limits": {
+    "label": 24,
+    "name": 28,
+    "qr_data": 120,
+    "rows": 4,
+    "tagline_line": 30
+  },
+  "qr_modes": [
+    "recess",
+    "deep",
+    "framed",
+    "relief"
+  ],
+  "qr_shapes": [
+    "square",
+    "round",
+    "dot"
+  ],
+  "styles": [
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#101010",
+        "feature": "#55ff55"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "ansi",
+      "label": "ANSI: a BBS box drawn in double lines",
+      "layout": "ansi",
+      "preview": "/previews/ansi.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#141414",
+        "feature": "#ff8a5b"
+      },
+      "decor": "arrows",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Koralle"
+      },
+      "frame": "none",
+      "id": "arrows",
+      "label": "Arrows: rows pointing at the QR panel",
+      "layout": "default",
+      "preview": "/previews/arrows.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#141414",
+        "feature": "#ffd166"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Bernstein"
+      },
+      "frame": "none",
+      "id": "asm",
+      "label": "Asm: seven instructions and a string literal",
+      "layout": "asm",
+      "preview": "/previews/asm.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#f3f1e7",
+        "feature": "#2f6b4f"
+      },
+      "decor": "bamboo",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Jade"
+      },
+      "frame": "band",
+      "id": "bamboo",
+      "label": "Bamboo: rods with nodes, jade on paper",
+      "layout": "default",
+      "preview": "/previews/bamboo.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f5f5f5",
+        "feature": "#111111"
+      },
+      "decor": "barcode",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "barcode",
+      "label": "Barcode: bars along the bottom, black on white",
+      "layout": "default",
+      "preview": "/previews/barcode.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#2b1d12",
+        "feature": "#e3b98a"
+      },
+      "decor": "chevron",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Rinde",
+        "feature": "Schrift Holz"
+      },
+      "frame": "none",
+      "id": "bark",
+      "label": "Bark: engraved chevrons, warm palette",
+      "layout": "default",
+      "preview": "/previews/bark.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#f2ece1",
+        "feature": "#c8321e"
+      },
+      "decor": "bauhaus",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Creme",
+        "feature": "Schrift Rot"
+      },
+      "frame": "none",
+      "id": "bauhaus",
+      "label": "Bauhaus: ring, quarter disc and dot, red on cream",
+      "layout": "bauhaus",
+      "preview": "/previews/bauhaus.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#101010",
+        "feature": "#7ef9a2"
+      },
+      "decor": "blocks",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Neongruen"
+      },
+      "frame": "none",
+      "id": "blocks",
+      "label": "Blocks: coarse random rectangles",
+      "layout": "default",
+      "preview": "/previews/blocks.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#f2f4f7",
+        "feature": "#1b3a6b"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Blau"
+      },
+      "frame": "double",
+      "id": "blueprint",
+      "label": "Blueprint: white base, blue features",
+      "layout": "default",
+      "preview": "/previews/blueprint.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0a0a0a",
+        "feature": "#ffcc33"
+      },
+      "decor": null,
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Bernstein"
+      },
+      "frame": "none",
+      "id": "board",
+      "label": "Board: departure board caps",
+      "layout": "ticker",
+      "preview": "/previews/board.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0d0d0d",
+        "feature": "#f5f5f5"
+      },
+      "decor": "brackets",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "brackets",
+      "label": "Brackets: camera framing marks in the corners",
+      "layout": "brutal",
+      "preview": "/previews/brackets.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#1d1d1f",
+        "feature": "#f5f5f7"
+      },
+      "decor": "braille",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Anthrazit",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "braille",
+      "label": "Braille: engraved dot cells you can feel",
+      "layout": "default",
+      "preview": "/previews/braille.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#2a120c",
+        "feature": "#d98b5f"
+      },
+      "decor": "brick",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Oxblood",
+        "feature": "Schrift Ton"
+      },
+      "frame": "none",
+      "id": "brick",
+      "label": "Brick: running bond wall, clay on oxblood",
+      "layout": "default",
+      "preview": "/previews/brick.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#151515",
+        "feature": "#f5f1e6"
+      },
+      "decor": "halftone",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Creme"
+      },
+      "frame": "none",
+      "id": "brutal",
+      "label": "Brutal: oversized name over a halftone gradient",
+      "layout": "brutal",
+      "preview": "/previews/brutal.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#04212b",
+        "feature": "#8ff0e8"
+      },
+      "decor": "bubbles",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tiefsee",
+        "feature": "Schrift Aqua"
+      },
+      "frame": "none",
+      "id": "bubbles",
+      "label": "Bubbles: rings floating upward",
+      "layout": "default",
+      "preview": "/previews/bubbles.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#0f0f10",
+        "feature": "#ff5252"
+      },
+      "decor": "bullseye",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Rot"
+      },
+      "frame": "none",
+      "id": "bullseye",
+      "label": "Bullseye: concentric rings, red on black",
+      "layout": "default",
+      "preview": "/previews/bullseye.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#1c1c1e",
+        "feature": "#b9bcc2"
+      },
+      "decor": "carbon",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Graphit",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "carbon",
+      "label": "Carbon: woven bundles, silver on graphite",
+      "layout": "default",
+      "preview": "/previews/carbon.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#241a12",
+        "feature": "#e8c9a0"
+      },
+      "decor": "maze",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Nussbaum",
+        "feature": "Schrift Sand"
+      },
+      "frame": "none",
+      "id": "carved",
+      "label": "Carved: labyrinth grooves under the text",
+      "layout": "default",
+      "preview": "/previews/carved.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#f2f2f2",
+        "feature": "#111111"
+      },
+      "decor": "checker",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "checker",
+      "label": "Checker: board fading out to the left",
+      "layout": "default",
+      "preview": "/previews/checker.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#2b1b3d",
+        "feature": "#ffd166"
+      },
+      "decor": "chevron",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Pflaume",
+        "feature": "Schrift Amber"
+      },
+      "frame": "none",
+      "id": "chevron",
+      "label": "Chevron: zigzag rows, amber on plum",
+      "layout": "default",
+      "preview": "/previews/chevron.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#0b3d2e",
+        "feature": "#d9b45b"
+      },
+      "decor": "circuit",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Platinengruen",
+        "feature": "Schrift Gold"
+      },
+      "frame": "double",
+      "id": "circuit",
+      "label": "Circuit: PCB traces and pads, gold on board green",
+      "layout": "default",
+      "preview": "/previews/circuit.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0b3d2e",
+        "feature": "#d9b45b"
+      },
+      "decor": "circuit",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Platinengruen",
+        "feature": "Schrift Gold"
+      },
+      "frame": "double",
+      "id": "circuitry",
+      "label": "Circuitry: PCB traces raised a second step",
+      "layout": "default",
+      "preview": "/previews/circuitry.png",
+      "qr": "framed",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#06070f",
+        "feature": "#f2f2f2"
+      },
+      "decor": "city",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtschwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "city",
+      "label": "City: skyline with lit windows",
+      "layout": "default",
+      "preview": "/previews/city.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#151515",
+        "feature": "#ececec"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "classic",
+      "label": "Classic: black base, white features",
+      "layout": "default",
+      "preview": "/previews/classic.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f5f5f2",
+        "feature": "#141414"
+      },
+      "decor": "code39",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "code39",
+      "label": "Code 39: a real barcode of the surname, verified by the tests",
+      "layout": "default",
+      "preview": "/previews/code39.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#1b1b1b",
+        "feature": "#e0b354"
+      },
+      "decor": "hex",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gold"
+      },
+      "frame": "none",
+      "id": "comb",
+      "label": "Comb: engraved honeycomb, matte inside the cells",
+      "layout": "default",
+      "preview": "/previews/comb.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#101418",
+        "feature": "#e6edf3"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tinte",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "commit",
+      "label": "Commit: author, date and a one line message",
+      "layout": "commit",
+      "preview": "/previews/commit.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#0d1730",
+        "feature": "#f0f4ff"
+      },
+      "decor": "constellation",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Navy",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "constellation",
+      "label": "Constellation: star map with linked neighbours",
+      "layout": "default",
+      "preview": "/previews/constellation.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0d0d12",
+        "feature": "#dfe6ff"
+      },
+      "decor": "conway",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtschwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "conway",
+      "label": "Conway: gliders and still lifes, embossed",
+      "layout": "default",
+      "preview": "/previews/conway.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#2b1414",
+        "feature": "#ff8f7a"
+      },
+      "decor": "scales",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Bordeaux",
+        "feature": "Schrift Koralle"
+      },
+      "frame": "none",
+      "id": "coral",
+      "label": "Coral: engraved scales, warm on warm",
+      "layout": "default",
+      "preview": "/previews/coral.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#14100c",
+        "feature": "#e0c9a6"
+      },
+      "decor": "coremem",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Ferrit",
+        "feature": "Schrift Kupfer"
+      },
+      "frame": "none",
+      "id": "coremem",
+      "label": "Coremem: ferrite cores with the wires threaded between",
+      "layout": "default",
+      "preview": "/previews/coremem.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#f0ebe1",
+        "feature": "#1f4b99"
+      },
+      "decor": "bauhaus",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Creme",
+        "feature": "Schrift Blau"
+      },
+      "frame": "none",
+      "id": "crest",
+      "label": "Crest: embossed Bauhaus primitives",
+      "layout": "bauhaus",
+      "preview": "/previews/crest.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#1c2126",
+        "feature": "#dfe9f3"
+      },
+      "decor": "crosses",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Stahl",
+        "feature": "Schrift Eis"
+      },
+      "frame": "band",
+      "id": "crosses",
+      "label": "Crosses: scattered X marks, ice on steel",
+      "layout": "default",
+      "preview": "/previews/crosses.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#0b1020",
+        "feature": "#9fe0ff"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Hellblau"
+      },
+      "frame": "none",
+      "id": "curl",
+      "label": "Curl: the response headers of a developer",
+      "layout": "curl",
+      "preview": "/previews/curl.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#101010",
+        "feature": "#f0f0f0"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "deepqr",
+      "label": "Deep QR: modules cut through the panel and into the base",
+      "layout": "default",
+      "preview": "/previews/deepqr.png",
+      "qr": "deep",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#12161a",
+        "feature": "#e9eef2"
+      },
+      "decor": "graph",
+      "emboss": "text",
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Schiefer",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "depth",
+      "label": "Depth: engraved grid, raised text, deep QR",
+      "layout": "default",
+      "preview": "/previews/depth.png",
+      "qr": "deep",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0f1117",
+        "feature": "#7ee787"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nacht",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "devtag",
+      "label": "Devtag: the </> glyph over the name",
+      "layout": "devtag",
+      "preview": "/previews/devtag.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0f1419",
+        "feature": "#a6e3a1"
+      },
+      "decor": "diffnote",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Tinte",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "diff",
+      "label": "Diff: added lines raised, removed lines engraved",
+      "layout": "diff",
+      "preview": "/previews/diff.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1a1a1c",
+        "feature": "#c9ccd1"
+      },
+      "decor": "dip",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Kunststoff",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "dip",
+      "label": "DIP: the card as a chip, legs and a pin 1 notch",
+      "layout": "default",
+      "preview": "/previews/dip.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0d1b2a",
+        "feature": "#7fd3f7"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Docker-Blau",
+        "feature": "Schrift Hellblau"
+      },
+      "frame": "none",
+      "id": "dockerfile",
+      "label": "Dockerfile: FROM, LABEL, EXPOSE, CMD",
+      "layout": "dockerfile",
+      "preview": "/previews/dockerfile.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f7f7f5",
+        "feature": "#101010"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "dotmatrix",
+      "label": "Dot matrix: every QR module is a raised disc",
+      "layout": "default",
+      "preview": "/previews/dotmatrix.png",
+      "qr": "relief",
+      "qr_shape": "dot"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#f6f1f4",
+        "feature": "#5b2a4a"
+      },
+      "decor": "polka",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Rose",
+        "feature": "Schrift Beere"
+      },
+      "frame": "band",
+      "id": "dotwork",
+      "label": "Dotwork: engraved polka grid",
+      "layout": "default",
+      "preview": "/previews/dotwork.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#101010",
+        "feature": "#ff8f5c"
+      },
+      "decor": "dragon",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Koralle"
+      },
+      "frame": "none",
+      "id": "dragon",
+      "label": "Dragon: twelve folds of the dragon curve",
+      "layout": "default",
+      "preview": "/previews/dragon.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0b0b0d",
+        "feature": "#8de08d"
+      },
+      "decor": "dsky",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "dsky",
+      "label": "DSKY: Apollo registers up top, caution lamps below",
+      "layout": "default",
+      "preview": "/previews/dsky.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#241c12",
+        "feature": "#f0dcb4"
+      },
+      "decor": "mountains",
+      "emboss": "text",
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Sandstein",
+        "feature": "Schrift Sand"
+      },
+      "frame": "none",
+      "id": "dune",
+      "label": "Dune: engraved ridges with an embossed name",
+      "layout": "default",
+      "preview": "/previews/dune.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f2f2f2",
+        "feature": "#1b1b1b"
+      },
+      "decor": null,
+      "emboss": "qr",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "embossqr",
+      "label": "Emboss QR: raised modules standing off the base",
+      "layout": "default",
+      "preview": "/previews/embossqr.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#12140f",
+        "feature": "#d7ff8a"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Limette"
+      },
+      "frame": "none",
+      "id": "env",
+      "label": "Env: a dotenv file that should not be committed",
+      "layout": "env",
+      "preview": "/previews/env.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#f7f3e8",
+        "feature": "#2b3a2f"
+      },
+      "decor": "fibonacci",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Bone",
+        "feature": "Schrift Moos"
+      },
+      "frame": "band",
+      "id": "fibonacci",
+      "label": "Fibonacci: squares with the golden spiral through them",
+      "layout": "default",
+      "preview": "/previews/fibonacci.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#140f0a",
+        "feature": "#ff9f45"
+      },
+      "decor": "flamegraph",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Kohle",
+        "feature": "Schrift Flamme"
+      },
+      "frame": "none",
+      "id": "flamegraph",
+      "label": "Flamegraph: the profiler mountain range",
+      "layout": "default",
+      "preview": "/previews/flamegraph.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#161a1f",
+        "feature": "#ffd166"
+      },
+      "decor": "frontpanel",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schiefer",
+        "feature": "Schrift Bernstein"
+      },
+      "frame": "none",
+      "id": "frontpanel",
+      "label": "Frontpanel: blinkenlights over a row of paddles",
+      "layout": "default",
+      "preview": "/previews/frontpanel.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#0a1020",
+        "feature": "#e8f0ff"
+      },
+      "decor": "starfield",
+      "emboss": "text",
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Frost"
+      },
+      "frame": "band",
+      "id": "frost",
+      "label": "Frost: engraved starfield, raised text",
+      "layout": "default",
+      "preview": "/previews/frost.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#1a1a1a",
+        "feature": "#9be7c4"
+      },
+      "decor": null,
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Mint"
+      },
+      "frame": "none",
+      "id": "ghost",
+      "label": "Ghost: outlined name over its own shadow",
+      "layout": "default",
+      "preview": "/previews/ghost.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1b1b1f",
+        "feature": "#f05133"
+      },
+      "decor": "gitgraph",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Anthrazit",
+        "feature": "Schrift Git-Orange"
+      },
+      "frame": "none",
+      "id": "gitgraph",
+      "label": "Gitgraph: a commit graph running along the bottom",
+      "layout": "default",
+      "preview": "/previews/gitgraph.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#0b0b12",
+        "feature": "#ff2e88"
+      },
+      "decor": "glitch",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tinte",
+        "feature": "Schrift Magenta"
+      },
+      "frame": "none",
+      "id": "glitch",
+      "label": "Glitch: torn scanline slabs, magenta on ink",
+      "layout": "terminal",
+      "preview": "/previews/glitch.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f4f6f2",
+        "feature": "#2f6f4e"
+      },
+      "decor": "graph",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "band",
+      "id": "graph",
+      "label": "Graph: 5 mm engineering paper, green ink on paper white",
+      "layout": "default",
+      "preview": "/previews/graph.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0f0f12",
+        "feature": "#d7d7dd"
+      },
+      "decor": "graycode",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "graycode",
+      "label": "Graycode: a six bit encoder disc, one bit per step",
+      "layout": "default",
+      "preview": "/previews/graycode.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#1e1e22",
+        "feature": "#f5f5f5"
+      },
+      "decor": "hatch",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Graphit",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "groove",
+      "label": "Groove: hatching engraved into the base",
+      "layout": "default",
+      "preview": "/previews/groove.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#f7f4fb",
+        "feature": "#5e5086"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Violett"
+      },
+      "frame": "band",
+      "id": "haskell",
+      "label": "Haskell: a record type and its one value",
+      "layout": "haskell",
+      "preview": "/previews/haskell.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#fdf6e3",
+        "feature": "#073642"
+      },
+      "decor": "hatch",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Solar",
+        "feature": "Schrift Tinte"
+      },
+      "frame": "band",
+      "id": "hatch",
+      "label": "Hatch: 45 degree hatching, ink on solar",
+      "layout": "default",
+      "preview": "/previews/hatch.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#141414",
+        "feature": "#f2c200"
+      },
+      "decor": "hazard",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gelb"
+      },
+      "frame": "none",
+      "id": "hazard",
+      "label": "Hazard: diagonal warning stripes along the bottom",
+      "layout": "default",
+      "preview": "/previews/hazard.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#071a2b",
+        "feature": "#59d9a4"
+      },
+      "decor": "helix",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tiefblau",
+        "feature": "Schrift Mint"
+      },
+      "frame": "band",
+      "id": "helix",
+      "label": "Helix: double strand with rungs",
+      "layout": "default",
+      "preview": "/previews/helix.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#12261f",
+        "feature": "#e7c86a"
+      },
+      "decor": "hex",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Dunkelgruen",
+        "feature": "Schrift Gold"
+      },
+      "frame": "none",
+      "id": "hex",
+      "label": "Hex: honeycomb outlines, gold on forest",
+      "layout": "default",
+      "preview": "/previews/hex.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0b0f14",
+        "feature": "#9ad1ff"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tinte",
+        "feature": "Schrift Hellblau"
+      },
+      "frame": "none",
+      "id": "hexdump",
+      "label": "Hexdump: the card as xxd output",
+      "layout": "hexdump",
+      "preview": "/previews/hexdump.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#0b1220",
+        "feature": "#8fd3ff"
+      },
+      "decor": "hilbert",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Hellblau"
+      },
+      "frame": "none",
+      "id": "hilbert",
+      "label": "Hilbert: one unbroken space filling curve",
+      "layout": "default",
+      "preview": "/previews/hilbert.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#1a1a1a",
+        "feature": "#f0e6d2"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Leinen"
+      },
+      "frame": "band",
+      "id": "hollow",
+      "label": "Hollow: outlined letters, less filament, sharper edge",
+      "layout": "outline",
+      "preview": "/previews/hollow.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#ececec",
+        "feature": "#151515"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "band",
+      "id": "inverse",
+      "label": "Inverse: white base, black features",
+      "layout": "default",
+      "preview": "/previews/inverse.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#101418",
+        "feature": "#7fb3ff"
+      },
+      "decor": "iso",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schiefer",
+        "feature": "Schrift Blau"
+      },
+      "frame": "double",
+      "id": "iso",
+      "label": "Iso: isometric graph paper, blue on slate",
+      "layout": "default",
+      "preview": "/previews/iso.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#f6f8fa",
+        "feature": "#24292f"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Tinte"
+      },
+      "frame": "none",
+      "id": "json",
+      "label": "JSON: the card as an object literal",
+      "layout": "json",
+      "preview": "/previews/json.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#e8e4dc",
+        "feature": "#2b2b2b"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Leinen",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "band",
+      "id": "jsonblind",
+      "label": "Jsonblind: object literal debossed into a warm base",
+      "layout": "json",
+      "preview": "/previews/jsonblind.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#24292f",
+        "feature": "#f6f8fa"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schiefer",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "jsonplate",
+      "label": "Jsonplate: object literal knocked out of a slab",
+      "layout": "json",
+      "preview": "/previews/jsonplate.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#16181d",
+        "feature": "#e9e6de"
+      },
+      "decor": "keycaps",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Anthrazit",
+        "feature": "Schrift Creme"
+      },
+      "frame": "none",
+      "id": "keycaps",
+      "label": "Keycaps: the surname on a row of embossed caps",
+      "layout": "default",
+      "preview": "/previews/keycaps.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#33203a",
+        "feature": "#f0e4d0"
+      },
+      "decor": "knit",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Aubergine",
+        "feature": "Schrift Wolle"
+      },
+      "frame": "band",
+      "id": "knit",
+      "label": "Knit: fair isle rows of V stitches and dots",
+      "layout": "default",
+      "preview": "/previews/knit.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0b0b1a",
+        "feature": "#ff4d6d"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Rot"
+      },
+      "frame": "none",
+      "id": "konami",
+      "label": "Konami: up up down down, then hire me",
+      "layout": "konami",
+      "preview": "/previews/konami.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#0d2b2b",
+        "feature": "#e0b354"
+      },
+      "decor": "lattice",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Petrol",
+        "feature": "Schrift Gold"
+      },
+      "frame": "double",
+      "id": "lattice",
+      "label": "Lattice: square kufic interlock, gold on teal",
+      "layout": "default",
+      "preview": "/previews/lattice.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#121212",
+        "feature": "#ff5a3c"
+      },
+      "decor": "ledmatrix",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift LED-Rot"
+      },
+      "frame": "none",
+      "id": "ledmatrix",
+      "label": "LED matrix: the domain lit on a dot panel",
+      "layout": "default",
+      "preview": "/previews/ledmatrix.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#04140f",
+        "feature": "#6effc0"
+      },
+      "decor": "lissajous",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Dunkelgruen",
+        "feature": "Schrift Mint"
+      },
+      "frame": "none",
+      "id": "lissajous",
+      "label": "Lissajous: three figures a scope would draw",
+      "layout": "default",
+      "preview": "/previews/lissajous.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0e1420",
+        "feature": "#cfe8ff"
+      },
+      "decor": "logicgates",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Eisblau"
+      },
+      "frame": "none",
+      "id": "logicgates",
+      "label": "Logic: an AND gate with an inverted output",
+      "layout": "default",
+      "preview": "/previews/logicgates.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1c1c20",
+        "feature": "#d8d8dc"
+      },
+      "decor": "magstripe",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Anthrazit",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "magstripe",
+      "label": "Magstripe: the three track layout, homage not data",
+      "layout": "default",
+      "preview": "/previews/magstripe.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#101210",
+        "feature": "#e8c07d"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Sand"
+      },
+      "frame": "none",
+      "id": "makefile",
+      "label": "Makefile: targets, a phony and one variable",
+      "layout": "makefile",
+      "preview": "/previews/makefile.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#05060a",
+        "feature": "#b6c9ff"
+      },
+      "decor": "mandelbrot",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nacht",
+        "feature": "Schrift Lavendel"
+      },
+      "frame": "none",
+      "id": "mandelbrot",
+      "label": "Mandelbrot: the set, eroded to what a nozzle holds",
+      "layout": "default",
+      "preview": "/previews/mandelbrot.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#111111",
+        "feature": "#fafafa"
+      },
+      "decor": null,
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "manifesto",
+      "label": "Manifesto: three words, square corners",
+      "layout": "manifesto",
+      "preview": "/previews/manifesto.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#f4f1e8",
+        "feature": "#1f1c18"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Tinte"
+      },
+      "frame": "band",
+      "id": "manpage",
+      "label": "Manpage: NAME, SYNOPSIS, SEE ALSO",
+      "layout": "manpage",
+      "preview": "/previews/manpage.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#030b03",
+        "feature": "#22ff88"
+      },
+      "decor": "matrix",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "matrix",
+      "label": "Matrix: digital rain in columns",
+      "layout": "terminal",
+      "preview": "/previews/matrix.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#101010",
+        "feature": "#e0483a"
+      },
+      "decor": "maze",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Rot"
+      },
+      "frame": "none",
+      "id": "maze",
+      "label": "Maze: a labyrinth of unit segments, red on black",
+      "layout": "default",
+      "preview": "/previews/maze.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#10131a",
+        "feature": "#8ab4f8"
+      },
+      "decor": "mesh",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Graphit",
+        "feature": "Schrift Blau"
+      },
+      "frame": "none",
+      "id": "mesh",
+      "label": "Mesh: low poly triangle net, blue on graphite",
+      "layout": "default",
+      "preview": "/previews/mesh.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#f0efe9",
+        "feature": "#26343d"
+      },
+      "decor": "graph",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Schiefer"
+      },
+      "frame": "band",
+      "id": "millimeter",
+      "label": "Millimeter: engraved 5 mm paper grid",
+      "layout": "default",
+      "preview": "/previews/millimeter.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#151515",
+        "feature": "#ececec"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "minimal",
+      "label": "Minimal: no frame, black base",
+      "layout": "default",
+      "preview": "/previews/minimal.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#101010",
+        "feature": "#c0c0c0"
+      },
+      "decor": "moire",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "moire",
+      "label": "Moire: two grids at a small angle",
+      "layout": "default",
+      "preview": "/previews/moire.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#0a0a0a",
+        "feature": "#f0f0f0"
+      },
+      "decor": "monoscope",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "monoscope",
+      "label": "Monoscope: a broadcast test card with a resolution wedge",
+      "layout": "default",
+      "preview": "/previews/monoscope.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#161616",
+        "feature": "#f2f2f2"
+      },
+      "decor": "morse",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "morse",
+      "label": "Morse: ADATEPE engraved as dots and dashes",
+      "layout": "default",
+      "preview": "/previews/morse.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#f2f2f2",
+        "feature": "#1b1b1b"
+      },
+      "decor": "checker",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Weiss",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "mosaic",
+      "label": "Mosaic: engraved checker fading left",
+      "layout": "default",
+      "preview": "/previews/mosaic.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#0e2233",
+        "feature": "#9fd0e0"
+      },
+      "decor": "mountains",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Eisblau"
+      },
+      "frame": "none",
+      "id": "mountains",
+      "label": "Mountains: layered ridges along the bottom",
+      "layout": "default",
+      "preview": "/previews/mountains.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#1a0b2e",
+        "feature": "#ff7ad9"
+      },
+      "decor": "wave",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Violett",
+        "feature": "Schrift Pink"
+      },
+      "frame": "none",
+      "id": "neon",
+      "label": "Neon: sine ribbons, pink on deep purple",
+      "layout": "default",
+      "preview": "/previews/neon.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#060a1a",
+        "feature": "#ffffff"
+      },
+      "decor": "starfield",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "nightsky",
+      "label": "Nightsky: raised stars, rounded QR",
+      "layout": "default",
+      "preview": "/previews/nightsky.png",
+      "qr": "recess",
+      "qr_shape": "round"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#151515",
+        "feature": "#ececec"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "double",
+      "id": "outline",
+      "label": "Outline: two hairlines instead of a band",
+      "layout": "default",
+      "preview": "/previews/outline.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#d9c39a",
+        "feature": "#2b2b2b"
+      },
+      "decor": "perfboard",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis FR4",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "perfboard",
+      "label": "Perfboard: 2.54 mm hole grid with power rails",
+      "layout": "default",
+      "preview": "/previews/perfboard.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#0d0f14",
+        "feature": "#b6c2ff"
+      },
+      "decor": "perspective",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nacht",
+        "feature": "Schrift Lavendel"
+      },
+      "frame": "none",
+      "id": "perspective",
+      "label": "Perspective: grid converging on a vanishing point",
+      "layout": "default",
+      "preview": "/previews/perspective.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#1a1408",
+        "feature": "#ffd98a"
+      },
+      "decor": "phyllotaxis",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Umbra",
+        "feature": "Schrift Honig"
+      },
+      "frame": "none",
+      "id": "phyllotaxis",
+      "label": "Phyllotaxis: sunflower packing at 137.5 degrees",
+      "layout": "default",
+      "preview": "/previews/phyllotaxis.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#101014",
+        "feature": "#dcdce4"
+      },
+      "decor": "moire",
+      "emboss": "text",
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "pinstripe",
+      "label": "Pinstripe: engraved hairlines under a raised name",
+      "layout": "default",
+      "preview": "/previews/pinstripe.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#14121f",
+        "feature": "#f7e26b"
+      },
+      "decor": "pixel",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Violett",
+        "feature": "Schrift Gelb"
+      },
+      "frame": "none",
+      "id": "pixel",
+      "label": "Pixel: dither ramp out of the top right corner",
+      "layout": "default",
+      "preview": "/previews/pixel.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#0f0f0f",
+        "feature": "#f6f6f6"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "plateau",
+      "label": "Plateau: knocked out slab with dotted QR",
+      "layout": "default",
+      "preview": "/previews/plateau.png",
+      "qr": "recess",
+      "qr_shape": "dot"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#f5f5f7",
+        "feature": "#2b6cb0"
+      },
+      "decor": "plus",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Blau"
+      },
+      "frame": "band",
+      "id": "plus",
+      "label": "Plus: grid of plus marks, blue on paper",
+      "layout": "default",
+      "preview": "/previews/plus.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#ffd9e8",
+        "feature": "#7a1f4b"
+      },
+      "decor": "polka",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Rose",
+        "feature": "Schrift Pflaume"
+      },
+      "frame": "band",
+      "id": "polka",
+      "label": "Polka: even dot grid, plum on rose",
+      "layout": "default",
+      "preview": "/previews/polka.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#111318",
+        "feature": "#f4f1ea"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nacht",
+        "feature": "Schrift Bone"
+      },
+      "frame": "none",
+      "id": "poster",
+      "label": "Poster: everything centred on the left half",
+      "layout": "centered",
+      "preview": "/previews/poster.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#e8dcc0",
+        "feature": "#26221c"
+      },
+      "decor": "punchcard",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Manila",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "band",
+      "id": "punchcard",
+      "label": "Punchcard: 80 column holes engraved into manila",
+      "layout": "default",
+      "preview": "/previews/punchcard.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#d9cdb4",
+        "feature": "#241f1a"
+      },
+      "decor": "punchtape",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Tape",
+        "feature": "Schrift Schwarz"
+      },
+      "frame": "none",
+      "id": "punchtape",
+      "label": "Punchtape: the name in ASCII on eight hole tape",
+      "layout": "default",
+      "preview": "/previews/punchtape.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#041b16",
+        "feature": "#4ff0c0"
+      },
+      "decor": "radar",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Dunkelgruen",
+        "feature": "Schrift Tuerkis"
+      },
+      "frame": "none",
+      "id": "radar",
+      "label": "Radar: rings sweeping from the bottom left corner",
+      "layout": "default",
+      "preview": "/previews/radar.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#1b1020",
+        "feature": "#ffb3f0"
+      },
+      "decor": "radiate",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtviolett",
+        "feature": "Schrift Rosa"
+      },
+      "frame": "none",
+      "id": "radiate",
+      "label": "Radiate: bars fanning from one point",
+      "layout": "default",
+      "preview": "/previews/radiate.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f6f6f2",
+        "feature": "#24333d"
+      },
+      "decor": "railroad",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Schiefer"
+      },
+      "frame": "none",
+      "id": "railroad",
+      "label": "Railroad: a syntax diagram with a bypass",
+      "layout": "default",
+      "preview": "/previews/railroad.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#0b1220",
+        "feature": "#9ec8ff"
+      },
+      "decor": "rain",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Mitternacht",
+        "feature": "Schrift Regenblau"
+      },
+      "frame": "none",
+      "id": "rain",
+      "label": "Rain: diagonal dashes on a window",
+      "layout": "default",
+      "preview": "/previews/rain.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#0b1220",
+        "feature": "#cfe3ff"
+      },
+      "decor": "rain",
+      "emboss": "text",
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Mitternacht",
+        "feature": "Schrift Eisblau"
+      },
+      "frame": "none",
+      "id": "rainstorm",
+      "label": "Rainstorm: engraved rain over a raised name",
+      "layout": "default",
+      "preview": "/previews/rainstorm.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#f8f8f7",
+        "feature": "#24292f"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Tinte"
+      },
+      "frame": "band",
+      "id": "readme",
+      "label": "Readme: the card as markdown source",
+      "layout": "readme",
+      "preview": "/previews/readme.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#151515",
+        "feature": "#ececec"
+      },
+      "decor": null,
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "relief",
+      "label": "Relief: the whole text block raised a second step",
+      "layout": "default",
+      "preview": "/previews/relief.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#0b1b2b",
+        "feature": "#7fe3ff"
+      },
+      "decor": "squares",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Navy",
+        "feature": "Schrift Cyan"
+      },
+      "frame": "none",
+      "id": "ripple",
+      "label": "Ripple: concentric squares, cyan on navy",
+      "layout": "default",
+      "preview": "/previews/ripple.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0a0a0a",
+        "feature": "#d8c98a"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Pergament"
+      },
+      "frame": "none",
+      "id": "roguelike",
+      "label": "Roguelike: an ASCII dungeon with the name in a vault",
+      "layout": "roguelike",
+      "preview": "/previews/roguelike.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#0d0d0f",
+        "feature": "#e8e8ea"
+      },
+      "decor": "rule30",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "rule30",
+      "label": "Rule 30: order on the left, chaos on the right",
+      "layout": "default",
+      "preview": "/previews/rule30.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#12100e",
+        "feature": "#ffb454"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Rost"
+      },
+      "frame": "none",
+      "id": "rustc",
+      "label": "Rustc: a borrow checker error with carets",
+      "layout": "rustc",
+      "preview": "/previews/rustc.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#12161c",
+        "feature": "#d9a441"
+      },
+      "decor": "scales",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tinte",
+        "feature": "Schrift Messing"
+      },
+      "frame": "none",
+      "id": "scales",
+      "label": "Scales: overlapping arcs, brass on ink",
+      "layout": "default",
+      "preview": "/previews/scales.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#05130d",
+        "feature": "#7dff9b"
+      },
+      "decor": "scope",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Phosphor",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "scope",
+      "label": "Scope: graticule with a sine and a square trace",
+      "layout": "default",
+      "preview": "/previews/scope.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#101010",
+        "feature": "#ff5252"
+      },
+      "decor": null,
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Rot"
+      },
+      "frame": "none",
+      "id": "shadow",
+      "label": "Shadow: text over its own offset ghost",
+      "layout": "default",
+      "preview": "/previews/shadow.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#150e1e",
+        "feature": "#f0c0ff"
+      },
+      "decor": "sierpinski",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Violett",
+        "feature": "Schrift Flieder"
+      },
+      "frame": "none",
+      "id": "sierpinski",
+      "label": "Sierpinski: a triangle subdivided five times",
+      "layout": "default",
+      "preview": "/previews/sierpinski.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#12212b",
+        "feature": "#e8c88c"
+      },
+      "decor": null,
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Petrol",
+        "feature": "Schrift Gold"
+      },
+      "frame": "band",
+      "id": "signet",
+      "label": "Signet: an embossed monogram next to the links",
+      "layout": "monogram",
+      "preview": "/previews/signet.png",
+      "qr": "recess",
+      "qr_shape": "round"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#05070d",
+        "feature": "#f2f2f2"
+      },
+      "decor": "city",
+      "emboss": "text",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtschwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "skyline",
+      "label": "Skyline: raised city with an embossed name",
+      "layout": "default",
+      "preview": "/previews/skyline.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#101418",
+        "feature": "#ffd166"
+      },
+      "decor": "snake",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schiefer",
+        "feature": "Schrift Amber"
+      },
+      "frame": "none",
+      "id": "snake",
+      "label": "Snake: one serpentine path folding across",
+      "layout": "default",
+      "preview": "/previews/snake.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#f7f2ea",
+        "feature": "#3b2f2f"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Creme",
+        "feature": "Schrift Espresso"
+      },
+      "frame": "band",
+      "id": "softqr",
+      "label": "Soft QR: rounded modules, gentler on the eye",
+      "layout": "default",
+      "preview": "/previews/softqr.png",
+      "qr": "relief",
+      "qr_shape": "round"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#161616",
+        "feature": "#7fd1ff"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Himmel"
+      },
+      "frame": "none",
+      "id": "spine",
+      "label": "Spine: the name set vertically along the edge",
+      "layout": "vertical",
+      "preview": "/previews/spine.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#efeae3",
+        "feature": "#21303d"
+      },
+      "decor": "spiral",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Bone",
+        "feature": "Schrift Schiefer"
+      },
+      "frame": "none",
+      "id": "spiral",
+      "label": "Spiral: one archimedean coil, slate on bone",
+      "layout": "default",
+      "preview": "/previews/spiral.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0f1a14",
+        "feature": "#8fe3b0"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Dunkelgruen",
+        "feature": "Schrift Mint"
+      },
+      "frame": "none",
+      "id": "sql",
+      "label": "SQL: a SELECT over the developers table",
+      "layout": "sql",
+      "preview": "/previews/sql.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1a1114",
+        "feature": "#ff8080"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Dunkelrot",
+        "feature": "Schrift Rot"
+      },
+      "frame": "none",
+      "id": "stacktrace",
+      "label": "Stacktrace: a NameError that resolves to a contact",
+      "layout": "stacktrace",
+      "preview": "/previews/stacktrace.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#060a1a",
+        "feature": "#ffffff"
+      },
+      "decor": "starfield",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "starfield",
+      "label": "Starfield: four pointed stars, denser up top",
+      "layout": "default",
+      "preview": "/previews/starfield.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#141414",
+        "feature": "#f2f2f2"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "stencil",
+      "label": "Stencil: text knocked out of a full bleed slab",
+      "layout": "default",
+      "preview": "/previews/stencil.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#163020",
+        "feature": "#ede0c8"
+      },
+      "decor": "stitch",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Waldgruen",
+        "feature": "Schrift Leinen"
+      },
+      "frame": "none",
+      "id": "stitch",
+      "label": "Stitch: dashed seam inside the edge",
+      "layout": "default",
+      "preview": "/previews/stitch.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#1b1200",
+        "feature": "#ffb703"
+      },
+      "decor": "sunburst",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Umbra",
+        "feature": "Schrift Amber"
+      },
+      "frame": "none",
+      "id": "sunburst",
+      "label": "Sunburst: rays from the top left, amber on umber",
+      "layout": "default",
+      "preview": "/previews/sunburst.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#2a0f2e",
+        "feature": "#ff9e58"
+      },
+      "decor": "sunset",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Beere",
+        "feature": "Schrift Orange"
+      },
+      "frame": "none",
+      "id": "sunset",
+      "label": "Sunset: bars thinning towards the top",
+      "layout": "default",
+      "preview": "/previews/sunset.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1d1f21",
+        "feature": "#f0c674"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Anthrazit",
+        "feature": "Schrift Gelb"
+      },
+      "frame": "none",
+      "id": "tags",
+      "label": "Tags: the card wrapped in a dev element",
+      "layout": "tags",
+      "preview": "/previews/tags.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#ece7dd",
+        "feature": "#b3452f"
+      },
+      "decor": "tape",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Leinen",
+        "feature": "Schrift Ziegel"
+      },
+      "frame": "none",
+      "id": "tape",
+      "label": "Tape: two strips across the top corners",
+      "layout": "bauhaus",
+      "preview": "/previews/tape.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#0a0a0a",
+        "feature": "#ffe066"
+      },
+      "decor": "teletext",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gelb"
+      },
+      "frame": "none",
+      "id": "teletext",
+      "label": "Teletext: a header band over mosaic cells",
+      "layout": "default",
+      "preview": "/previews/teletext.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0a0f0a",
+        "feature": "#35ff6a"
+      },
+      "decor": "scanlines",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "terminal",
+      "label": "Terminal: shell prompt lines on scanlines",
+      "layout": "terminal",
+      "preview": "/previews/terminal.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#f6f1e7",
+        "feature": "#3a7d6c"
+      },
+      "decor": "terrazzo",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Creme",
+        "feature": "Schrift Petrol"
+      },
+      "frame": "band",
+      "id": "terrazzo",
+      "label": "Terrazzo: scattered chips, teal on cream",
+      "layout": "default",
+      "preview": "/previews/terrazzo.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#f7f3e8",
+        "feature": "#8a2b2b"
+      },
+      "decor": "ticket",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Bordeaux"
+      },
+      "frame": "none",
+      "id": "ticket",
+      "label": "Ticket: perforation holes and a tear rule",
+      "layout": "default",
+      "preview": "/previews/ticket.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#06212e",
+        "feature": "#a8e6f0"
+      },
+      "decor": "wave",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Tiefblau",
+        "feature": "Schrift Eis"
+      },
+      "frame": "none",
+      "id": "tide",
+      "label": "Tide: engraved ribbons along the bottom",
+      "layout": "default",
+      "preview": "/previews/tide.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#fdf6e3",
+        "feature": "#073642"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Solarized",
+        "feature": "Schrift Tinte"
+      },
+      "frame": "band",
+      "id": "todo",
+      "label": "Todo: two things done, three left",
+      "layout": "todo",
+      "preview": "/previews/todo.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#10202b",
+        "feature": "#e6d5b8"
+      },
+      "decor": "topo",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Navy",
+        "feature": "Schrift Sand"
+      },
+      "frame": "band",
+      "id": "topo",
+      "label": "Topo: contour rings behind the card, sand on navy",
+      "layout": "default",
+      "preview": "/previews/topo.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#161a12",
+        "feature": "#d8e07a"
+      },
+      "decor": "lattice",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Waldnacht",
+        "feature": "Schrift Limette"
+      },
+      "frame": "none",
+      "id": "totem",
+      "label": "Totem: vertical name, engraved lattice",
+      "layout": "vertical",
+      "preview": "/previews/totem.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1b1030",
+        "feature": "#8ce0ff"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Violett",
+        "feature": "Schrift Cyan"
+      },
+      "frame": "none",
+      "id": "tracker",
+      "label": "Tracker: a ProTracker pattern, notes and volumes",
+      "layout": "tracker",
+      "preview": "/previews/tracker.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#131313",
+        "feature": "#f2c200"
+      },
+      "decor": "hazard",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Gelb"
+      },
+      "frame": "none",
+      "id": "tread",
+      "label": "Tread: hazard stripes embossed like a step edge",
+      "layout": "default",
+      "preview": "/previews/tread.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#101010",
+        "feature": "#e6e6e6"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "tree",
+      "label": "Tree: the card as tree output",
+      "layout": "tree",
+      "preview": "/previews/tree.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#4c4c55",
+        "feature": "#e8e8ec"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Graphit",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "band",
+      "id": "treeblind",
+      "label": "Treeblind: tree output debossed, depth instead of colour",
+      "layout": "tree",
+      "preview": "/previews/treeblind.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#101010",
+        "feature": "#ececec"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "treeplate",
+      "label": "Treeplate: tree output knocked out of a full bleed slab",
+      "layout": "tree",
+      "preview": "/previews/treeplate.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#1a2113",
+        "feature": "#c3e88d"
+      },
+      "decor": "tri",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Olive",
+        "feature": "Schrift Limette"
+      },
+      "frame": "none",
+      "id": "tri",
+      "label": "Tri: triangle tessellation, lime on olive",
+      "layout": "default",
+      "preview": "/previews/tri.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "generative",
+      "colors": {
+        "base": "#f4f1ea",
+        "feature": "#2f3e46"
+      },
+      "decor": "truchet",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Schiefer"
+      },
+      "frame": "band",
+      "id": "truchet",
+      "label": "Truchet: quarter arcs that wander into loops",
+      "layout": "default",
+      "preview": "/previews/truchet.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#101014",
+        "feature": "#f2e6c4"
+      },
+      "decor": "turingtape",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Sand"
+      },
+      "frame": "none",
+      "id": "turingtape",
+      "label": "Turing tape: cells and a read head",
+      "layout": "default",
+      "preview": "/previews/turingtape.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#16232b",
+        "feature": "#e6d5b8"
+      },
+      "decor": "topo",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Schiefer",
+        "feature": "Schrift Sand"
+      },
+      "frame": "band",
+      "id": "valley",
+      "label": "Valley: contour rings engraved, not raised",
+      "layout": "default",
+      "preview": "/previews/valley.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "basic",
+      "colors": {
+        "base": "#f7f7f5",
+        "feature": "#1b2733"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Papier",
+        "feature": "Schrift Tinte"
+      },
+      "frame": "band",
+      "id": "vcard",
+      "label": "Vcard: the card as its own vCard source",
+      "layout": "vcard",
+      "preview": "/previews/vcard.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "machine",
+      "colors": {
+        "base": "#0e0e0e",
+        "feature": "#ffd166"
+      },
+      "decor": null,
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Amber"
+      },
+      "frame": "none",
+      "id": "viewfinder",
+      "label": "Viewfinder: corner brackets around the code",
+      "layout": "default",
+      "preview": "/previews/viewfinder.png",
+      "qr": "framed",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#1e1e2e",
+        "feature": "#a6e3a1"
+      },
+      "decor": "vimchrome",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Nachtblau",
+        "feature": "Schrift Gruen"
+      },
+      "frame": "none",
+      "id": "vim",
+      "label": "Vim: buffer with a tilde column and a status line",
+      "layout": "vim",
+      "preview": "/previews/vim.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#122626",
+        "feature": "#e0b354"
+      },
+      "decor": "lattice",
+      "emboss": "decor",
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Petrol",
+        "feature": "Schrift Gold"
+      },
+      "frame": "double",
+      "id": "waffle",
+      "label": "Waffle: embossed lattice you can feel",
+      "layout": "default",
+      "preview": "/previews/waffle.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#101010",
+        "feature": "#00e5ff"
+      },
+      "decor": "waveform",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Schwarz",
+        "feature": "Schrift Cyan"
+      },
+      "frame": "none",
+      "id": "waveform",
+      "label": "Waveform: audio bars along the bottom",
+      "layout": "default",
+      "preview": "/previews/waveform.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#efe9dd",
+        "feature": "#4a5a4a"
+      },
+      "decor": "terrazzo",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Kalk",
+        "feature": "Schrift Moos"
+      },
+      "frame": "band",
+      "id": "weathered",
+      "label": "Weathered: engraved terrazzo chips",
+      "layout": "default",
+      "preview": "/previews/weathered.png",
+      "qr": "relief",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#1b1b1d",
+        "feature": "#c8ccd2"
+      },
+      "decor": "carbon",
+      "emboss": null,
+      "engrave": true,
+      "filaments": {
+        "base": "Basis Graphit",
+        "feature": "Schrift Silber"
+      },
+      "frame": "none",
+      "id": "weave",
+      "label": "Weave: carbon bundles engraved into the base",
+      "layout": "default",
+      "preview": "/previews/weave.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "pattern",
+      "colors": {
+        "base": "#071019",
+        "feature": "#7fe3ff"
+      },
+      "decor": "wireglobe",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Tiefsee",
+        "feature": "Schrift Cyan"
+      },
+      "frame": "none",
+      "id": "wireglobe",
+      "label": "Wireglobe: latitudes and longitudes, no fill",
+      "layout": "default",
+      "preview": "/previews/wireglobe.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "developer",
+      "colors": {
+        "base": "#0e1a2b",
+        "feature": "#dfe6ef"
+      },
+      "decor": "workbench",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Amiga-Blau",
+        "feature": "Schrift Weiss"
+      },
+      "frame": "none",
+      "id": "workbench",
+      "label": "Workbench: Amiga window chrome with gadgets",
+      "layout": "default",
+      "preview": "/previews/workbench.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    },
+    {
+      "category": "retro",
+      "colors": {
+        "base": "#171717",
+        "feature": "#efe7dc"
+      },
+      "decor": "zebra",
+      "emboss": null,
+      "engrave": false,
+      "filaments": {
+        "base": "Basis Kohle",
+        "feature": "Schrift Bone"
+      },
+      "frame": "none",
+      "id": "zebra",
+      "label": "Zebra: sine warped bands, bone on charcoal",
+      "layout": "default",
+      "preview": "/previews/zebra.png",
+      "qr": "recess",
+      "qr_shape": "square"
+    }
+  ]
+}

@@ -29,16 +29,87 @@ jobs:
           cache: pip
 
       - name: Install
-        run: pip install -r requirements-dev.txt
+        run: pip install -r requirements-dev.txt -r worker/requirements.txt
 
       - name: Test
-        run: pytest -q
+        # the contract test needs the web dependencies, and there is a job for
+        # that; here it is skipped rather than silently passing
+        run: pytest -q --ignore=tests/test_contract.py
 
       - name: Build card
         run: |
           python build_card.py
           python build_card.py --corners square
           python build_card.py --style code39
+          python build_card.py --check
+          python build_card.py --svg /tmp/card.svg
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install python
+        run: pip install -r requirements-dev.txt -r worker/requirements.txt
+
+      - name: Install web
+        working-directory: web
+        run: npm ci
+
+      - name: Previews and catalogue
+        # the gallery is built from these two, so they are generated rather
+        # than trusted; a catalogue that drifted from STYLES fails right here
+        run: |
+          python build_card.py --all
+          python build_card.py --dump-catalog /tmp/catalog.json
+          diff -u web/data/catalog.json /tmp/catalog.json
+
+      - name: Lint
+        working-directory: web
+        run: npx eslint . --max-warnings 0
+
+      - name: Typecheck
+        working-directory: web
+        run: npm run typecheck
+
+      - name: Unit tests
+        working-directory: web
+        run: npm run test
+
+      - name: Contract, zod against pydantic
+        run: pytest -q tests/test_contract.py
+
+      - name: Build
+        working-directory: web
+        run: npm run build
+
+      - name: Browsers
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+
+      - name: End to end
+        run: ./scripts/e2e.sh
+        env:
+          PYTHON: python
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: web/test-results
+          retention-days: 5
 
   meta:
     name: meta
@@ -66,3 +137,12 @@ jobs:
             fi
           done
           exit "$missing"
+
+      - name: No secret ever lands in a client bundle
+        run: |
+          set -eu
+          if git grep -nI -E 'NEXT_PUBLIC_[A-Z_]*(TOKEN|SECRET|KEY|PASSWORD)' -- web > /tmp/leak.txt; then
+            echo "A secret is named NEXT_PUBLIC_, which ships it to every visitor:" >&2
+            cat /tmp/leak.txt >&2
+            exit 1
+          fi

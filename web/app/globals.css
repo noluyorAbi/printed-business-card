@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+/*
+ * Card Studio.
+ *
+ * The user picks two saturated filament colours for the card itself, so the
+ * interface has to stay out of their way. Graphite and paper carry the
+ * chrome, one accent carries interaction, and orange means exactly one thing:
+ * the print check found something.
+ */
+
+@theme {
+  --color-graphite: #17181a;
+  --color-paper: #f2f0ec;
+  --color-steel: #8a8f98;
+  --color-dye: #2b2fe0;
+  --color-flag: #e8590c;
+
+  --font-display: "Archivo Expanded", "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+}
+
+:root {
+  --bg: var(--color-paper);
+  --fg: var(--color-graphite);
+  --muted: #5f646c;
+  --rule: #d8d5ce;
+  --panel: #ffffff;
+  --shade: #e7e4dd;
+  --accent: var(--color-dye);
+  --flag: var(--color-flag);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--color-graphite);
+    --fg: var(--color-paper);
+    --muted: #9aa0a8;
+    --rule: #2a2c30;
+    --panel: #1e2023;
+    --shade: #232529;
+    --accent: #7c80ff;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="light"] {
+  --bg: var(--color-paper);
+  --fg: var(--color-graphite);
+  --muted: #5f646c;
+  --rule: #d8d5ce;
+  --panel: #ffffff;
+  --shade: #e7e4dd;
+  --accent: var(--color-dye);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: var(--color-graphite);
+  --fg: var(--color-paper);
+  --muted: #9aa0a8;
+  --rule: #2a2c30;
+  --panel: #1e2023;
+  --shade: #232529;
+  --accent: #7c80ff;
+  color-scheme: dark;
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every measurement on this site is a physical one, so digits line up. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.rule {
+  border-color: var(--rule);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* The one orchestrated moment: a new render fades over the old one while the
+ * profile strip settles onto its new heights. Everything else holds still. */
+@keyframes card-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.card-in {
+  animation: card-in 180ms ease-out;
+}
+
+.zbar {
+  transition:
+    height 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    bottom 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-in {
+    animation: none;
+  }
+  .zbar {
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+input[type="text"],
+input[type="url"],
+select {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  color: var(--fg);
+}
+
+input[type="text"]::placeholder,
+input[type="url"]::placeholder {
+  color: var(--muted);
+}

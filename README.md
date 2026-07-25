@@ -104,10 +104,68 @@ Then in Bambu Studio:
 4. Print without supports and without a brim; the flat base gives a clean
    bottom face on its own.
 
-To make it your card, edit the constants and the text at the top of
-`build_card.py`: `QR_DATA` for the QR target, the `place_text` calls for name
-and tagline, the `rows` list for the contact lines. Sizes and positions are
-plain constants in the same file.
+To make it your card without touching the file, pass a `Spec`:
+
+```python
+import build_card as bc
+
+spec = bc.Spec(
+    style="terminal",
+    name="Mira Halvorsen",
+    tagline=("Distributed systems",),
+    rows=(("mail", "mira@halvorsen.dev"), ("github", "git.halvorsen.dev")),
+    qr_data="https://halvorsen.dev",
+)
+card = bc.build_shapes(spec=spec)
+print(bc.check_printability(card, spec)["metrics"])
+bc.card_meshes(card)          # the two printable parts
+```
+
+Or from the shell:
+
+```bash
+python build_card.py --style terminal        # one style
+python build_card.py --all                   # every preview
+python build_card.py --check                 # the printability report
+python build_card.py --svg card.svg          # layered SVG
+python build_card.py --dump-catalog cat.json # styles, decors, layouts, limits
+python build_card.py --corners square        # square instead of rounded
+```
+
+Everything is still a plain constant in the same file, so editing
+`CARD_W`, `QR_SIZE` or the type scale moves all 163 layouts at once.
+
+## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/zap.svg" width="16" align="center"> Card Studio, the web app
+
+`web/` is a Next.js app on Vercel that puts the whole catalogue in a browser:
+a gallery of all 163 cards, an editor for your own text and QR target, a live
+2D and 3D preview, the print check, and a download.
+
+Vercel does not compute geometry. `worker/` is a FastAPI container that
+imports `build_card` and answers with the four layers as SVG paths plus their
+z ranges; the browser extrudes those with three.js, so no mesh crosses the
+network until you actually download one. Vercel proxies, caches on a hash of
+the canonical spec, and rate limits.
+
+```bash
+python build_card.py --all                       # previews for the gallery
+python build_card.py --dump-catalog web/data/catalog.json
+
+WORKER_TOKEN=dev .venv/bin/uvicorn worker.app:app --port 8099 &
+
+cd web && npm ci
+printf 'WORKER_URL=http://127.0.0.1:8099\nWORKER_TOKEN=dev\n' > .env.local
+npm run dev
+```
+
+`./scripts/e2e.sh` runs the whole stack, worker and web build and a browser,
+the way CI does. Deployment is in [DEPLOY.md](DEPLOY.md), the design and the
+contracts are in [PLAN.md](PLAN.md).
+
+One thing worth calling out: the print check is not a second implementation.
+`check_printability` lives in `build_card.py`, the test suite calls it, and
+the editor shows what it returns, so the browser and CI can never disagree
+about what a 0.2 mm nozzle will hold.
 
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 

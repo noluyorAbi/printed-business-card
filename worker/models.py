@@ -8,7 +8,7 @@ other, or the build fails.
 
 import sys
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -56,7 +56,8 @@ class Text(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1, max_length=LIMITS["name"])
-    tagline: list[str] = Field(default_factory=list, max_length=2)
+    tagline: list[Annotated[str, Field(max_length=LIMITS["tagline_line"])]] = \
+        Field(default_factory=list, max_length=2)
     rows: list[Row] = Field(default_factory=list, max_length=LIMITS["rows"])
 
     @field_validator("name")
@@ -121,7 +122,9 @@ class CardSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     v: Literal[1] = 1
-    style: str
+    # membership in STYLES is checked below; the length bound is here so the
+    # published schema matches the Zod one field for field
+    style: str = Field(min_length=1)
     corners: Literal["round", "square"] | None = None
     text: Text
     qr: Qr

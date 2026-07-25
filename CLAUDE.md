@@ -15,8 +15,12 @@ Vor Arbeit an der Web-App alle drei lesen.
 | `build_card.py` | kompletter Generator: Geometrie, Styles, Decors, Layouts, Export, Preview |
 | `tests/test_build.py` | Invarianten: watertight, QR decodiert, Text bleibt in der Spalte, Druckbarkeit |
 | `assets/previews/` | 163 PNGs, Quelle fuer README-Gallery und Web-Gallery |
-| `worker/` | (geplant) FastAPI-Container, importiert `build_card` |
-| `web/` | (geplant) Next.js App auf Vercel |
+| `worker/` | FastAPI-Container, importiert `build_card`, rechnet Geometrie |
+| `web/` | Next.js App auf Vercel: Gallery, Studio, 3D, Export |
+| `tests/test_spec.py` | Spec, SVG, Druck-Check, Katalog |
+| `tests/test_worker.py` | HTTP-Oberflaeche des Workers |
+| `tests/test_contract.py` | Zod und Pydantic beschreiben dasselbe |
+| `scripts/e2e.sh` | startet Worker plus Web-Build und faehrt Playwright |
 
 ## Harte Invarianten, nie ohne Grund brechen
 
@@ -50,7 +54,9 @@ Vor Arbeit an der Web-App alle drei lesen.
 - `PUSH_GATE=skip git push`, und add/commit/push als getrennte Aufrufe (das Gate-Hook
   blockiert Ketten).
 
-## Web-App, sobald sie existiert
+## Web-App
+
+Betrieb: [DEPLOY.md](DEPLOY.md). Lokal alles zusammen: `./scripts/e2e.sh`.
 
 - **CardSpec ist die einzige Quelle der Wahrheit.** Zod im Frontend, Pydantic im
   Worker, beide gespiegelt aus derselben Struktur. Keine losen Query-Parameter.
@@ -65,7 +71,17 @@ Vor Arbeit an der Web-App alle drei lesen.
   `build_card.py`, Editor und Tests rufen dieselbe Funktion. Die Messung wird nie
   ein zweites Mal formuliert.
 - Der Editor kann keine Karte erzeugen, die den Print-Check verletzt, ohne dass die
-  App es sichtbar macht. Warnen, nicht stumm reparieren.
+  App es sichtbar macht. Warnen, nicht stumm reparieren. `error` blockiert den
+  Download, `warn` nicht.
+- **Der Check misst gegen die Basislinie des Styles**, nicht gegen eine absolute
+  Zahl. Ein Drittel der Styles liegt bewusst unter jedem festen Schwellwert
+  (`signet` setzt zwei Initialen 0.06 mm auseinander, die `tree`-Layouts zeichnen
+  Rahmenzeichen, die sich beruehren sollen). `test_check_passes_every_style_with_its_own_text`
+  haelt das fest: die Karten, die das Repo ausliefert, duerfen nie beanstandet werden.
+- **Zwei Ansichten, eine Quelle.** `layers` ist die Malreihenfolge fuer 2D,
+  `solids` sind die Koerper, die `card_meshes` extrudiert. Eine Gravur ist
+  weggenommenes Material; im 3D-Bild darf sie nie als Block obendrauf liegen.
+- **Kein Geheimnis heisst `NEXT_PUBLIC_`.** Der `meta`-Job bricht sonst ab.
 - **Die Oberflaeche traegt Graphit und Papier**, ein einziger Akzent (`--dye`, das
   Blau von Anreisslack) und Orange nur fuer Warnungen. Grund: der Nutzer waehlt
   selbst zwei kraeftige Kartenfarben, die App darf ihm dabei nicht in die Quere
