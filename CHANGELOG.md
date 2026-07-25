@@ -8,6 +8,49 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- **Card Studio**, a web app in `web/`: a gallery of all 163 cards, an editor
+  for your own name, tagline, contact rows and QR target, live 2D and 3D
+  preview, the print check, and 3MF and STL downloads. A card lives entirely
+  in its URL, so sharing one is sharing the address; there is no account and
+  nothing is stored.
+- **`worker/`**, a FastAPI container that imports `build_card` and answers
+  with the four layers as SVG paths plus their z ranges. The browser extrudes
+  those with three.js, so no mesh crosses the network until a download is
+  actually requested. Vercel proxies, caches on a hash of the canonical spec,
+  and rate limits.
+- `build_card.Spec`: name, tagline, contact rows, QR payload and per style
+  overrides, so the generator can build somebody else's card. Every argument
+  defaults to what the module constants held, and a parity check over all 163
+  styles confirms the geometry is unchanged.
+- `render_svg`, `card_solids`, `check_printability` and `catalog`, plus
+  `--dump-catalog`, `--svg` and `--check` on the command line.
+- A `mail` icon, style categories for the gallery filter, and contact rows
+  that tighten their leading instead of colliding when a fourth is added.
+- `tests/test_contract.py` compares the JSON Schema exported by the Zod schema
+  with the one exported by the Pydantic model, so the two descriptions of a
+  CardSpec cannot drift apart silently.
+- `scripts/e2e.sh` brings up the worker and a production web build and runs 22
+  Playwright tests against them, on desktop and mobile, the way CI does.
+
+### Fixed
+
+- `build_shapes` could take the whole interpreter down with SIGTRAP when
+  called from several threads: matplotlib's font machinery is not thread safe.
+  Everything that touches type now serialises.
+- `place_text` fitted the ink width and ignored the leading offset, so an
+  indented code line could sit past its own `max_x`. It now fits the right
+  edge. Eight styles shift by fractions of a millimetre, all of them lines
+  that were already overflowing.
+- Hero lines asked for the full card width regardless of height, which is only
+  safe while the name is short. Room now depends on whether the line clears
+  the QR panel.
+- The printability thresholds are relative to each style's own stock text
+  rather than absolute. A third of the catalogue sits under any fixed floor on
+  purpose: the signet monogram sets two initials 0.06 mm apart, and the tree
+  layouts draw box characters that are meant to touch.
+
 ### Changed
 
 - Card grows from 80 x 45 mm to 84 x 52 mm, inside ID-1 with clearance, corner
