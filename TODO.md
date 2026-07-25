@@ -73,12 +73,13 @@ Reihenfolge ist die Abarbeitungsreihenfolge.
 - [x] Playwright-Smoke: Gallery laedt, Studio rendert, Export liefert 3MF
 - [x] CI: Lint, Typecheck, Web-Tests, Worker-Build
 - [x] Deploy-Konfiguration: `vercel.json`, `fly.toml`, Dockerfile, `DEPLOY.md`
-- [ ] Vercel-Projekt und Fly-App tatsaechlich anlegen und die Env-Variablen setzen
-      (braucht die Konten des Nutzers, siehe DEPLOY.md Schritt 1 und 2)
+- [x] Beides deployt: App und Worker als zwei Vercel-Projekte, Env gesetzt,
+      22 Playwright-Tests laufen gegen die Live-Seite
 - [x] README um einen Abschnitt "Web-App" erweitern
 
 ## Noch offen
-- [ ] Fly.io oder Render fuer den Worker (Plan nennt Fly.io als Standard)
+- [x] Worker laeuft als Vercel Python Function. Der Container in `worker/`
+      bleibt als Alternative fuer den Fall, dass fuenf Sekunden Kaltstart stoeren
 - [ ] Eigene Domain fuer die App oder `*.vercel.app`
 - [x] `catalog.json` ist eingecheckt, die CI vergleicht ihn gegen `--dump-catalog`
 - [ ] Ob der Editor eigene Icons erlaubt oder bei den vier eingebauten bleibt

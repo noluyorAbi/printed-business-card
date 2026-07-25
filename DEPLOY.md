@@ -1,48 +1,87 @@
 # Card Studio betreiben
 
-Zwei Dienste. Vercel liefert die Oberflaeche aus und cached, ein Container
-rechnet die Geometrie. Sie kennen sich ueber genau zwei Variablen.
+Zwei Dienste, zwei Vercel-Projekte. Eines liefert die Oberflaeche aus und
+cached, eines rechnet die Geometrie. Sie kennen sich ueber genau zwei
+Variablen.
 
 ```
-Browser  ->  Vercel (Next.js)  ->  Fly.io (FastAPI + build_card.py)
-                 WORKER_URL          WORKER_TOKEN prueft jeden Aufruf
-                 WORKER_TOKEN
+Browser  ->  printed-business-card   ->  card-studio-worker
+             (Next.js)                   (Python, FastAPI + build_card.py)
+             WORKER_URL                  WORKER_TOKEN prueft jeden Aufruf
+             WORKER_TOKEN
 ```
+
+Beides laeuft:
+
+| | |
+| --- | --- |
+| App | https://printed-business-card.vercel.app |
+| Worker | https://card-studio-worker.vercel.app |
+
+**Der Plan sagte zuerst, der Worker passe nicht auf Vercel. Das war falsch,
+und zwar ungemessen.** Die geschaetzten 200 MB zaehlten `opencv-python-headless`
+und `zxing-cpp` mit, die nur die Tests brauchen: opencv dekodiert QR-Codes in
+`check_printability(decode=True)`, was der Dienst nie aufruft, und zxing liest
+einen Barcode ausschliesslich in der CI. Was uebrig bleibt, sind 133 MB
+installiert, innerhalb der 250 MB einer Python-Funktion. Die Schriften bringt
+matplotlib selbst mit (DejaVu), also gibt es auch dafuer nichts zu
+installieren.
+
+Der Preis ist ein Kaltstart von rund fuenf Sekunden, waehrend shapely, trimesh
+und matplotlib importieren. Warm antwortet `/render` in etwa 600 ms. Der
+Editor cached ueber den Spec-Hash, und die Route davor haelt die letzten paar
+hundert Antworten, also faellt der Kaltstart selten an. Wer ihn gar nicht
+haben will, nimmt den Container aus Abschnitt 1b.
 
 ---
 
-## 1. Worker
+## 1. Worker auf Vercel
 
 ```bash
-cd worker
-fly launch --no-deploy --copy-config          # legt die App an, deployt nicht
-fly secrets set WORKER_TOKEN="$(openssl rand -hex 32)"
-fly deploy
-fly status                                     # merkt euch den Hostnamen
-curl https://<app>.fly.dev/health              # {"ok":true,"styles":163}
+vercel link --yes --project card-studio-worker      # Root bleibt das Repo
+vercel env add WORKER_TOKEN production              # openssl rand -hex 32
+vercel deploy --prod
+curl https://<app>.vercel.app/health                # {"ok":true,"styles":163}
 ```
 
-Das Image wird aus dem Repository-Wurzelverzeichnis gebaut, weil es
-`build_card.py` braucht. `fly deploy` aus `worker/` heraus erledigt das ueber
-die `fly.toml`; von Hand:
+Drei Dinge, die beim ersten Versuch schiefgingen und deshalb hier stehen:
+
+- **Das Root-Verzeichnis muss das Repository sein, nicht `worker/`.** Eine
+  Vercel-Funktion buendelt nur ihr eigenes Root-Verzeichnis. Mit `worker/` als
+  Root fehlte `build_card.py` schlicht, und die Funktion starb beim Import.
+  Deshalb liegt der Einstiegspunkt in `api/index.py` im Wurzelverzeichnis.
+- **`api/requirements.txt` ist die Liste fuer das Deployment.** Sie ist bewusst
+  von der Wurzel-`requirements.txt` getrennt: wer nur eine STL will, soll kein
+  Web-Framework installieren muessen. `tests/test_worker.py` prueft, dass sie
+  weiterhin alles abdeckt, was der Generator braucht.
+- **Der Worker darf nicht hinter Vercels SSO stehen.** Die App ruft ihn Server
+  zu Server, ein Login-Redirect kaeme als HTML zurueck.
+
+## 1b. Worker als Container, wenn der Kaltstart stoert
 
 ```bash
 docker build -f worker/Dockerfile -t card-worker .
 docker run --rm -p 8080:8080 -e WORKER_TOKEN=dev card-worker
 ```
 
-Wichtig an der Maschine:
+Auf Fly.io mit der beiliegenden `worker/fly.toml`:
 
-- **Sie bleibt an.** `min_machines_running = 1`. Ein Kaltstart kostet mehrere
-  Sekunden, weil shapely, trimesh und matplotlib importiert werden muessen,
-  und der Editor rendert bei jedem Tastendruck.
-- **Die Fonts stecken im Image.** `build_card` zeichnet echte Glyphen-Umrisse,
-  das Ergebnis haengt also davon ab, welche Schriften installiert sind. Genau
-  das hat die CI schon einmal rot gemacht.
-- **Der Token ist die einzige Tuer.** Ohne ihn antwortet alles ausser
-  `/health` mit 401.
+```bash
+cd worker
+fly launch --no-deploy --copy-config
+fly secrets set WORKER_TOKEN="$(openssl rand -hex 32)"
+fly deploy
+```
 
-## 2. Vercel
+`min_machines_running = 1` haelt die Maschine an, damit es gar keinen
+Kaltstart gibt. Die Fonts stecken im Image, weil `build_card` echte
+Glyphen-Umrisse zeichnet und das Ergebnis davon abhaengt, welche Schriften
+installiert sind. Genau das hat die CI schon einmal rot gemacht.
+
+Der Token ist in beiden Faellen die einzige Tuer: ohne ihn antwortet alles
+ausser `/health` mit 401.
+
+## 2. Vercel, die App
 
 Projekt anlegen, **Root Directory auf `web`** setzen. Die Einstellung
 "Include source files outside of the Root Directory in the Build Step" muss
@@ -53,7 +92,7 @@ Environment-Variablen, fuer Production und Preview:
 
 | Name | Wert | Sichtbarkeit |
 | --- | --- | --- |
-| `WORKER_URL` | `https://<app>.fly.dev` | Server |
+| `WORKER_URL` | `https://card-studio-worker.vercel.app` | Server |
 | `WORKER_TOKEN` | derselbe Wert wie im Worker | Server |
 | `RATE_RENDER` | optional, Default 60 pro IP und Minute | Server |
 | `RATE_EXPORT` | optional, Default 10 pro IP und Minute | Server |
@@ -72,7 +111,7 @@ vercel --prod
 ## 3. Danach pruefen
 
 ```bash
-curl -s https://<app>.fly.dev/health
+curl -s https://card-studio-worker.vercel.app/health
 curl -s -o /dev/null -w '%{http_code}\n' https://<projekt>.vercel.app/          # 200
 curl -s -o /dev/null -w '%{http_code}\n' https://<projekt>.vercel.app/studio    # 200
 ```
@@ -85,10 +124,12 @@ erscheinen, stimmt die ganze Kette.
 
 | Symptom | Ursache | Abhilfe |
 | --- | --- | --- |
-| Studio zeigt "Der Worker antwortet nicht" | `WORKER_URL` falsch, oder die Maschine schlaeft | `fly status`, `fly logs` |
+| Studio sagt "Der Geometrie-Dienst ist nicht verbunden" | `WORKER_URL` oder `WORKER_TOKEN` fehlt | `vercel env ls` in beiden Projekten |
+| Worker antwortet mit HTML statt JSON | SSO-Schutz steht auf dem Worker-Projekt | Deployment Protection dort ausschalten |
+| `FUNCTION_INVOCATION_FAILED` | Root-Verzeichnis des Worker-Projekts steht auf `worker/` | auf das Repository zuruecksetzen, siehe Abschnitt 1 |
 | Jeder Render 401 | Token stimmt nicht ueberein | in beiden Umgebungen neu setzen |
-| Render dauert Sekunden | Kaltstart | `min_machines_running` pruefen |
-| Layout sitzt anders als lokal | Fonts fehlen im Image | `fonts-dejavu-core` im Dockerfile |
+| Erster Render dauert Sekunden | Kaltstart der Funktion | erwartet, siehe oben; oder Abschnitt 1b |
+| Layout sitzt anders als lokal | andere Schriften | lokal gibt es Arial, sonst DejaVu; die Tests decken beides ab |
 | Gallery ohne Bilder | Previews nicht kopiert | Root-Directory-Einstellung, siehe oben |
 | 429 beim Tippen | Rate Limit zu eng | `RATE_RENDER` anheben |
 

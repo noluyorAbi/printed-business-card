@@ -41,9 +41,9 @@ single filament change.
 There is a browser version too:
 **[Card Studio](https://printed-business-card.vercel.app?utm_source=readme&utm_medium=intro)**
 shows all 163 styles, lets you put your own name and QR target on one, previews
-it in 2D and 3D, and hands you the 3MF. The editor is live; the geometry
-service behind it is not deployed yet, so the gallery works and the editor
-tells you what is missing. See [DEPLOY.md](DEPLOY.md).
+it in 2D and 3D, checks it against a 0.2 mm nozzle, and hands you the 3MF. No
+account, nothing stored: a card lives entirely in its URL, so sharing one is
+sharing the address.
 
 ---
 
@@ -172,6 +172,13 @@ npm run dev
 `./scripts/e2e.sh` runs the whole stack, worker and web build and a browser,
 the way CI does. Deployment is in [DEPLOY.md](DEPLOY.md), the design and the
 contracts are in [PLAN.md](PLAN.md).
+
+Both halves run as Vercel projects: the app, and the worker as a Python
+function. That is a correction to the original plan, which assumed the
+geometry stack was too heavy for a serverless function. It is not: the 200 MB
+estimate counted opencv and zxing, which only the tests use. What actually
+ships is 133 MB, and matplotlib brings its own fonts. The container in
+`worker/` is still there for when a five second cold start is not acceptable.
 
 One thing worth calling out: the print check is not a second implementation.
 `check_printability` lives in `build_card.py`, the test suite calls it, and

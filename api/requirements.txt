@@ -1,0 +1,15 @@
+# Dependencies for the Vercel deployment of the geometry worker.
+#
+# It sits here rather than in the repository root because the root file is the
+# generator's, and someone who only wants an STL should not have to install a
+# web framework for it. tests/test_worker.py checks that this list still
+# covers everything the generator needs.
+matplotlib>=3.8
+mapbox-earcut>=1.0
+numpy>=1.26
+qrcode>=7.4
+shapely>=2.0
+trimesh>=4.0
+
+fastapi>=0.115
+pydantic>=2.9

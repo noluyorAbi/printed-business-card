@@ -1,4 +1,16 @@
--r ../requirements.txt
+# Self-contained on purpose. Vercel's Python builder installs this file with
+# the worker directory as its working directory, and a "-r ../requirements.txt"
+# include is not something to gamble a deploy on. The generator's own
+# requirements.txt stays the source of truth, and a test asserts that every
+# package listed there also appears here.
+matplotlib>=3.8
+mapbox-earcut>=1.0
+numpy>=1.26
+qrcode>=7.4
+shapely>=2.0
+trimesh>=4.0
+
+# the service itself
 fastapi>=0.115
-uvicorn[standard]>=0.32
 pydantic>=2.9
+uvicorn[standard]>=0.32    # only for the container and local runs

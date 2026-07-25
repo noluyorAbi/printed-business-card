@@ -177,6 +177,28 @@ def test_a_warning_does_not_block_the_download(client):
     assert r.status_code == 200
 
 
+def test_the_worker_requirements_cover_the_generator():
+    """worker/requirements.txt is duplicated on purpose, so it has to be checked.
+
+    It cannot use "-r ../requirements.txt" because Vercel installs it with the
+    worker directory as the working directory. Duplication without a check is
+    how a deploy starts failing on an import nobody remembers adding.
+    """
+    import re
+
+    def packages(path):
+        out = set()
+        for line in open(os.path.join(ROOT, path)):
+            line = line.split("#")[0].strip()
+            if not line or line.startswith("-"):
+                continue
+            out.add(re.split(r"[<>=\[]", line)[0].strip().lower())
+        return out
+
+    missing = packages("requirements.txt") - packages("worker/requirements.txt")
+    assert not missing, f"worker/requirements.txt is missing {sorted(missing)}"
+
+
 def test_parallel_renders_do_not_kill_the_service(client):
     """The endpoint has to survive what a browser test actually does to it."""
     from concurrent.futures import ThreadPoolExecutor

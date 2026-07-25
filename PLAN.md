@@ -4,11 +4,18 @@ Der strategische Ueberblick steht in [ROADMAP.md](ROADMAP.md), die Aufgabenliste
 [TODO.md](TODO.md). Dieses Dokument ist der Bauplan: Vertraege, Signaturen,
 Dateibaum, Designsystem, Akzeptanzkriterien. Wer eine Phase umsetzt, liest hier.
 
-**Stand.** Phase 0 bis 6 sind gebaut und laufen lokal als ganze Kette
-(`./scripts/e2e.sh`). Was noch aussteht, steht in [TODO.md](TODO.md): das
-Vercel-Projekt und die Fly-App muessen mit den Konten des Nutzers tatsaechlich
-angelegt werden ([DEPLOY.md](DEPLOY.md)), und Exporte streamen heute durch den
-Worker, statt zusaetzlich in Vercel Blob zu landen.
+**Stand.** Phase 0 bis 6 sind gebaut und deployt. Die App laeuft unter
+https://printed-business-card.vercel.app, der Worker unter
+https://card-studio-worker.vercel.app, und die 22 Playwright-Tests laufen
+gegen die Live-Seite. Offen ist nur noch, dass Exporte durch den Worker
+streamen, statt zusaetzlich in Vercel Blob zu landen.
+
+**Die Architekturentscheidung oben ist teilweise widerlegt.** Der Plan sagte,
+der Worker passe nicht in eine Vercel-Funktion. Diese Zahl war geschaetzt, nie
+gemessen, und sie zaehlte opencv und zxing mit, die nur die Tests brauchen.
+Gemessen sind es 133 MB gegen ein Limit von 250 MB. Der Worker laeuft jetzt
+als Vercel Python Function; der Container bleibt fuer den Fall, dass der
+Kaltstart von rund fuenf Sekunden stoert. Details in [DEPLOY.md](DEPLOY.md).
 
 Drei Dinge sind beim Bauen anders entschieden worden als hier zuerst geplant.
 Sie stehen unten an ihrer Stelle, hier nur als Liste, damit niemand nach der
