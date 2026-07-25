@@ -15,11 +15,19 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 
 import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(ROOT, "web")
+
+# `worker` is a package under the repository root, so the root has to be
+# importable. Doing it here rather than relying on another test file having
+# done it first: this module has to pass when run on its own, which is exactly
+# how CI runs it.
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
 
 def _zod_schema():
@@ -37,9 +45,6 @@ def _zod_schema():
 
 
 def _pydantic_schema():
-    import sys
-
-    sys.path.insert(0, os.path.join(ROOT, "worker"))
     from worker.models import CardSpec
 
     return CardSpec.model_json_schema()
@@ -124,9 +129,7 @@ def test_both_sides_agree_on_limits_and_enums(trees):
 def test_the_limits_come_from_one_place():
     """The numbers in the schemas are build_card's, not hand copied twice."""
     import re
-    import sys
 
-    sys.path.insert(0, ROOT)
     import build_card
 
     source = open(os.path.join(WEB, "lib", "spec.ts")).read()
