@@ -87,40 +87,25 @@ def test_printable_feature_sizes():
     """Type and QR modules stay above what a 0.2 mm nozzle holds.
 
     A stroke or a gap under about 0.45 mm bleeds shut on the print, which is
-    what made the first printed card's small text run together.
+    what made the first printed card's small text run together. The measuring
+    is done by `build_card.check_printability`, the same function the web
+    editor calls, so the two can never disagree about what is printable.
     """
     module = build_card.QR_SIZE / build_card.QR_MODULES
     assert module >= 0.80, module
     assert build_card.QR_QUIET >= 3 * module - 1e-9  # quiet zone in modules
 
-    def stroke_and_gap(geom):
-        lo, hi = 0.0, 1.0
-        for _ in range(24):
-            mid = (lo + hi) / 2
-            if geom.buffer(-mid).is_empty:
-                hi = mid
-            else:
-                lo = mid
-        parts = list(geom.geoms) if geom.geom_type == "MultiPolygon" else [geom]
-        gap = min((a.distance(b) for i, a in enumerate(parts) for b in parts[i + 1:]),
-                  default=9.0)
-        return 2 * lo, gap
-
-    cases = [
-        ("Alperen Adatepe", build_card.EM_NAME, build_card.FONT_BOLD, build_card.TRACK_NAME),
-        ("digital experiences", build_card.EM_TAG, build_card.FONT, build_card.TRACK_TAG),
-        ("git.adatepe.dev", build_card.EM_ROW, build_card.FONT, build_card.TRACK_ROW),
-        ("in.adatepe.dev", build_card.EM_ROW, build_card.FONT, build_card.TRACK_ROW),
-    ]
-    for text, em, font, track in cases:
-        stroke, gap = stroke_and_gap(build_card.text_shape(text, em, font, track))
-        assert stroke >= 0.45, (text, stroke)
-        assert gap >= 0.38, (text, gap)
+    report = build_card.check_printability()
+    assert report["ok"], report["issues"]
+    metrics = report["metrics"]
+    assert metrics["min_stroke_mm"] >= 0.45, metrics
+    assert metrics["qr_module_mm"] >= 0.80, metrics
+    assert metrics["text_within_column"]
 
     # the code layouts use a monospaced face, whose fixed advance leaves a
     # slightly tighter gap; it still has to clear two extrusion widths
     for text in ("git.adatepe.dev", "+ digital experiences"):
-        stroke, gap = stroke_and_gap(
+        stroke, gap = build_card._stroke_and_gap(
             build_card.text_shape(text, build_card.EM_CODE, build_card.FONT_MONO))
         assert stroke >= 0.42, (text, stroke)
         assert gap >= 0.34, (text, gap)

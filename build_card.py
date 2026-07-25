@@ -14,6 +14,8 @@ is what stops letters from bleeding into each other on the print.
 """
 
 from collections import namedtuple
+from contextlib import contextmanager
+from dataclasses import dataclass, replace as spec_replace
 from functools import lru_cache, reduce
 
 import numpy as np
@@ -123,6 +125,21 @@ def card_outline(corners=CORNERS):
 def row_y(i):
     """Baseline of contact row i, counted from the top of the block."""
     return ROW_Y0 + (len(ROWS) - 1 - i) * ROW_LEAD
+
+
+def row_ys(n, ceiling=None, lead=None):
+    """Baselines for n contact rows, bottom anchored at ROW_Y0.
+
+    The block grows upward, so a fourth row would otherwise walk into the
+    tagline. Passing the lowest occupied baseline above the block as `ceiling`
+    tightens the leading just enough to stay clear of it.
+    """
+    if n <= 0:
+        return []
+    lead = ROW_LEAD if lead is None else lead
+    if n > 1 and ceiling is not None:
+        lead = min(lead, max((ceiling - ROW_Y0) / (n - 1), EM_ROW * 0.95))
+    return [ROW_Y0 + (n - 1 - i) * lead for i in range(n)]
 
 
 # Every style resolves to these four 2D layers. base and feature are the two
@@ -1985,12 +2002,40 @@ def place_text(s, em, x, y, fp=FONT, track=0.0, max_x=None):
     """
     shape = text_shape(s, em, fp, track)
     if max_x is not None and not shape.is_empty:
-        width = shape.bounds[2] - shape.bounds[0]
+        # fit the right edge measured from the origin, not the ink width: an
+        # indented code line carries its leading spaces as offset, and fitting
+        # only the ink lets that offset push the line past max_x
+        right = shape.bounds[2]
         room = max_x - x
-        if width > room > 0:
-            k = room / width
+        if right > room > 0:
+            k = room / right
             shape = text_shape(s, em * k, fp, track * k)
+    _record(s, shape)
     return shp_translate(shape, xoff=x, yoff=y)
+
+
+# The print check has to measure the type as it is actually drawn, at the size
+# the layout ended up using after fitting, not at the size the layout asked
+# for. Rather than thread a return channel through fifteen layout branches,
+# place_text drops each finished line here while a check is running.
+_RECORDER = None
+
+
+def _record(s, shape):
+    """Hand a finished line to the print check, if one is listening."""
+    if _RECORDER is not None:
+        _RECORDER.append((s, shape))
+
+
+@contextmanager
+def recording_lines():
+    """Collect (text, shape) for every line placed inside the block."""
+    global _RECORDER
+    previous, _RECORDER = _RECORDER, []
+    try:
+        yield _RECORDER
+    finally:
+        _RECORDER = previous
 
 
 # ---------------------------------------------------------------- icons
@@ -2031,23 +2076,51 @@ def icon_github(cx, cy, r=None):
     return disk.difference(cat)
 
 
+def icon_mail(cx, cy, r=None):
+    """Envelope: a ring with a flap cut out of it, same weight as the others."""
+    r = ICON_R if r is None else r
+    stroke = r * 0.26
+    # same footprint as the other icons, so the label column never shifts
+    w, h = r, r * 0.68
+    body = box(cx - w, cy - h, cx + w, cy + h)
+    ring = body.difference(body.buffer(-stroke))
+    # the flap is two strokes from the top corners down to the middle
+    flap = unary_union([
+        Polygon([(cx - w, cy + h), (cx, cy - h * 0.15), (cx + w, cy + h)])
+        .exterior.buffer(stroke / 2)
+    ]).intersection(body.buffer(-stroke * 0.4))
+    return unary_union([ring, flap])
+
+
+# Icons the editor may pick, by the id the CardSpec uses. "none" draws nothing
+# and lets the label start at the left edge of the text column.
+ICONS = {
+    "globe": icon_globe,
+    "linkedin": icon_linkedin,
+    "github": icon_github,
+    "mail": icon_mail,
+    "none": None,
+}
+
+
 # ---------------------------------------------------------------- QR
-def qr_matrix():
+@lru_cache(maxsize=64)
+def qr_matrix(data=None):
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,
                        border=0, box_size=1)
-    qr.add_data(QR_DATA)
+    qr.add_data(QR_DATA if data is None else data)
     qr.make(fit=True)
-    return qr.get_matrix()
+    return tuple(tuple(row) for row in qr.get_matrix())
 
 
-def qr_dark_modules(shape="square", panel=None):
+def qr_dark_modules(shape="square", panel=None, data=None):
     """Dark modules as one polygon.
 
     shape: "square" is the plain grid, "round" softens the corners and "dot"
     turns every module into a disc. Rounded and dotted modules stay above the
     contrast a decoder needs, which the test suite checks for every style.
     """
-    m = qr_matrix()
+    m = qr_matrix(data)
     n = len(m)
     mod = QR_SIZE / n
     px0, py0, px1, py1 = panel or PANEL
@@ -2107,11 +2180,14 @@ def build_frame(base, kind, qr_mode="recess", panel=None):
 # "www." can never print: the w-w pair measures 0.03 mm of gap at any size a
 # business card can hold, so it fuses into a block. The domain reads fine
 # without it.
-ROWS = [
-    (icon_globe, "adatepe.dev"),
-    (icon_linkedin, "in.adatepe.dev"),
-    (icon_github, "git.adatepe.dev"),
-]
+DEFAULT_ROWS = (
+    ("globe", "adatepe.dev"),
+    ("linkedin", "in.adatepe.dev"),
+    ("github", "git.adatepe.dev"),
+)
+
+# Resolved form the layouts consume: (icon builder or None, label).
+ROWS = [(ICONS[i], label) for i, label in DEFAULT_ROWS]
 
 
 # Code shaped layouts. Every line is monospaced and at most 21 characters,
@@ -2332,14 +2408,42 @@ CODE_BLOCKS = {
 }
 
 
-def _code_block(layout):
+def _subst_table(spec):
+    """Ordered replacements that turn the stock code blocks into a spec's text.
+
+    The blocks are written out as literal lines rather than templates, because
+    a template with braces would fight the JSON and Makefile layouts, which use
+    braces as content. Longest key first, so "git.adatepe.dev" is replaced
+    before the "adatepe.dev" inside it. With the default spec every key maps to
+    itself and the blocks come out unchanged.
+    """
+    pairs = [(NAME, spec.name)]
+    for i, (_, stock) in enumerate(DEFAULT_ROWS):
+        pairs.append((stock, spec.rows[i][1] if i < len(spec.rows) else ""))
+    for i, stock in enumerate(TAGLINE):
+        pairs.append((stock, spec.tagline[i] if i < len(spec.tagline) else ""))
+        pairs.append((stock.lower(), (spec.tagline[i] if i < len(spec.tagline)
+                                      else "").lower()))
+    return sorted(pairs, key=lambda p: -len(p[0]))
+
+
+def _subst(text, table):
+    for stock, live in table:
+        if stock and stock in text:
+            text = text.replace(stock, live)
+    return text
+
+
+def _code_block(layout, spec=None):
     """A monospaced block of lines, top aligned under the top margin."""
-    lines = CODE_BLOCKS[layout]
+    spec = spec or DEFAULT_SPEC
+    table = _subst_table(spec)
     x0 = TEXT_X0 + (3.0 if layout == "vim" else 0.0)   # vim leaves room for ~
     top = CARD_H - MARGIN - EM_CODE
     parts = []
-    for i, (text, bold) in enumerate(lines):
-        if not text:
+    for i, (text, bold) in enumerate(CODE_BLOCKS[layout]):
+        text = _subst(text, table)
+        if not text.strip():
             continue
         parts.append(place_text(text, EM_CODE, x0, top - i * CODE_LEAD,
                                 FONT_MONO_BOLD if bold else FONT_MONO,
@@ -2347,10 +2451,77 @@ def _code_block(layout):
     return unary_union(parts).buffer(0)
 
 
+NAME = "Alperen Adatepe"
 TAGLINE = ("Creating powerful", "digital experiences")
 
 
 NAME_ROOM = CARD_W - EDGE_SAFE      # lines above the panel band may run wide
+
+
+# ---------------------------------------------------------------- spec
+# Everything the card says, separated from how it looks. A Spec with no
+# arguments reproduces the card this repo has always built, byte for byte, so
+# the CLI and the test suite keep working while the web editor feeds the same
+# functions arbitrary text.
+_KEEP = object()      # "leave this to the style", distinct from None ("off")
+
+LIMITS = {"name": 28, "label": 24, "rows": 4, "qr_data": 120,
+          "tagline_line": 30}
+
+
+@dataclass(frozen=True)
+class Spec:
+    style: str = "classic"
+    corners: str | None = None
+    name: str = NAME
+    tagline: tuple = TAGLINE
+    rows: tuple = DEFAULT_ROWS          # ((icon_id, label), ...)
+    qr_data: str = QR_DATA
+    qr_mode: str | None = None
+    qr_shape: str | None = None
+    decor: object = _KEEP               # str, None (off), or _KEEP
+    frame: str | None = None
+    layout: str | None = None
+    emboss: bool | None = None
+    engrave: bool | None = None
+    base_color: str | None = None
+    feature_color: str | None = None
+
+    def resolved(self):
+        """The style entry with this spec's overrides applied."""
+        st = dict(STYLES[self.style])
+        if self.corners:
+            st["corners"] = self.corners
+        if self.qr_mode:
+            st["qr"] = self.qr_mode
+        if self.qr_shape:
+            st["qr_shape"] = self.qr_shape
+        if self.decor is not _KEEP:
+            st["decor"] = self.decor
+        if self.frame:
+            st["frame"] = self.frame
+        if self.layout:
+            st["layout"] = self.layout
+        if self.emboss is not None:
+            # the editor sends a switch, the style table stores which layer
+            # gets the extra height; True means the type, which is the one
+            # every style can do
+            st["emboss"] = ("text" if self.emboss is True else
+                            None if self.emboss is False else self.emboss)
+        if self.engrave is not None:
+            st["decor_mode"] = "engrave" if self.engrave else None
+        if self.base_color:
+            st["base_color"] = self.base_color
+        if self.feature_color:
+            st["feature_color"] = self.feature_color
+        return st
+
+    def icon_rows(self):
+        """Rows as the layouts want them: (icon builder or None, label)."""
+        return [(ICONS.get(icon), label) for icon, label in self.rows]
+
+
+DEFAULT_SPEC = Spec()
 
 
 def _centered(txt, em, y, fp=FONT, track=0.0, cx=None):
@@ -2368,99 +2539,176 @@ def _centered(txt, em, y, fp=FONT, track=0.0, cx=None):
     return shp_translate(shape, centre - (b[0] + b[2]) / 2, y)
 
 
-def build_content(layout):
+def _initials(name):
+    """Up to three initials for the monogram layout."""
+    words = [w for w in name.split() if w]
+    return "".join(w[0] for w in words[:3]).upper() or "?"
+
+
+def _strip_labels(rows):
+    """One tight line of contacts, the way the manifesto layouts want it.
+
+    Rows that are subdomains of the first one collapse to their own label, so
+    adatepe.dev / in.adatepe.dev / git.adatepe.dev reads "adatepe.dev in git"
+    instead of repeating the domain three times at a size nobody can print.
+    """
+    labels = [label for _, label in rows]
+    if not labels:
+        return ""
+    out = [labels[0]]
+    for label in labels[1:]:
+        short = label.split(".")[0]
+        out.append(short if label.endswith(labels[0]) and short else label)
+    return "  ".join(out)
+
+
+def _hero_words(name):
+    """Split a name into the two hero lines the brutal layouts stack."""
+    words = [w for w in name.split() if w]
+    if len(words) >= 2:
+        return words[0].upper(), " ".join(words[1:]).upper()
+    return (words[0].upper() if words else ""), ""
+
+
+def _icon_row(icon_fn, label, x, y, em, track, max_x, gap=1.6):
+    """One contact row. Without an icon the label starts at the column edge."""
+    if icon_fn is None:
+        return [place_text(label, em, x, y, FONT, track, max_x=max_x)]
+    return [icon_fn(x + ICON_R, y + ICON_DY),
+            place_text(label, em, x + 2 * ICON_R + gap, y, FONT, track, max_x=max_x)]
+
+
+def _room_x(y, panel_y1):
+    """How far right a line at this height may run.
+
+    Above the QR panel the full card width is free. Level with it, the line
+    has to stop at the text column, or a long name walks straight across the
+    code. The stock text is short enough that this never bites, which is
+    exactly why it needed writing down.
+    """
+    return NAME_ROOM if y >= panel_y1 else TEXT_X1
+
+
+def _row_ceiling(spec):
+    """Lowest baseline the contact block has to stay under."""
+    if spec.tagline:
+        return TAG_Y - (len(spec.tagline) - 1) * TAG_LEAD - EM_TAG * 1.2
+    return NAME_Y - EM_NAME * 1.2
+
+
+def build_content(layout, spec=None):
     """Name, tagline and contact rows as one polygon, per layout variant.
 
-    Every branch places type on the shared grid (TEXT_X0, NAME_Y, row_y), so a
-    change of card size or type scale moves all nine layouts at once.
+    Every branch places type on the shared grid (TEXT_X0, NAME_Y, row_ys), so a
+    change of card size or type scale moves all layouts at once. The text comes
+    from `spec`; with the default spec this reproduces the original card.
     """
+    spec = spec or DEFAULT_SPEC
+    name, tagline, rows = spec.name, spec.tagline, spec.icon_rows()
+    ys = row_ys(len(rows), _row_ceiling(spec))
+    panel_y1 = panel_box(spec.resolved())[3]
     parts = []
 
     if layout in CODE_BLOCKS:
-        return _code_block(layout)
+        return _code_block(layout, spec)
 
     if layout == "devtag":
         # the one glyph every developer reads as "this person writes code"
-        parts.append(place_text("</>", 13.0, TEXT_X0, CARD_H - MARGIN - 9.6,
-                                FONT_MONO_BOLD, max_x=NAME_ROOM))
-        parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, 31.6,
+        y_tag = CARD_H - MARGIN - 9.6
+        parts.append(place_text("</>", 13.0, TEXT_X0, y_tag,
+                                FONT_MONO_BOLD, max_x=_room_x(y_tag, panel_y1)))
+        parts.append(place_text(name, EM_NAME, TEXT_X0, 31.6,
                                 FONT_BOLD, TRACK_NAME, max_x=TEXT_X1))
-        parts.append(place_text("digital experiences", EM_TAG, TEXT_X0, 25.0,
-                                FONT, TRACK_TAG, max_x=TEXT_X1))
-        for i, (icon_fn, label) in enumerate(ROWS):
-            y = 18.2 - i * 5.5
-            parts.append(icon_fn(ICON_X, y + ICON_DY))
-            parts.append(place_text(label, EM_ROW * 0.82, LABEL_X, y, FONT, TRACK_ROW, max_x=TEXT_X1))
+        if tagline:
+            parts.append(place_text(tagline[-1], EM_TAG, TEXT_X0, 25.0,
+                                    FONT, TRACK_TAG, max_x=TEXT_X1))
+        lead = 5.5 if len(rows) <= 3 else 16.5 / len(rows)
+        for i, (icon_fn, label) in enumerate(rows):
+            parts += _icon_row(icon_fn, label, TEXT_X0, 18.2 - i * lead,
+                               EM_ROW * 0.82, TRACK_ROW, TEXT_X1)
         return unary_union(parts).buffer(0)
 
     if layout == "manifesto":
         for i, word in enumerate(("BUILD.", "SHIP.", "REPEAT.")):
-            parts.append(place_text(word, EM_HERO, TEXT_X0,
-                                    CARD_H - MARGIN - EM_HERO - i * EM_HERO * 1.25,
-                                    FONT_BOLD, TRACK_HERO, max_x=NAME_ROOM))
-        parts.append(place_text("Alperen Adatepe", EM_ROW * 0.9, TEXT_X0, 9.5,
+            y = CARD_H - MARGIN - EM_HERO - i * EM_HERO * 1.25
+            parts.append(place_text(word, EM_HERO, TEXT_X0, y, FONT_BOLD,
+                                    TRACK_HERO, max_x=_room_x(y, panel_y1)))
+        parts.append(place_text(name, EM_ROW * 0.9, TEXT_X0, 9.5,
                                 FONT_BOLD, TRACK_ROW, max_x=TEXT_X1))
-        parts.append(place_text("adatepe.dev  in  git", EM_ROW * 0.72, TEXT_X0, 4.6,
-                                FONT, TRACK_ROW, max_x=TEXT_X1))
+        strip = _strip_labels(rows[:3])
+        if strip:
+            parts.append(place_text(strip, EM_ROW * 0.72, TEXT_X0, 4.6,
+                                    FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "centered":
-        parts.append(_centered("Alperen Adatepe", EM_NAME, NAME_Y, FONT_BOLD, TRACK_NAME))
-        for i, line in enumerate(TAGLINE):
+        parts.append(_centered(name, EM_NAME, NAME_Y, FONT_BOLD, TRACK_NAME))
+        for i, line in enumerate(tagline):
             parts.append(_centered(line, EM_TAG, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG))
-        for i, (_, label) in enumerate(ROWS):
-            parts.append(_centered(label, EM_ROW, row_y(i), FONT, TRACK_ROW))
+        for i, (_, label) in enumerate(rows):
+            parts.append(_centered(label, EM_ROW, ys[i], FONT, TRACK_ROW))
         return unary_union(parts).buffer(0)
 
     if layout == "monogram":
-        parts.append(place_text("AA", EM_NAME * 2.7, TEXT_X0, CY - 3.0, FONT_BOLD, max_x=TEXT_X1))
-        parts.append(place_text("Alperen Adatepe", EM_ROW * 0.85, TEXT_X0, MARGIN + 1.0,
+        # the monogram is capped at the width two initials happen to need, so
+        # a third one shrinks to fit instead of walking into the link column
+        parts.append(place_text(_initials(name), EM_NAME * 2.7, TEXT_X0, CY - 3.0,
+                                FONT_BOLD, max_x=TEXT_X0 + 23.4))
+        parts.append(place_text(name, EM_ROW * 0.85, TEXT_X0, MARGIN + 1.0,
                                 FONT_BOLD, TRACK_ROW, max_x=TEXT_X1))
-        for i, (_, label) in enumerate(ROWS):
+        for i, (_, label) in enumerate(rows):
             parts.append(place_text(label, EM_ROW * 0.66, TEXT_X0 + 22.5,
-                                    CY + 4.0 - i * ROW_LEAD * 0.75, FONT, TRACK_ROW, max_x=TEXT_X1))
+                                    CY + 4.0 - i * ROW_LEAD * 0.75, FONT, TRACK_ROW,
+                                    max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "vertical":
         from shapely.affinity import rotate
 
-        name = rotate(text_shape("ALPEREN ADATEPE", EM_ROW * 0.8, FONT_BOLD, TRACK_ROW),
-                      90, origin=(0, 0))
-        b = name.bounds
-        parts.append(shp_translate(name, TEXT_X0 + EM_ROW - b[0], MARGIN - b[1]))
+        # the name runs up the card, so its room is the height, not the width
+        em, track = EM_ROW * 0.8, TRACK_ROW
+        flat = text_shape(name.upper(), em, FONT_BOLD, track)
+        room = CARD_H - 2 * MARGIN
+        width = flat.bounds[2] - flat.bounds[0] if not flat.is_empty else 0.0
+        if width > room > 0:
+            k = room / width
+            flat = text_shape(name.upper(), em * k, FONT_BOLD, track * k)
+        _record(name.upper(), flat)
+        upright = rotate(flat, 90, origin=(0, 0))
+        b = upright.bounds
+        parts.append(shp_translate(upright, TEXT_X0 + EM_ROW - b[0], MARGIN - b[1]))
         col = TEXT_X0 + EM_ROW * 2.0
-        for i, line in enumerate(TAGLINE):
+        for i, line in enumerate(tagline):
             parts.append(place_text(line, EM_TAG * 0.85, col, TAG_Y - i * TAG_LEAD,
                                     FONT, TRACK_TAG, max_x=TEXT_X1))
-        for i, (icon_fn, label) in enumerate(ROWS):
-            y = row_y(i)
-            parts.append(icon_fn(col + ICON_R, y + ICON_DY))
-            parts.append(place_text(label, EM_ROW * 0.78, col + 2 * ICON_R + 1.4, y,
-                                    FONT, TRACK_ROW, max_x=TEXT_X1))
+        for i, (icon_fn, label) in enumerate(rows):
+            parts += _icon_row(icon_fn, label, col, ys[i], EM_ROW * 0.78,
+                               TRACK_ROW, TEXT_X1, gap=1.4)
         return unary_union(parts).buffer(0)
 
     if layout == "outline":
         # letters as hollow rings: less filament, and a sharper tactile edge
-        solid = text_shape("Alperen Adatepe", EM_NAME, FONT_BOLD, TRACK_NAME)
-        solid = shp_translate(solid, TEXT_X0, NAME_Y)
+        solid = place_text(name, EM_NAME, TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME,
+                           max_x=_room_x(NAME_Y, panel_y1))
         parts.append(solid.difference(solid.buffer(-EM_NAME * 0.085)))
-        for i, line in enumerate(TAGLINE):
-            parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG, max_x=TEXT_X1))
-        for i, (icon_fn, label) in enumerate(ROWS):
-            y = row_y(i)
-            parts.append(icon_fn(ICON_X, y + ICON_DY))
-            parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW, max_x=TEXT_X1))
+        for i, line in enumerate(tagline):
+            parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD,
+                                    FONT, TRACK_TAG, max_x=TEXT_X1))
+        for i, (icon_fn, label) in enumerate(rows):
+            parts += _icon_row(icon_fn, label, TEXT_X0, ys[i], EM_ROW,
+                               TRACK_ROW, TEXT_X1)
         return unary_union(parts).buffer(0)
 
     if layout == "ticker":
         # one long line per row, like a departure board
-        parts.append(place_text("ALPEREN  ADATEPE", EM_NAME * 0.9, TEXT_X0, NAME_Y,
-                                FONT_BOLD, TRACK_NAME, max_x=NAME_ROOM))
-        for i, line in enumerate(TAGLINE):
+        parts.append(place_text(name.upper().replace(" ", "  "), EM_NAME * 0.9,
+                                TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME,
+                                max_x=_room_x(NAME_Y, panel_y1)))
+        for i, line in enumerate(tagline):
             parts.append(place_text(line.upper(), EM_TAG * 0.8, TEXT_X0,
                                     TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG, max_x=TEXT_X1))
-        for i, (_, label) in enumerate(ROWS):
-            parts.append(place_text(label.upper(), EM_ROW * 0.78, TEXT_X0, row_y(i),
+        for i, (_, label) in enumerate(rows):
+            parts.append(place_text(label.upper(), EM_ROW * 0.78, TEXT_X0, ys[i],
                                     FONT_BOLD, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
@@ -2468,34 +2716,40 @@ def build_content(layout):
         # the name owns the card: two hero lines up top, a tight contact block
         # underneath. bauhaus indents the block to clear the quarter disc.
         indent = 12.0 if layout == "bauhaus" else 0.0
-        parts.append(place_text("ALPEREN", EM_HERO, TEXT_X0, CARD_H - MARGIN - EM_HERO,
-                                FONT_BOLD, TRACK_HERO, max_x=NAME_ROOM))
-        parts.append(place_text("ADATEPE", EM_HERO, TEXT_X0,
-                                CARD_H - MARGIN - EM_HERO * 2.2, FONT_BOLD, TRACK_HERO, max_x=NAME_ROOM))
-        for i, (_, label) in enumerate(ROWS):
+        first, second = _hero_words(name)
+        y1 = CARD_H - MARGIN - EM_HERO
+        y2 = CARD_H - MARGIN - EM_HERO * 2.2
+        parts.append(place_text(first, EM_HERO, TEXT_X0, y1, FONT_BOLD, TRACK_HERO,
+                                max_x=_room_x(y1, panel_y1)))
+        if second:
+            parts.append(place_text(second, EM_HERO, TEXT_X0, y2, FONT_BOLD,
+                                    TRACK_HERO, max_x=_room_x(y2, panel_y1)))
+        lead = EM_ROW * 1.25 if len(rows) <= 3 else 16.0 / len(rows)
+        for i, (_, label) in enumerate(rows):
             parts.append(place_text(label, EM_ROW * 0.75, TEXT_X0 + indent,
-                                    MARGIN + 1.5 + (len(ROWS) - 1 - i) * EM_ROW * 1.25,
-                                    FONT, TRACK_ROW))
+                                    MARGIN + 1.5 + (len(rows) - 1 - i) * lead,
+                                    FONT, TRACK_ROW, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
     if layout == "terminal":
-        parts.append(place_text("> Alperen Adatepe", EM_NAME * 0.88, TEXT_X0, NAME_Y,
-                                FONT_BOLD, TRACK_NAME, max_x=NAME_ROOM))
-        for i, line in enumerate(TAGLINE):
+        parts.append(place_text(f"> {name}", EM_NAME * 0.88, TEXT_X0, NAME_Y,
+                                FONT_BOLD, TRACK_NAME,
+                                max_x=_room_x(NAME_Y, panel_y1)))
+        for i, line in enumerate(tagline):
             parts.append(place_text(f"# {line.lower()}", EM_SMALL, TEXT_X0,
                                     TAG_Y - i * TAG_LEAD, FONT, TRACK_SMALL, max_x=TEXT_X1))
-        for i, (_, label) in enumerate(ROWS):
-            parts.append(place_text(f"$ open {label}", EM_SMALL, TEXT_X0, row_y(i),
+        for i, (_, label) in enumerate(rows):
+            parts.append(place_text(f"$ open {label}", EM_SMALL, TEXT_X0, ys[i],
                                     FONT, TRACK_SMALL, max_x=TEXT_X1))
         return unary_union(parts).buffer(0)
 
-    parts.append(place_text("Alperen Adatepe", EM_NAME, TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME, max_x=NAME_ROOM))
-    for i, line in enumerate(TAGLINE):
-        parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT, TRACK_TAG, max_x=TEXT_X1))
-    for i, (icon_fn, label) in enumerate(ROWS):
-        y = row_y(i)
-        parts.append(icon_fn(ICON_X, y + ICON_DY))
-        parts.append(place_text(label, EM_ROW, LABEL_X, y, FONT, TRACK_ROW, max_x=TEXT_X1))
+    parts.append(place_text(name, EM_NAME, TEXT_X0, NAME_Y, FONT_BOLD, TRACK_NAME,
+                            max_x=_room_x(NAME_Y, panel_y1)))
+    for i, line in enumerate(tagline):
+        parts.append(place_text(line, EM_TAG, TEXT_X0, TAG_Y - i * TAG_LEAD, FONT,
+                                TRACK_TAG, max_x=TEXT_X1))
+    for i, (icon_fn, label) in enumerate(rows):
+        parts += _icon_row(icon_fn, label, TEXT_X0, ys[i], EM_ROW, TRACK_ROW, TEXT_X1)
     return unary_union(parts).buffer(0)
 
 
@@ -3995,6 +4249,52 @@ DECOR = {
 PANEL_MODES = {"recess", "deep", "framed"}
 RELIEF_MODES = {"relief"}
 
+# ---------------------------------------------------------------- categories
+# The gallery needs a coarse grouping, and a style table of 163 entries is not
+# the place to repeat one more key 163 times. Anything not listed lands in
+# "pattern", which is where most decorative styles belong anyway.
+CATEGORIES = {
+    "basic": {"classic", "inverse", "minimal", "outline", "hollow", "relief",
+              "shadow", "ghost", "stencil", "poster", "crest", "signet",
+              "monoscope", "centered", "spine", "totem", "vcard", "carved",
+              "depth", "plateau", "groove", "millimeter", "rule"},
+    "developer": {"terminal", "ansi", "asm", "commit", "conway", "devtag",
+                  "diff", "dockerfile", "env", "flamegraph", "gitgraph",
+                  "graycode", "haskell", "hexdump", "json", "jsonblind",
+                  "jsonplate", "konami", "makefile", "manpage", "readme",
+                  "rustc", "sql", "stacktrace", "todo", "tree", "treeblind",
+                  "treeplate", "vim", "tags", "brackets", "circuitry",
+                  "logicgates", "perfboard", "dip", "keycaps", "workbench",
+                  "board", "frontpanel", "dsky", "coremem", "tracker",
+                  "roguelike", "manifesto", "blueprint", "magstripe"},
+    "generative": {"conway", "dragon", "fibonacci", "hilbert", "lissajous",
+                   "mandelbrot", "phyllotaxis", "rule30", "sierpinski",
+                   "truchet", "maze", "constellation", "nightsky", "starfield",
+                   "spiral", "helix", "radiate", "ripple", "moire", "curl",
+                   "mosaic", "terrazzo", "perspective", "dotwork"},
+    "machine": {"barcode", "code39", "braille", "morse", "punchcard",
+                "punchtape", "turingtape", "dotmatrix", "ledmatrix",
+                "teletext", "railroad", "scope", "radar", "viewfinder",
+                "deepqr", "embossqr", "softqr", "graph"},
+    "retro": {"neon", "sunset", "pixel", "glitch", "matrix", "rain",
+              "rainstorm", "skyline", "city", "bauhaus", "brutal", "iso",
+              "zebra", "hazard", "ticket", "tape", "blocks", "waffle"},
+}
+# Sorted so a style listed twice lands in the first category that claims it.
+_CATEGORY_ORDER = ("developer", "generative", "machine", "retro", "basic")
+
+
+def style_category(name):
+    for cat in _CATEGORY_ORDER:
+        if name in CATEGORIES[cat]:
+            return cat
+    return "pattern"
+
+
+for _name, _st in STYLES.items():
+    _st.setdefault("category", style_category(_name))
+del _name, _st
+
 
 def _clean(geom, base):
     """Trim to the card, drop T-vertices and point contacts, then heal."""
@@ -4004,9 +4304,17 @@ def _clean(geom, base):
     return geom.buffer(0.01).buffer(-0.01).buffer(0).simplify(0.002).buffer(0)
 
 
-def build_shapes(style=DEFAULT_STYLE, corners=None):
-    """Resolve a style into the four 2D layers of a Card."""
-    st = STYLES[style] if isinstance(style, str) else style
+def build_shapes(style=DEFAULT_STYLE, corners=None, spec=None):
+    """Resolve a style into the four 2D layers of a Card.
+
+    `spec` carries the text and the QR payload. Without one the module
+    defaults apply, which is what the CLI and the test suite rely on.
+    """
+    if spec is not None:
+        st = spec.resolved()
+        corners = corners or spec.corners
+    else:
+        st = STYLES[style] if isinstance(style, str) else style
     qr_mode = st["qr"]
     base = card_outline(corners or st.get("corners", CORNERS))
     panel_rect = panel_box(st)
@@ -4014,8 +4322,9 @@ def build_shapes(style=DEFAULT_STYLE, corners=None):
 
     frame = build_frame(base, st["frame"], "recess" if qr_mode in PANEL_MODES else "relief",
                         panel_rect)
-    content = build_content(st.get("layout", "default"))
-    modules = qr_dark_modules(st.get("qr_shape", "square"), panel_rect)
+    content = build_content(st.get("layout", "default"), spec)
+    modules = qr_dark_modules(st.get("qr_shape", "square"), panel_rect,
+                              spec.qr_data if spec else None)
 
     texture = Polygon()
     if st.get("decor"):
@@ -4262,6 +4571,314 @@ def preview(card, path, style=DEFAULT_STYLE):
     plt.close(fig)
 
 
+# ---------------------------------------------------------------- web surface
+# Three functions the web app needs and the CLI happens to expose too: the
+# same geometry as SVG, the print check the test suite already performs, and
+# the style catalogue the gallery and the editor dropdowns are built from.
+
+def _svg_path(geom, precision=3):
+    """One SVG path covering a polygon or multipolygon, fill-rule evenodd.
+
+    Coordinates stay in millimetres with y pointing up, exactly as the
+    generator works. The viewer flips y with a transform, so nothing here has
+    to know which way a browser draws.
+    """
+    if geom.is_empty:
+        return ""
+    polys = list(geom.geoms) if geom.geom_type == "MultiPolygon" else [geom]
+    out = []
+    for poly in polys:
+        for ring in [poly.exterior, *poly.interiors]:
+            coords = list(ring.coords)
+            if len(coords) < 3:
+                continue
+            head = coords[0]
+            out.append("M%s %s" % (round(head[0], precision), round(head[1], precision)))
+            out += ["L%s %s" % (round(x, precision), round(y, precision))
+                    for x, y in coords[1:-1]]
+            out.append("Z")
+    return "".join(out)
+
+
+def render_svg(card, colors=None, corners=None):
+    """The four layers as SVG paths, with the z range each one occupies.
+
+    Built from the same polygons that go into the meshes, so the preview can
+    never show something the print file does not have.
+    """
+    colors = colors or {"base": "#111111", "feature": "#ffffff"}
+    layers = [
+        ("engrave", BASE_Z - ENGRAVE_Z, BASE_Z, True, card.engrave),
+        ("base", 0.0, BASE_Z, False, card.base),
+        ("feature", BASE_Z, BASE_Z + TOP_Z, False, card.feature),
+        ("high", BASE_Z + TOP_Z, BASE_Z + TOP_Z + HIGH_Z, False, card.high),
+    ]
+    return {
+        "card": {"w": CARD_W, "h": CARD_H, "corners": corners or CORNERS},
+        "layers": [{"id": name, "z0": z0, "z1": z1, "cut": cut,
+                    "d": _svg_path(geom)}
+                   for name, z0, z1, cut, geom in layers],
+        "colors": dict(colors),
+    }
+
+
+def svg_document(card, colors=None, corners=None):
+    """A standalone SVG, for the CLI and for anything that wants one file."""
+    r = render_svg(card, colors, corners)
+    base_c, feat_c = r["colors"]["base"], r["colors"]["feature"]
+    fill = {"engrave": _shade(base_c, -0.55), "base": base_c,
+            "feature": feat_c, "high": _shade(feat_c, 0.22)}
+    body = "".join(
+        f'<path d="{layer["d"]}" fill="{fill[layer["id"]]}" fill-rule="evenodd"/>'
+        for layer in r["layers"] if layer["d"])
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{CARD_W}mm" '
+            f'height="{CARD_H}mm" viewBox="0 0 {CARD_W} {CARD_H}">'
+            f'<g transform="translate(0,{CARD_H}) scale(1,-1)">{body}</g></svg>')
+
+
+def _stroke_and_gap(geom):
+    """Thinnest stroke and smallest gap in a piece of type, in millimetres.
+
+    The stroke comes from eroding until the shape disappears, the gap from the
+    closest approach of any two separate parts. This is the measurement that
+    told us why the first printed card's small text ran together.
+    """
+    if geom.is_empty:
+        return 9.0, 9.0
+    lo, hi = 0.0, 1.0
+    for _ in range(24):
+        mid = (lo + hi) / 2
+        if geom.buffer(-mid).is_empty:
+            hi = mid
+        else:
+            lo = mid
+    parts = list(geom.geoms) if geom.geom_type == "MultiPolygon" else [geom]
+    gap = min((a.distance(b) for i, a in enumerate(parts) for b in parts[i + 1:]),
+              default=9.0)
+    return 2 * lo, gap
+
+
+# What a 0.2 mm nozzle holds. Below the floor the feature does not survive the
+# print; between floor and target it prints but starts to close up.
+#
+# The numbers are calibrated against the reference card, which was printed and
+# inspected: its thinnest stroke is 0.49 mm and its tightest pair is 0.26 mm,
+# a u-l corner in the tagline that reads cleanly because the two glyphs differ
+# in height. The card that failed before the type was reworked measured
+# 0.24 mm, so that is where the error line sits. A wishful 0.45 mm gap target
+# would flag the very card this project ships, which trains people to ignore
+# the check.
+#
+# The QR gets two lines rather than one. The panel is a fixed 22 mm, so a
+# longer payload buys more modules and each one shrinks: the stock link sits
+# at 25 modules and 0.88 mm, a LinkedIn profile URL needs 29 and drops to
+# 0.76 mm. That still prints, so it warns. 0.60 mm is three extrusion widths
+# and the real physical end of the road, so that one is an error.
+STROKE_FLOOR, STROKE_TARGET = 0.38, 0.45
+GAP_FLOOR, GAP_TARGET = 0.24, 0.25
+MODULE_FLOOR, MODULE_TARGET = 0.60, 0.80
+EPS = 0.005     # float noise, well under anything a nozzle can resolve
+
+
+@lru_cache(maxsize=256)
+def _style_baseline(style):
+    """Thinnest stroke and tightest gap this style has with the stock text.
+
+    That is the bar a user's own text has to clear: the style was rendered,
+    reviewed and in the reference case printed at these numbers, so anything
+    at least as good is fine by construction.
+    """
+    layout = STYLES[style].get("layout", "default")
+    with recording_lines() as lines:
+        build_content(layout, Spec(style=style))
+    stroke, gap = 9.0, 9.0
+    for text, shape in lines:
+        if not text.strip() or shape.is_empty:
+            continue
+        s, g = _stroke_and_gap(shape)
+        stroke, gap = min(stroke, s), min(gap, g)
+    return stroke, gap
+
+
+def check_printability(card=None, spec=None, decode=False):
+    """Measure a card against what a 0.2 mm nozzle can actually lay down.
+
+    Returns the same structure the web app shows next to the editor. The test
+    suite calls this too, so the editor and CI never disagree about what is
+    printable.
+    """
+    spec = spec or DEFAULT_SPEC
+    st = spec.resolved()
+    layout = st.get("layout", "default")
+    card = card if card is not None else build_shapes(spec=spec)
+
+    matrix = qr_matrix(spec.qr_data)
+    module = QR_SIZE / len(matrix)
+    panel = box(*panel_box(st))
+
+    issues = []
+
+    def add(level, code, field, message, hint=""):
+        issues.append({"level": level, "code": code, "field": field,
+                       "message": message, "hint": hint})
+
+    # Measure every line the layout actually draws, at the size it ended up
+    # using. Measuring the finished content polygon instead would be wrong:
+    # a union of lines has no gap between neighbouring rows, so the tightest
+    # pair inside a word disappears into the block.
+    with recording_lines() as lines:
+        content = build_content(layout, spec)
+
+    # map a drawn line back to the field that produced it, so a warning can
+    # point at the input the user has to change
+    def field_of(text):
+        if spec.name and spec.name in text:
+            return "text.name"
+        for i, line in enumerate(spec.tagline):
+            if line and (line in text or line.lower() in text):
+                return f"text.tagline.{i}"
+        for i, (_, label) in enumerate(spec.rows):
+            if label and label in text:
+                return f"text.rows.{i}"
+        return "text"
+
+    # A fixed threshold is the wrong tool here. A third of the styles sit under
+    # it on purpose: the signet monogram sets two initials 0.06 mm apart, and
+    # the tree layouts draw box characters that are meant to touch. Those cards
+    # were rendered, reviewed and printed. So the question the check answers is
+    # not "is this above some number" but "did your text make this style worse
+    # than the style already is". The absolute floors still apply, they just
+    # cannot demand more than the style's own baseline.
+    base_stroke, base_gap = _style_baseline(spec.style)
+    stroke_error = min(STROKE_FLOOR, base_stroke)
+    stroke_warn = min(STROKE_TARGET, base_stroke)
+    gap_error = min(GAP_FLOOR, base_gap)
+    gap_warn = min(GAP_TARGET, base_gap)
+
+    min_stroke, min_gap = 9.0, 9.0
+    for text, shape in lines:
+        if not text.strip() or shape.is_empty:
+            continue
+        field = field_of(text)
+        stroke, gap = _stroke_and_gap(shape)
+        min_stroke, min_gap = min(min_stroke, stroke), min(min_gap, gap)
+        if stroke < stroke_error - EPS:
+            add("error", "stroke_thin", field,
+                f"Strichstaerke {stroke:.2f} mm, das druckt nicht mehr.",
+                "Kuerze den Text. Er wird gerade so weit herunterskaliert, "
+                "dass die Striche verschwinden.")
+        elif stroke < stroke_warn - EPS:
+            add("warn", "stroke_tight", field,
+                f"Strichstaerke {stroke:.2f} mm, unter dem Zielwert von "
+                f"{stroke_warn:.2f} mm.",
+                "Druckbar, aber die Kanten werden weich.")
+        if gap < gap_error - EPS:
+            add("error", "gap_closed", field,
+                f"Buchstabenabstand {gap:.2f} mm, die Zeichen laufen zusammen.",
+                "Kuerze den Text, dann skaliert er nicht so weit herunter.")
+        elif gap < gap_warn - EPS:
+            add("warn", "gap_tight", field,
+                f"Buchstabenabstand {gap:.2f} mm, unter dem Zielwert von "
+                f"{gap_warn:.2f} mm.",
+                "Druckbar, kann aber an den Engstellen zulaufen.")
+
+    # QR
+    if module < MODULE_FLOOR:
+        add("error", "qr_dense", "qr.data",
+            f"QR-Modul {module:.2f} mm, unter dem Minimum von {MODULE_FLOOR:.2f} mm.",
+            "Das Ziel ist zu lang fuer 22 mm. Nimm einen kurzen Link.")
+    elif module < MODULE_TARGET:
+        add("warn", "qr_small", "qr.data",
+            f"QR-Modul {module:.2f} mm, unter dem Zielwert von {MODULE_TARGET:.2f} mm.",
+            "Scannt weiterhin, verzeiht aber weniger beim Druck. Ein kuerzeres "
+            "Ziel bringt groessere Module.")
+
+    # layout: type may never creep under the QR panel or off the card
+    overlap = content.intersection(panel.buffer(0.8)).area
+    within_column = overlap < 0.01
+    if not within_column:
+        add("error", "text_under_panel", "text",
+            "Der Text laeuft unter das QR-Feld.",
+            "Kuerze eine Zeile oder nimm ein Layout mit schmalerer Spalte.")
+    x0, y0, x1, y1 = content.bounds if not content.is_empty else (9, 9, 9, 9)
+    if x0 < EDGE_SAFE or y0 < EDGE_SAFE or y1 > CARD_H - EDGE_SAFE:
+        add("error", "text_off_card", "text",
+            "Der Text reicht bis an den Kartenrand.",
+            "Weniger Zeilen, oder ein Layout mit mehr Luft.")
+
+    decoded = None
+    if decode:
+        decoded = _decode_preview(card, st)
+        if decoded is not True:
+            add("error", "qr_unreadable", "qr.data",
+                "Der QR-Code wurde in der Vorschau nicht dekodiert.",
+                "Melde das bitte, dieser Fall sollte nicht auftreten.")
+
+    return {
+        "ok": not any(i["level"] == "error" for i in issues),
+        "metrics": {
+            "min_stroke_mm": round(min_stroke, 3),
+            "min_gap_mm": round(min_gap, 3),
+            "qr_module_mm": round(module, 3),
+            "qr_modules": len(matrix),
+            "qr_quiet_modules": round(QR_QUIET / module, 1),
+            "qr_decoded": decoded,
+            "text_within_column": within_column,
+        },
+        "issues": issues,
+    }
+
+
+def _decode_preview(card, st):
+    """Render the card and hand it to a real QR decoder. Slow, opt in only."""
+    import tempfile
+
+    import cv2
+    import matplotlib
+
+    matplotlib.use("Agg")
+    with tempfile.NamedTemporaryFile(suffix=".png") as fh:
+        preview(card, fh.name, st)
+        data, _, _ = cv2.QRCodeDetector().detectAndDecode(cv2.imread(fh.name))
+    return data or False
+
+
+def catalog():
+    """Everything the gallery and the editor need to know, as plain data."""
+    return {
+        "card": {"w": CARD_W, "h": CARD_H, "corner_r": CORNER_R,
+                 "base_z": BASE_Z, "top_z": TOP_Z, "high_z": HIGH_Z,
+                 "engrave_z": ENGRAVE_Z},
+        "limits": dict(LIMITS),
+        "icons": sorted(ICONS),
+        "styles": [
+            {
+                "id": name,
+                "label": st["label"],
+                "category": st.get("category", "experimental"),
+                "decor": st.get("decor"),
+                "frame": st["frame"],
+                "layout": st.get("layout", "default"),
+                "qr": st["qr"],
+                "qr_shape": st.get("qr_shape", "square"),
+                "emboss": st.get("emboss"),
+                "engrave": st.get("decor_mode") == "engrave"
+                           or st.get("text_mode") == "engrave",
+                "colors": {"base": st["base_color"], "feature": st["feature_color"]},
+                "filaments": {"base": st["base_name"], "feature": st["feature_name"]},
+                "preview": f"/previews/{name}.png",
+            }
+            for name, st in sorted(STYLES.items())
+        ],
+        "decors": [{"id": k, "bottom": k in BOTTOM_DECORS} for k in sorted(DECOR)],
+        "layouts": [{"id": k, "mono": k in CODE_BLOCKS} for k in sorted(
+            set(CODE_BLOCKS) | {st.get("layout", "default") for st in STYLES.values()})],
+        "qr_modes": ["recess", "deep", "framed", "relief"],
+        "qr_shapes": ["square", "round", "dot"],
+        "frames": ["band", "double", "none"],
+    }
+
+
 def build_style(style, prefix, preview_path, meshes=True, corners=None):
     st = STYLES[style]
     card = build_shapes(style, corners)
@@ -4291,7 +4908,40 @@ def main():
                     help="where --all writes its previews (default: %(default)s)")
     ap.add_argument("--corners", choices=("round", "square"), default=None,
                     help="override the card corners for this run")
+    ap.add_argument("--dump-catalog", metavar="PATH",
+                    help="write the style catalogue as JSON and exit")
+    ap.add_argument("--svg", metavar="PATH",
+                    help="also write the card as a layered SVG")
+    ap.add_argument("--check", action="store_true",
+                    help="print the printability report and exit")
     args = ap.parse_args()
+
+    if args.dump_catalog:
+        import json
+
+        with open(args.dump_catalog, "w") as fh:
+            json.dump(catalog(), fh, indent=2, sort_keys=True)
+            fh.write("\n")
+        print(f"catalog: {args.dump_catalog}")
+        return
+
+    if args.check:
+        import json
+
+        spec = Spec(style=args.style, corners=args.corners)
+        print(json.dumps(check_printability(spec=spec), indent=2, ensure_ascii=False))
+        return
+
+    if args.svg:
+        spec = Spec(style=args.style, corners=args.corners)
+        card = build_shapes(spec=spec)
+        st = spec.resolved()
+        with open(args.svg, "w") as fh:
+            fh.write(svg_document(card, {"base": st["base_color"],
+                                         "feature": st["feature_color"]},
+                                  args.corners))
+        print(f"svg: {args.svg}")
+        return
 
     if args.all:
         import os
