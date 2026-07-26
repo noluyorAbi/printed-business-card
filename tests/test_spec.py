@@ -205,6 +205,72 @@ def test_every_issue_names_a_field_and_says_what_to_do():
         assert issue["field"] and issue["message"] and issue["hint"]
 
 
+def test_every_code_layout_that_shows_a_name_follows_an_edit():
+    """Editing the name has to change the card, in every layout that shows one.
+
+    The code layouts are literal text with the stock name written into them,
+    and each one writes it differently: the ANSI box shouts it in capitals,
+    the assembly listing labels it `_alperen`, the man page heads a section
+    with `ADATEPE(1)`. Substituting only the exact spelling left eleven of
+    them frozen: you could retype your name and nothing moved.
+
+    makefile, sql and tracker are the honest exceptions. They print a link and
+    no name at all, so there is nothing for an edit to change.
+    """
+    nameless = {"makefile", "sql", "tracker"}
+    for layout in sorted(build_card.CODE_BLOCKS):
+        stock = build_card.build_content(layout, build_card.Spec())
+        edited = build_card.build_content(
+            layout, build_card.Spec(name="Mira Halvorsen"))
+        moved = stock.symmetric_difference(edited).area > 1e-6
+        assert moved is (layout not in nameless), layout
+
+
+def test_a_frame_does_not_shift_when_the_name_changes():
+    """The stock name happened to fit the art; somebody else's will not.
+
+    A shorter name has to leave the frame exactly where it was. A longer one
+    gives back whatever slack the line has and may still overrun, which
+    `place_text` then scales to the column; what it may never do is lose
+    characters off the end.
+    """
+    shorter = build_card._subst_table(build_card.Spec(name="Bo"))
+    longer = build_card._subst_table(
+        build_card.Spec(name="Bartholomew Fitzwilliam"))
+
+    for layout in sorted(build_card.CODE_BLOCKS):
+        for stock, _ in build_card.CODE_BLOCKS[layout]:
+            if not stock or stock[-1] not in build_card._ART_EDGE:
+                continue
+
+            out = build_card._keep_width(stock, build_card._subst(stock, shorter))
+            assert len(out) == len(stock), (layout, stock, out)
+
+            out = build_card._keep_width(stock, build_card._subst(stock, longer))
+            assert out.endswith(stock[-1]), (layout, stock, out)
+            assert len(out) >= len(stock), (layout, stock, out)
+
+
+def test_a_one_word_name_stays_where_the_long_one_started():
+    stock = "║  ALPEREN ADATEPE  ║"
+    out = build_card._keep_width(
+        stock, build_card._subst(stock, build_card._subst_table(
+            build_card.Spec(name="Bo"))))
+    assert len(out) == len(stock)
+    # the padding lands on the right, so the type does not drift into the wall
+    assert out.startswith("║  BO")
+
+
+def test_a_substituted_row_is_not_rewritten_a_second_time():
+    """One pass, or a later rule chews on what an earlier one just wrote."""
+    spec = build_card.Spec(
+        name="Mira Halvorsen",
+        rows=(("globe", "adatepe.dev"),),        # deliberately the stock value
+    )
+    table = build_card._subst_table(spec)
+    assert build_card._subst("adatepe.dev", table) == "adatepe.dev"
+
+
 def test_building_from_several_threads_does_not_take_the_process_down():
     """matplotlib's font machinery is not thread safe, and it fails hard.
 

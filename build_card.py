@@ -13,6 +13,7 @@ nozzle: strokes and inter-letter gaps stay at or above roughly 0.45 mm, which
 is what stops letters from bleeding into each other on the print.
 """
 
+import re
 import threading
 from collections import namedtuple
 from contextlib import contextmanager
@@ -2432,30 +2433,108 @@ CODE_BLOCKS = {
 }
 
 
+def _name_forms(name):
+    """The shapes a name takes inside a code block.
+
+    The blocks do not all print a name the same way. The ANSI box shouts it in
+    capitals, the assembly listing labels it `_alperen`, the man page heads a
+    section with `ADATEPE(1)`, the roguelike map splits it over two lines. Any
+    form that is not listed here is a form the editor cannot change, which is
+    exactly the bug this exists to prevent: eleven layouts used to ignore the
+    name entirely and there was no way to tell from the outside.
+    """
+    words = [w for w in name.split() if w] or [name]
+    first, last = words[0], words[-1]
+    return [name, name.upper(), name.lower(),
+            first, first.upper(), first.lower(),
+            last, last.upper(), last.lower()]
+
+
 def _subst_table(spec):
-    """Ordered replacements that turn the stock code blocks into a spec's text.
+    """Replacements that turn the stock code blocks into a spec's text.
 
     The blocks are written out as literal lines rather than templates, because
     a template with braces would fight the JSON and Makefile layouts, which use
-    braces as content. Longest key first, so "git.adatepe.dev" is replaced
-    before the "adatepe.dev" inside it. With the default spec every key maps to
-    itself and the blocks come out unchanged.
+    braces as content. With the default spec every key maps to itself and the
+    blocks come out unchanged.
+
+    Returns a compiled alternation plus a lookup, not a list of replacements,
+    because sequential `str.replace` calls rescan text they have already
+    written. A user whose row reads "adatepe.dev" would otherwise have it
+    rewritten a second time by a later rule. One pass, longest match wins.
     """
-    pairs = [(NAME, spec.name)]
+    mapping = {}
+
+    def add(stock, live):
+        if stock and stock not in mapping:
+            mapping[stock] = live
+
+    for stock, live in zip(_name_forms(NAME), _name_forms(spec.name)):
+        add(stock, live)
     for i, (_, stock) in enumerate(DEFAULT_ROWS):
-        pairs.append((stock, spec.rows[i][1] if i < len(spec.rows) else ""))
+        add(stock, spec.rows[i][1] if i < len(spec.rows) else "")
     for i, stock in enumerate(TAGLINE):
-        pairs.append((stock, spec.tagline[i] if i < len(spec.tagline) else ""))
-        pairs.append((stock.lower(), (spec.tagline[i] if i < len(spec.tagline)
-                                      else "").lower()))
-    return sorted(pairs, key=lambda p: -len(p[0]))
+        live = spec.tagline[i] if i < len(spec.tagline) else ""
+        add(stock, live)
+        add(stock.lower(), live.lower())
+        add(stock.upper(), live.upper())
+
+    keys = sorted(mapping, key=len, reverse=True)
+    pattern = re.compile("|".join(re.escape(k) for k in keys)) if keys else None
+    return pattern, mapping
 
 
 def _subst(text, table):
-    for stock, live in table:
-        if stock and stock in text:
-            text = text.replace(stock, live)
-    return text
+    pattern, mapping = table
+    if pattern is None:
+        return text
+    return pattern.sub(lambda m: mapping[m.group(0)], text)
+
+
+# Lines that close with one of these are drawing a frame: the ANSI box, the
+# roguelike map, the tracker rails. Their right hand edge has to stay put.
+_ART_EDGE = set("#|+*") | {chr(c) for c in range(0x2500, 0x2580)}
+
+
+def _keep_width(stock, live):
+    """Re-pad a substituted line so a frame does not shift with the name.
+
+    The stock text happened to fit the art. Somebody else's name will not, and
+    a box whose right wall moves by three characters looks broken rather than
+    personalised. So the gap between the text and the closing edge absorbs the
+    difference: it grows when the name is shorter and gives way when it is
+    longer.
+    """
+    if not stock or stock[-1] not in _ART_EDGE:
+        return live
+    delta = len(stock) - len(live)
+    if delta == 0:
+        return live
+
+    # every run of two or more spaces that is not the leading indent
+    runs = [m for m in re.finditer(r" {2,}", live) if m.start() > 0]
+    if runs:
+        # widest gap, and on a tie the one nearest the closing edge, so a
+        # short name stays where the long one started instead of drifting
+        run = max(runs, key=lambda m: (m.end() - m.start(), m.start()))
+        width = run.end() - run.start()
+        keep = width + delta if delta > 0 else max(1, width + delta)
+        return live[:run.start()] + " " * keep + live[run.end():]
+
+    # No gap to borrow from, as in the hexdump gutter "|Alperen Adatepe|".
+    # Pad against the closing edge instead, which is what an ascii column
+    # does anyway.
+    edge = len(live)
+    while edge > 0 and live[edge - 1] in _ART_EDGE:
+        edge -= 1
+    if edge in (0, len(live)):
+        return live
+    if delta > 0:
+        return live[:edge] + " " * delta + live[edge:]
+    cut = 0
+    while cut < -delta and edge - cut > 0 and live[edge - cut - 1] == " ":
+        cut += 1
+    return live[:edge - cut] + live[edge:]
 
 
 def _code_block(layout, spec=None):
@@ -2465,8 +2544,8 @@ def _code_block(layout, spec=None):
     x0 = TEXT_X0 + (3.0 if layout == "vim" else 0.0)   # vim leaves room for ~
     top = CARD_H - MARGIN - EM_CODE
     parts = []
-    for i, (text, bold) in enumerate(CODE_BLOCKS[layout]):
-        text = _subst(text, table)
+    for i, (stock, bold) in enumerate(CODE_BLOCKS[layout]):
+        text = _keep_width(stock, _subst(stock, table))
         if not text.strip():
             continue
         parts.append(place_text(text, EM_CODE, x0, top - i * CODE_LEAD,
