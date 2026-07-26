@@ -1,0 +1,55 @@
+{
+  "$comment": [
+    "Input for the launch-board skill. Committed on purpose: it holds no secrets",
+    "and no copy. The password lives in the environment, every post body lives in",
+    "the board behind it."
+  ],
+  "goal": "stars",
+  "$goal": "Primary is stars. The second goal is people who actually print one, which is why the maker channels are in the plan at all; it shapes wave 2 rather than the register of wave 1.",
+  "product": {
+    "name": "Card Studio",
+    "oneLiner": "Design a 3D printable business card in the browser, then print it.",
+    "url": "https://printed-business-card.vercel.app",
+    "repo": "https://github.com/noluyorAbi/printed-business-card",
+    "licence": "MIT",
+    "$licence": "OSI approved, so r/opensource, the awesome lists and OpenAlternative all stay open and the words open source are allowed."
+  },
+  "audiences": [
+    "3d-printing",
+    "developers",
+    "generative",
+    "indie-hackers"
+  ],
+  "launchDate": "2026-08-12",
+  "$launchDate": "Wednesday. Moved off the planned Tuesday because 2026-08-11 is the WAL poster presentation, and Show HN is won in the reply thread, which needs the evening free. Waves 2 to 4 follow at weekly spacing.",
+  "channels": {
+    "include": [],
+    "exclude": [
+      "r/functionalprint",
+      "r/3Dprinting",
+      "r/programming"
+    ],
+    "$exclude": "The first two need a photograph of a printed card and there is none. r/programming rejects project posts outright; only a real technical article fits, which is a separate piece of work."
+  },
+  "assets": {
+    "formats": [
+      "16:9",
+      "9:16",
+      "1:1",
+      "og",
+      "banner"
+    ],
+    "narratedVideo": true,
+    "$narratedVideo": "A screen capture of the editor is the asset that carries every channel here, including the maker ones where there is no photograph to show. It stands in for the missing photo.",
+    "realPhotoRequired": false,
+    "$realPhotoRequired": "Answered no, only renders. It costs the two strongest channels for the top audience. A phone photograph of the card that was already printed would reopen them, and it is tracked as an unlock rather than a blocker."
+  },
+  "hooks": {
+    "afterScaffold": "cd web && npm run typecheck && npm run build",
+    "beforeSeed": null,
+    "afterSeed": null,
+    "beforeDeploy": null,
+    "beforePost": "curl -sf -o /dev/null -w '%{http_code}' https://printed-business-card.vercel.app/ | grep -q 200",
+    "$": "beforePost asserts the live site answers before anything is pasted into a thread that cannot be edited."
+  }
+}
