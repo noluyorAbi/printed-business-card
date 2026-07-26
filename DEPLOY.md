@@ -113,6 +113,7 @@ vercel --prod
 ```bash
 curl -s https://card-studio-worker.vercel.app/health
 curl -s -o /dev/null -w '%{http_code}\n' https://<projekt>.vercel.app/          # 200
+curl -s -o /dev/null -w '%{http_code}\n' https://<projekt>.vercel.app/gallery   # 200
 curl -s -o /dev/null -w '%{http_code}\n' https://<projekt>.vercel.app/studio    # 200
 ```
 

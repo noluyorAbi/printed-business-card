@@ -70,6 +70,10 @@ Betrieb: [DEPLOY.md](DEPLOY.md). Lokal alles zusammen: `./scripts/e2e.sh`.
 - **Der Druck-Check ist Produktionscode.** `check_printability` liegt in
   `build_card.py`, Editor und Tests rufen dieselbe Funktion. Die Messung wird nie
   ein zweites Mal formuliert.
+- **Die Oberflaeche ist Englisch**, auch die Meldungen des Druck-Checks. Die
+  kommen aus `build_card.py`, also wird dort uebersetzt, nicht im Frontend.
+  ROADMAP, PLAN, TODO, DEPLOY und CLAUDE bleiben Deutsch.
+- **`/` ist die Landing Page, `/gallery` das Raster** mit allen 163 Karten.
 - Der Editor kann keine Karte erzeugen, die den Print-Check verletzt, ohne dass die
   App es sichtbar macht. Warnen, nicht stumm reparieren. `error` blockiert den
   Download, `warn` nicht.

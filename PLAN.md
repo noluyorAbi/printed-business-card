@@ -4,6 +4,10 @@ Der strategische Ueberblick steht in [ROADMAP.md](ROADMAP.md), die Aufgabenliste
 [TODO.md](TODO.md). Dieses Dokument ist der Bauplan: Vertraege, Signaturen,
 Dateibaum, Designsystem, Akzeptanzkriterien. Wer eine Phase umsetzt, liest hier.
 
+**Sprache.** Die Oberflaeche ist durchgehend Englisch, einschliesslich der
+Meldungen des Druck-Checks. Diese Planungsdokumente bleiben Deutsch, weil sie
+an den Autor gerichtet sind, nicht an Besucher.
+
 **Stand.** Phase 0 bis 6 sind gebaut und deployt. Die App laeuft unter
 https://printed-business-card.vercel.app, der Worker unter
 https://card-studio-worker.vercel.app, und die 22 Playwright-Tests laufen
