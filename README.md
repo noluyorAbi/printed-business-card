@@ -185,6 +185,22 @@ One thing worth calling out: the print check is not a second implementation.
 the editor shows what it returns, so the browser and CI can never disagree
 about what a 0.2 mm nozzle will hold.
 
+Downloads are named for what they are and carry their own documentation:
+
+```
+mira-halvorsen-terminal-square-4eba8ade.3mf
+mira-halvorsen-terminal-square-4eba8ade-base.stl
+```
+
+Whose card, which style, which corners, and a short hash so two exports of
+the same card at different settings never collide. Inside, the 3MF carries
+Title, Designer and a Description that states the card size, which filament
+sits at which height, which layer the colour change lands on at 0.1 mm, and
+that it was drawn for a 0.2 mm nozzle. The QR target, the style and the spec
+hash go in behind a declared namespace. The STL puts the same sentence in its
+80 byte header, which is the only place an STL can carry anything at all and
+which almost every exporter leaves blank.
+
 ## <img src="https://raw.githubusercontent.com/noluyorAbi/printed-business-card/main/assets/icons/terminal.svg" width="16" align="center"> Styles
 
 163 styles ship with the script. A style only changes the 2D layout and

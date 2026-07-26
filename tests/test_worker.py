@@ -139,6 +139,61 @@ def test_export_gives_a_3mf_a_slicer_can_open(client):
     assert "Metadata/model_settings.config" in names
 
 
+def test_the_download_name_describes_the_card(client):
+    spec = default_spec("terminal")
+    spec.text.name = "Mira Halvorsen"
+    spec.corners = "square"
+
+    r = client.post("/export", json={"spec": body(spec), "format": "3mf"},
+                    headers=AUTH)
+    assert r.status_code == 200
+    name = r.headers["content-disposition"].split('filename="')[1].rstrip('"')
+    assert name.startswith("mira-halvorsen-terminal-square-")
+    assert name.endswith(".3mf")
+
+    for fmt, suffix in (("stl-base", "-base.stl"), ("stl-top", "-top.stl"),
+                        ("svg", ".svg")):
+        r = client.post("/export", json={"spec": body(spec), "format": fmt},
+                        headers=AUTH)
+        got = r.headers["content-disposition"].split('filename="')[1].rstrip('"')
+        assert got.endswith(suffix), (fmt, got)
+        assert got.startswith("mira-halvorsen-terminal-square-"), (fmt, got)
+
+
+def test_a_hostile_name_cannot_reach_the_content_disposition_header(client):
+    """The filename is built from a text box, so it has to be unbreakable."""
+    spec = default_spec()
+    spec.text.name = 'a"; drop/../table'
+
+    r = client.post("/export", json={"spec": body(spec), "format": "3mf"},
+                    headers=AUTH)
+    assert r.status_code == 200
+    disposition = r.headers["content-disposition"]
+    assert disposition.count('"') == 2          # exactly the pair around the name
+    name = disposition.split('filename="')[1].rstrip('"')
+    assert set(name) <= set("abcdefghijklmnopqrstuvwxyz0123456789-.")
+    assert ".." not in name and "/" not in name
+
+
+def test_the_exported_3mf_explains_itself(client):
+    import io
+    import zipfile
+
+    spec = default_spec("depth")
+    spec.text.name = "Mira Halvorsen"
+    spec.qr.data = "https://halvorsen.dev"
+
+    r = client.post("/export", json={"spec": body(spec), "format": "3mf"},
+                    headers=AUTH)
+    with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+        model = z.read("3D/3dmodel.model").decode()
+
+    assert "Mira Halvorsen" in model
+    assert "https://halvorsen.dev" in model
+    assert "cardstudio:SpecHash" in model
+    assert "0.2 mm nozzle" in model
+
+
 def test_export_gives_both_stl_parts(client):
     for fmt in ("stl-base", "stl-top"):
         r = client.post("/export", json={"spec": body(default_spec()), "format": fmt},

@@ -111,11 +111,17 @@ test.describe("studio", () => {
     await page.goto("/studio");
     await expect(page.locator("svg[role='img']")).toBeVisible({ timeout: 20_000 });
 
+    await page.getByLabel("Name").fill("Mira Halvorsen");
+    await expect(page.locator("svg[role='img']")).toBeVisible();
+
     const [download] = await Promise.all([
       page.waitForEvent("download", { timeout: 45_000 }),
       page.getByRole("button", { name: "3MF" }).click(),
     ]);
-    expect(download.suggestedFilename()).toMatch(/^card-[0-9a-f]{16}\.3mf$/);
+    // the name has to say whose card it is and which style, not just a hash
+    expect(download.suggestedFilename()).toMatch(
+      /^mira-halvorsen-classic-[0-9a-f]{8}\.3mf$/,
+    );
 
     const path = await download.path();
     const { readFileSync } = await import("node:fs");

@@ -4524,12 +4524,129 @@ def extrude(geom, height, z0):
     return trimesh.util.concatenate(meshes)
 
 
-def write_3mf(path, parts):
+_SLUG_FOLD = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "å": "a", "ø": "o",
+              "æ": "ae", "ð": "d", "þ": "th", "ł": "l"}
+
+
+def slugify(text, limit=32):
+    """A filename-safe fragment of a name.
+
+    Everything a download name carries comes from a text box, so this is a
+    whitelist and not a blacklist: lowercase ascii letters, digits and single
+    hyphens, nothing else survives. That rules out a quote breaking out of the
+    Content-Disposition header, a slash inventing a directory, and a leading
+    dot hiding the file, without any of those needing to be enumerated.
+    """
+    import unicodedata
+
+    folded = "".join(_SLUG_FOLD.get(c, c) for c in (text or "").lower())
+    ascii_only = (unicodedata.normalize("NFKD", folded)
+                  .encode("ascii", "ignore").decode())
+    out, last_dash = [], True
+    for ch in ascii_only:
+        if ch.isalnum():
+            out.append(ch)
+            last_dash = False
+        elif not last_dash:
+            out.append("-")
+            last_dash = True
+    return "".join(out).strip("-")[:limit].strip("-")
+
+
+def export_basename(spec, card_hash=None):
+    """The stem of a downloaded file.
+
+    "card-3f2a9b.3mf" tells you nothing three weeks later, sitting in a
+    downloads folder next to four other attempts. Whose name is on it, which
+    style, and which of the several versions you exported are exactly the
+    three questions, so the name answers all three: the short hash is what
+    tells two otherwise identical exports apart.
+    """
+    spec = spec or DEFAULT_SPEC
+    parts = [slugify(spec.name) or "card", slugify(spec.style, 20)]
+    if spec.corners == "square":
+        parts.append("square")
+    if card_hash:
+        parts.append(slugify(str(card_hash), 8))
+    return "-".join(p for p in parts if p)
+
+
+def _xml_attr(value):
+    """Escape a string for an XML attribute. Metadata now carries free text."""
+    return (str(value).replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def card_metadata(spec=None, card=None, card_hash=None):
+    """What the file should be able to tell someone who only has the file.
+
+    A 3MF that arrives without its conversation should still say what it is,
+    how thick each filament sits, where the colour change goes and what the QR
+    code points at. All of it is derived, none of it is typed twice.
+    """
+    spec = spec or DEFAULT_SPEC
+    st = spec.resolved()
+    layer = 0.1
+    meta = {
+        "Title": f"{spec.name} business card, {spec.style}",
+        "Designer": spec.name,
+        "Description": (
+            f"{CARD_W:g} x {CARD_H:g} mm printable business card, style "
+            f"\"{spec.style}\". Two filaments, one colour change: "
+            f"{st['base_name']} from 0 to {BASE_Z:g} mm, {st['feature_name']} "
+            f"from {BASE_Z:g} to {BASE_Z + TOP_Z:g} mm. At {layer:g} mm layers "
+            f"the change lands at layer {int(round(BASE_Z / layer)) + 1}. "
+            f"Drawn for a 0.2 mm nozzle; print flat, no supports, no brim."
+        ),
+        "Application": "Card Studio (printed-business-card)",
+    }
+    custom = {
+        "Style": spec.style,
+        "StyleLabel": st["label"],
+        "Corners": spec.corners or st.get("corners", CORNERS),
+        "CardSize": f"{CARD_W:g}x{CARD_H:g}x{BASE_Z + TOP_Z:g} mm",
+        "BaseFilament": st["base_name"],
+        "FeatureFilament": st["feature_name"],
+        "QrTarget": spec.qr_data,
+        "Source": "https://github.com/noluyorAbi/printed-business-card",
+    }
+    if card_hash:
+        custom["SpecHash"] = str(card_hash)
+    if card is not None:
+        if not card.engrave.is_empty:
+            custom["EngraveDepth"] = f"{ENGRAVE_Z:g} mm"
+        if not card.high.is_empty:
+            custom["EmbossHeight"] = f"{HIGH_Z:g} mm"
+    return meta, custom
+
+
+def stl_bytes(mesh, header=""):
+    """Binary STL with a real description in the 80 byte header.
+
+    That header is the only place an STL can carry anything at all, and every
+    exporter leaves it blank or fills it with its own name. It must not begin
+    with "solid": a reader that sees that word treats the whole file as ascii
+    and fails on the binary that follows.
+    """
+    data = bytearray(mesh.export(file_type="stl"))
+    text = header.encode("ascii", "ignore")[:79]
+    if text.lower().startswith(b"solid"):
+        text = b"# " + text
+    data[0:80] = text.ljust(80, b"\0")
+    return bytes(data)
+
+
+def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
     """Bambu-Studio project 3MF: one object with one part per filament.
 
     parts: list of (name, extruder_number, trimesh). Extruder numbers are
     1-based filament slots, stored in Metadata/model_settings.config so
     Bambu Studio opens the file already two-colored.
+
+    meta: the 3MF core specification's own metadata names (Title, Designer,
+    Description and so on). custom: anything else, which the specification
+    requires to sit behind a declared namespace, so those go out prefixed
+    "cardstudio:".
     """
     import uuid
     import zipfile
@@ -4562,14 +4679,30 @@ def write_3mf(path, parts):
         )
 
     parent_id = len(parts) + 2
+
+    # The core specification allows a fixed set of metadata names; anything
+    # else has to sit behind a namespace declared on the model element, or a
+    # strict reader is entitled to reject the file.
+    known = ("Title", "Designer", "Description", "Copyright", "LicenseTerms",
+             "Rating", "CreationDate", "ModificationDate", "Application")
+    extra = "".join(
+        f'<metadata name="{k}">{_xml_attr(v)}</metadata>'
+        for k, v in (meta or {}).items() if k in known and k != "Application"
+    ) + "".join(
+        f'<metadata name="cardstudio:{k}">{_xml_attr(v)}</metadata>'
+        for k, v in (custom or {}).items()
+    )
+
     model = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<model unit="millimeter" xml:lang="en-US" '
         'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
         'xmlns:BambuStudio="http://schemas.bambulab.com/package/2021" '
+        'xmlns:cardstudio="https://github.com/noluyorAbi/printed-business-card" '
         'xmlns:p="http://schemas.microsoft.com/3dmanufacturing/production/2015/06">'
         '<metadata name="Application">BambuStudio-01.10.00.00</metadata>'
         '<metadata name="BambuStudio:3mfVersion">1</metadata>'
+        f"{extra}"
         f"<resources>{''.join(objects)}"
         f'<object id="{parent_id}" p:UUID="{uid(parent_id)}" type="model">'
         f"<components>{''.join(components)}</components></object>"
@@ -4581,7 +4714,7 @@ def write_3mf(path, parts):
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         "<config>\n"
         f'<object id="{parent_id}">\n'
-        '  <metadata key="name" value="Visitenkarte"/>\n'
+        f'  <metadata key="name" value="{_xml_attr(object_name)}"/>\n'
         '  <metadata key="extruder" value="1"/>\n'
         f"{''.join(part_cfg)}"
         "</object>\n"
@@ -4755,17 +4888,32 @@ def render_svg(card, colors=None, corners=None):
     }
 
 
-def svg_document(card, colors=None, corners=None):
-    """A standalone SVG, for the CLI and for anything that wants one file."""
+def svg_document(card, colors=None, corners=None, spec=None):
+    """A standalone SVG, for the CLI and for anything that wants one file.
+
+    It carries a title and a description, so the file says what it is when it
+    is opened in an editor rather than a browser, and each layer is a named
+    group at its own z range instead of four anonymous paths.
+    """
     r = render_svg(card, colors, corners)
     base_c, feat_c = r["colors"]["base"], r["colors"]["feature"]
     fill = {"engrave": _shade(base_c, -0.55), "base": base_c,
             "feature": feat_c, "high": _shade(feat_c, 0.22)}
     body = "".join(
+        f'<g id="{layer["id"]}" data-z0="{layer["z0"]:g}" data-z1="{layer["z1"]:g}">'
         f'<path d="{layer["d"]}" fill="{fill[layer["id"]]}" fill-rule="evenodd"/>'
+        f"</g>"
         for layer in r["layers"] if layer["d"])
+
+    meta, custom = card_metadata(spec, card)
+    described = "".join(f"<{k}>{_xml_attr(v)}</{k}>"
+                        for k, v in custom.items())
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{CARD_W}mm" '
             f'height="{CARD_H}mm" viewBox="0 0 {CARD_W} {CARD_H}">'
+            f'<title>{_xml_attr(meta["Title"])}</title>'
+            f'<desc>{_xml_attr(meta["Description"])}</desc>'
+            f'<metadata><cardstudio xmlns="https://github.com/noluyorAbi/'
+            f'printed-business-card">{described}</cardstudio></metadata>'
             f'<g transform="translate(0,{CARD_H}) scale(1,-1)">{body}</g></svg>')
 
 
@@ -5020,16 +5168,22 @@ def catalog():
 
 def build_style(style, prefix, preview_path, meshes=True, corners=None):
     st = STYLES[style]
+    spec = Spec(style=style, corners=corners)
     card = build_shapes(style, corners)
     if meshes:
         base_mesh, feature_mesh = card_meshes(card)
+        meta, custom = card_metadata(spec, card)
         print(f"{style} base: {len(base_mesh.faces)} faces")
         print(f"{style} features: {len(feature_mesh.faces)} faces")
-        base_mesh.export(f"{prefix}_base.stl")
-        feature_mesh.export(f"{prefix}_top.stl")
+        with open(f"{prefix}_base.stl", "wb") as fh:
+            fh.write(stl_bytes(base_mesh, f"{meta['Title']} | base | {st['base_name']}"))
+        with open(f"{prefix}_top.stl", "wb") as fh:
+            fh.write(stl_bytes(feature_mesh,
+                               f"{meta['Title']} | features | {st['feature_name']}"))
         write_3mf(
             f"{prefix}.3mf",
             [(st["base_name"], 1, base_mesh), (st["feature_name"], 2, feature_mesh)],
+            meta=meta, custom=custom, object_name=meta["Title"],
         )
     preview(card, preview_path, style)
     print(f"{style}: {preview_path}")
@@ -5080,7 +5234,7 @@ def main():
         with open(args.svg, "w") as fh:
             fh.write(svg_document(card, {"base": st["base_color"],
                                          "feature": st["feature_color"]},
-                                  args.corners))
+                                  args.corners, spec))
         print(f"svg: {args.svg}")
         return
 
@@ -5097,15 +5251,20 @@ def main():
 
     if args.style == DEFAULT_STYLE:
         # keep the historical filenames for the default card
+        spec = Spec(style=DEFAULT_STYLE, corners=args.corners)
         card = build_shapes(DEFAULT_STYLE, args.corners)
         base_mesh, white_mesh = card_meshes(card)
         print(f"base: {len(base_mesh.faces)} faces, watertight={base_mesh.is_watertight}")
         print(f"white: {len(white_mesh.faces)} faces, watertight={white_mesh.is_watertight}")
-        base_mesh.export("visitenkarte_base_black.stl")
-        white_mesh.export("visitenkarte_top_white.stl")
+        meta, custom = card_metadata(spec, card)
+        with open("visitenkarte_base_black.stl", "wb") as fh:
+            fh.write(stl_bytes(base_mesh, f"{meta['Title']} | base | Basis Schwarz"))
+        with open("visitenkarte_top_white.stl", "wb") as fh:
+            fh.write(stl_bytes(white_mesh, f"{meta['Title']} | features | Schrift Weiss"))
         write_3mf(
             "visitenkarte.3mf",
             [("Basis Schwarz", 1, base_mesh), ("Schrift Weiss", 2, white_mesh)],
+            meta=meta, custom=custom, object_name=meta["Title"],
         )
         preview(card, "visitenkarte_preview.png", DEFAULT_STYLE)
     else:

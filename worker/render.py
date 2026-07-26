@@ -13,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import build_card  # noqa: E402
+from build_card import BASE_Z, TOP_Z  # noqa: E402
 
 from models import CardSpec  # noqa: E402  isort: skip
 
@@ -76,24 +77,35 @@ def export(spec: CardSpec, fmt: str) -> tuple[bytes, str, str]:
     if not report["ok"]:
         raise CheckFailed(report["issues"])
 
-    name = f"card-{spec_hash(spec)}"
+    digest = spec_hash(spec)
+    name = build_card.export_basename(inner, digest)
+    meta, custom = build_card.card_metadata(inner, card, digest)
 
     if fmt == "svg":
-        doc = build_card.svg_document(card, _colors(spec, resolved), spec.corners)
+        doc = build_card.svg_document(card, _colors(spec, resolved),
+                                      spec.corners, inner)
         return doc.encode(), MEDIA_TYPES[fmt], f"{name}.svg"
 
     base_mesh, feature_mesh = build_card.card_meshes(card)
-    if fmt == "stl-base":
-        return base_mesh.export(file_type="stl"), MEDIA_TYPES[fmt], f"{name}-base.stl"
-    if fmt == "stl-top":
-        return feature_mesh.export(file_type="stl"), MEDIA_TYPES[fmt], f"{name}-top.stl"
+    if fmt in ("stl-base", "stl-top"):
+        top = fmt == "stl-top"
+        mesh = feature_mesh if top else base_mesh
+        filament = resolved["feature_name" if top else "base_name"]
+        z0, z1 = (BASE_Z, BASE_Z + TOP_Z) if top else (0.0, BASE_Z)
+        header = (f"{meta['Title']} | {'features' if top else 'base'} "
+                  f"| {filament} | z {z0:g}-{z1:g} mm | {digest}")
+        return (build_card.stl_bytes(mesh, header), MEDIA_TYPES[fmt],
+                f"{name}-{'top' if top else 'base'}.stl")
 
     # 3MF: write_3mf takes a path, so hand it a scratch file and read it back
     with tempfile.NamedTemporaryFile(suffix=".3mf") as fh:
-        build_card.write_3mf(fh.name, [
-            (resolved["base_name"], 1, base_mesh),
-            (resolved["feature_name"], 2, feature_mesh),
-        ])
+        build_card.write_3mf(
+            fh.name,
+            [(resolved["base_name"], 1, base_mesh),
+             (resolved["feature_name"], 2, feature_mesh)],
+            meta=meta, custom=custom,
+            object_name=f"{spec.text.name} ({spec.style})",
+        )
         data = Path(fh.name).read_bytes()
     return data, MEDIA_TYPES["3mf"], f"{name}.3mf"
 

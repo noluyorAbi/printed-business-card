@@ -301,6 +301,160 @@ def test_building_from_several_threads_does_not_take_the_process_down():
     assert errors == []
 
 
+def test_a_download_name_says_whose_card_it_is():
+    spec = build_card.Spec(style="terminal", name="Mira Halvorsen")
+    stem = build_card.export_basename(spec, "4eba8ade12345678")
+    assert stem == "mira-halvorsen-terminal-4eba8ade"
+
+    square = build_card.spec_replace(spec, corners="square")
+    assert "square" in build_card.export_basename(square, "4eba8ade12345678")
+
+    # two cards that differ only in something the name cannot show still get
+    # different files, which is the whole reason the hash is there
+    a = build_card.export_basename(spec, "aaaaaaaa")
+    b = build_card.export_basename(spec, "bbbbbbbb")
+    assert a != b
+
+
+def test_a_name_from_a_text_box_cannot_escape_the_filename():
+    """The stem is built from user text, so it is a whitelist, not a filter."""
+    nasty = [
+        '../../etc/passwd',
+        'a"; rm -rf /; echo "',
+        "line\nbreak",
+        "..",
+        ".hidden",
+        "C:\\Windows\\System32",
+        "a\x00b",
+        "Ω≈ç√∫",
+    ]
+    for value in nasty:
+        stem = build_card.export_basename(
+            build_card.Spec(name=value), "0123456789abcdef")
+        assert set(stem) <= set("abcdefghijklmnopqrstuvwxyz0123456789-"), (value, stem)
+        assert not stem.startswith((".", "-"))
+        assert "/" not in stem and "\\" not in stem and ".." not in stem
+
+    # a name with nothing usable in it still produces a file, not an empty one
+    assert build_card.export_basename(
+        build_card.Spec(name="中文"), "abc").startswith("card-")
+
+
+def test_a_name_keeps_its_shape_through_the_slug():
+    assert build_card.slugify("Jörg Müller-Straße") == "joerg-mueller-strasse"
+    assert build_card.slugify("  spaced   out  ") == "spaced-out"
+    assert build_card.slugify("x" * 80, limit=10) == "x" * 10
+
+
+def test_the_3mf_carries_what_the_file_needs_to_say_for_itself():
+    """A print file that arrives alone should still explain itself."""
+    import zipfile
+    from xml.etree import ElementTree
+
+    spec = build_card.Spec(style="depth", name="Mira Halvorsen",
+                           qr_data="https://halvorsen.dev")
+    card = build_card.build_shapes(spec=spec)
+    meta, custom = build_card.card_metadata(spec, card, "0c08d567")
+    base_mesh, feature_mesh = build_card.card_meshes(card)
+
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(suffix=".3mf") as fh:
+        build_card.write_3mf(fh.name,
+                             [("Basis", 1, base_mesh), ("Schrift", 2, feature_mesh)],
+                             meta=meta, custom=custom, object_name=meta["Title"])
+        with zipfile.ZipFile(fh.name) as z:
+            names = set(z.namelist())
+            model = z.read("3D/3dmodel.model").decode()
+            config = z.read("Metadata/model_settings.config").decode()
+
+    assert {"3D/3dmodel.model", "Metadata/model_settings.config",
+            "[Content_Types].xml", "_rels/.rels"} <= names
+
+    ns = {"c": "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"}
+    root = ElementTree.fromstring(model)
+    found = {m.get("name"): (m.text or "") for m in root.findall("c:metadata", ns)}
+
+    assert found["Designer"] == "Mira Halvorsen"
+    assert "depth" in found["Title"]
+    assert "0.2 mm nozzle" in found["Description"]
+    assert "colour change" in found["Description"]
+    assert found["cardstudio:QrTarget"] == "https://halvorsen.dev"
+    assert found["cardstudio:SpecHash"] == "0c08d567"
+    # depth engraves and embosses, so both depths are stated
+    assert found["cardstudio:EngraveDepth"] == "0.3 mm"
+    assert found["cardstudio:EmbossHeight"] == "0.3 mm"
+
+    # the custom names sit behind a declared namespace, or a strict reader may
+    # reject the whole file
+    assert 'xmlns:cardstudio=' in model
+    assert meta["Title"] in config
+
+
+def test_metadata_survives_a_name_full_of_xml():
+    from xml.etree import ElementTree
+
+    spec = build_card.Spec(name='Mira <b>"&" Halvorsen</b>')
+    meta, custom = build_card.card_metadata(spec)
+    card = build_card.build_shapes(spec=spec)
+    base_mesh, feature_mesh = build_card.card_meshes(card)
+
+    import tempfile
+    import zipfile
+
+    with tempfile.NamedTemporaryFile(suffix=".3mf") as fh:
+        build_card.write_3mf(fh.name,
+                             [("Basis", 1, base_mesh), ("Schrift", 2, feature_mesh)],
+                             meta=meta, custom=custom, object_name=meta["Title"])
+        with zipfile.ZipFile(fh.name) as z:
+            model = z.read("3D/3dmodel.model").decode()
+            config = z.read("Metadata/model_settings.config").decode()
+
+    ElementTree.fromstring(model)          # still well formed
+    ElementTree.fromstring(config)
+    root = ElementTree.fromstring(model)
+    ns = {"c": "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"}
+    found = {m.get("name"): (m.text or "") for m in root.findall("c:metadata", ns)}
+    assert found["Designer"] == 'Mira <b>"&" Halvorsen</b>'
+
+
+def test_the_stl_header_carries_a_description_and_stays_binary():
+    card = build_card.build_shapes("classic")
+    base_mesh, _ = build_card.card_meshes(card)
+
+    plain = base_mesh.export(file_type="stl")
+    tagged = build_card.stl_bytes(base_mesh, "Card Studio | base | z 0-0.6 mm")
+
+    assert len(tagged) == len(plain)
+    assert tagged[80:] == plain[80:]           # only the header differs
+    assert tagged[:80].rstrip(b"\0").decode() == "Card Studio | base | z 0-0.6 mm"
+
+    # a header starting with "solid" makes readers parse the binary as ascii
+    sneaky = build_card.stl_bytes(base_mesh, "solid something")
+    assert not sneaky[:5].lower().startswith(b"solid")
+
+    # and it still loads
+    import io
+
+    import trimesh
+
+    reloaded = trimesh.load(io.BytesIO(tagged), file_type="stl")
+    assert len(reloaded.faces) == len(base_mesh.faces)
+    assert reloaded.is_watertight
+
+
+def test_the_svg_names_its_layers_and_says_what_it_is():
+    spec = build_card.Spec(style="depth", name="Mira Halvorsen")
+    card = build_card.build_shapes(spec=spec)
+    doc = build_card.svg_document(card, spec=spec)
+
+    assert "<title>Mira Halvorsen business card, depth</title>" in doc
+    for layer in ("engrave", "base", "feature", "high"):
+        assert f'<g id="{layer}"' in doc
+    assert 'data-z0="0.6" data-z1="1"' in doc      # the feature layer's real z
+    assert "https://github.com/noluyorAbi/printed-business-card" in doc
+
+
 def test_catalog_describes_every_style():
     cat = build_card.catalog()
     assert len(cat["styles"]) == len(build_card.STYLES)
