@@ -63,7 +63,7 @@ export function Stage({
           viewBox={`0 0 ${render.card.w} ${render.card.h}`}
           className="card-in absolute inset-0 h-full w-full"
           role="img"
-          aria-label={`Vorschau der Karte im Stil ${render.style.id}`}
+          aria-label={`Preview of the ${render.style.id} card`}
         >
           <g transform={`translate(0,${render.card.h}) scale(1,-1)`}>
             {render.layers.map((layer) =>
@@ -87,12 +87,11 @@ export function Stage({
         <div className="absolute inset-0 grid place-items-center p-6 text-center">
           <div className="max-w-[42ch]">
             <p className="num text-[13px]" style={{ color: "var(--flag)" }}>
-              Der Geometrie-Dienst ist nicht verbunden
+              The geometry service is not connected
             </p>
             <p className="mt-2 text-[13px]" style={{ color: "var(--muted)" }}>
-              Die Karten werden von einem Python-Worker gerechnet, nicht von
-              dieser Seite. Ohne ihn bleibt der Editor leer. Die Galerie
-              funktioniert weiterhin.
+              The cards are computed by a Python worker, not by this page.
+              Without it the editor stays empty. The gallery still works.
             </p>
             <a
               href="https://github.com/noluyorAbi/printed-business-card/blob/main/DEPLOY.md"
@@ -109,7 +108,7 @@ export function Stage({
           className="num absolute inset-0 grid place-items-center text-[12px]"
           style={{ color: "var(--muted)" }}
         >
-          wird gerechnet
+          computing
         </div>
       )}
     </div>

@@ -14,7 +14,7 @@ export function CheckPanel({ check }: { check: PrintCheck | null }) {
     return (
       <div className="rounded-lg border rule p-3">
         <div className="num text-[11px]" style={{ color: "var(--muted)" }}>
-          Druck-Check
+          Print check
         </div>
       </div>
     );
@@ -40,35 +40,35 @@ export function CheckPanel({ check }: { check: PrintCheck | null }) {
           style={{ background: colour, opacity: errors.length || warnings.length ? 1 : 0.5 }}
         />
         <span className="num text-[11px] uppercase tracking-wider">
-          Druck-Check
+          Print check
         </span>
         <span className="num ml-auto text-[11px]" style={{ color: "var(--muted)" }}>
           {errors.length
-            ? `${errors.length} Fehler`
+            ? `${errors.length} error${errors.length > 1 ? "s" : ""}`
             : warnings.length
-              ? `${warnings.length} Hinweis${warnings.length > 1 ? "e" : ""}`
-              : "sauber"}
+              ? `${warnings.length} warning${warnings.length > 1 ? "s" : ""}`
+              : "clean"}
         </span>
       </div>
 
       <dl className="num mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
         <Metric
-          k="Strich"
+          k="Stroke"
           v={`${check.metrics.min_stroke_mm.toFixed(2)} mm`}
           low={check.metrics.min_stroke_mm < 0.45}
         />
         <Metric
-          k="Abstand"
+          k="Gap"
           v={`${check.metrics.min_gap_mm.toFixed(2)} mm`}
           low={check.metrics.min_gap_mm < 0.25}
         />
         <Metric
-          k="QR-Modul"
+          k="QR module"
           v={`${check.metrics.qr_module_mm.toFixed(2)} mm`}
           low={check.metrics.qr_module_mm < 0.8}
         />
         <Metric
-          k="QR-Matrix"
+          k="QR matrix"
           v={`${check.metrics.qr_modules} × ${check.metrics.qr_modules}`}
         />
       </dl>

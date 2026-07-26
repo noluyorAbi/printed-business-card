@@ -4826,55 +4826,53 @@ def check_printability(card=None, spec=None, decode=False):
         min_stroke, min_gap = min(min_stroke, stroke), min(min_gap, gap)
         if stroke < stroke_error - EPS:
             add("error", "stroke_thin", field,
-                f"Strichstaerke {stroke:.2f} mm, das druckt nicht mehr.",
-                "Kuerze den Text. Er wird gerade so weit herunterskaliert, "
-                "dass die Striche verschwinden.")
+                f"Stroke {stroke:.2f} mm, too thin to print.",
+                "Shorten the text. It is being scaled down far enough that the "
+                "strokes disappear.")
         elif stroke < stroke_warn - EPS:
             add("warn", "stroke_tight", field,
-                f"Strichstaerke {stroke:.2f} mm, unter dem Zielwert von "
-                f"{stroke_warn:.2f} mm.",
-                "Druckbar, aber die Kanten werden weich.")
+                f"Stroke {stroke:.2f} mm, under the {stroke_warn:.2f} mm target.",
+                "Printable, but the edges will come out soft.")
         if gap < gap_error - EPS:
             add("error", "gap_closed", field,
-                f"Buchstabenabstand {gap:.2f} mm, die Zeichen laufen zusammen.",
-                "Kuerze den Text, dann skaliert er nicht so weit herunter.")
+                f"Letter gap {gap:.2f} mm, the characters will fuse.",
+                "Shorten the text so it is not scaled down as far.")
         elif gap < gap_warn - EPS:
             add("warn", "gap_tight", field,
-                f"Buchstabenabstand {gap:.2f} mm, unter dem Zielwert von "
-                f"{gap_warn:.2f} mm.",
-                "Druckbar, kann aber an den Engstellen zulaufen.")
+                f"Letter gap {gap:.2f} mm, under the {gap_warn:.2f} mm target.",
+                "Printable, but the tightest pairs may close up.")
 
     # QR
     if module < MODULE_FLOOR:
         add("error", "qr_dense", "qr.data",
-            f"QR-Modul {module:.2f} mm, unter dem Minimum von {MODULE_FLOOR:.2f} mm.",
-            "Das Ziel ist zu lang fuer 22 mm. Nimm einen kurzen Link.")
+            f"QR module {module:.2f} mm, under the {MODULE_FLOOR:.2f} mm minimum.",
+            "The target is too long for 22 mm. Use a short link.")
     elif module < MODULE_TARGET:
         add("warn", "qr_small", "qr.data",
-            f"QR-Modul {module:.2f} mm, unter dem Zielwert von {MODULE_TARGET:.2f} mm.",
-            "Scannt weiterhin, verzeiht aber weniger beim Druck. Ein kuerzeres "
-            "Ziel bringt groessere Module.")
+            f"QR module {module:.2f} mm, under the {MODULE_TARGET:.2f} mm target.",
+            "Still scans, but leaves less room for print error. A shorter "
+            "target buys bigger modules.")
 
     # layout: type may never creep under the QR panel or off the card
     overlap = content.intersection(panel.buffer(0.8)).area
     within_column = overlap < 0.01
     if not within_column:
         add("error", "text_under_panel", "text",
-            "Der Text laeuft unter das QR-Feld.",
-            "Kuerze eine Zeile oder nimm ein Layout mit schmalerer Spalte.")
+            "The text runs under the QR panel.",
+            "Shorten a line, or pick a layout with a narrower column.")
     x0, y0, x1, y1 = content.bounds if not content.is_empty else (9, 9, 9, 9)
     if x0 < EDGE_SAFE or y0 < EDGE_SAFE or y1 > CARD_H - EDGE_SAFE:
         add("error", "text_off_card", "text",
-            "Der Text reicht bis an den Kartenrand.",
-            "Weniger Zeilen, oder ein Layout mit mehr Luft.")
+            "The text reaches the edge of the card.",
+            "Fewer lines, or a layout with more room.")
 
     decoded = None
     if decode:
         decoded = _decode_preview(card, st)
         if decoded is not True:
             add("error", "qr_unreadable", "qr.data",
-                "Der QR-Code wurde in der Vorschau nicht dekodiert.",
-                "Melde das bitte, dieser Fall sollte nicht auftreten.")
+                "The QR code did not decode from the rendered preview.",
+                "Please report this, it is not supposed to happen.")
 
     return {
         "ok": not any(i["level"] == "error" for i in issues),

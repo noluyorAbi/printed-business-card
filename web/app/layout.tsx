@@ -32,9 +32,10 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Card Studio",
+  title: { default: "Card Studio", template: "%s" },
   description:
     "163 3D printable business cards. Put your own name on one, check it against a 0.2 mm nozzle, and download the 3MF.",
+  metadataBase: new URL("https://printed-business-card.vercel.app"),
 };
 
 export default function RootLayout({
@@ -43,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           // read the stored choice before first paint, so a dark reader never
@@ -77,10 +78,10 @@ export default function RootLayout({
             </span>
             <nav className="ml-auto flex items-center gap-1 text-[13px]">
               <Link
-                href="/"
+                href="/gallery"
                 className="rounded px-2.5 py-1.5 hover:bg-[var(--shade)]"
               >
-                Galerie
+                Gallery
               </Link>
               <Link
                 href="/studio"
@@ -99,13 +100,13 @@ export default function RootLayout({
         >
           <div className="mx-auto flex max-w-[1400px] flex-wrap gap-x-6 gap-y-2">
             <span>
-              Zwei Filamente, ein Wechsel. Basis 0.6 mm, Features 0.4 mm.
+              Two filaments, one change. Base 0.6 mm, features 0.4 mm.
             </span>
             <a
               className="underline underline-offset-2 hover:text-[var(--fg)]"
               href="https://github.com/noluyorAbi/printed-business-card"
             >
-              Quellcode
+              Source
             </a>
           </div>
         </footer>

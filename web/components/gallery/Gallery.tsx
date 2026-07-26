@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CardTile } from "@/components/gallery/CardTile";
-import { ZStack } from "@/components/ZStack";
 import {
   CATEGORY_LABELS,
   catalog,
@@ -73,43 +72,18 @@ export function Gallery() {
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 pb-16 sm:px-6">
-      {/* The one thing these cards have that a paper card does not is height.
-          So the page opens on the card seen edge on, at the real ratio, with
-          the scale beside it. */}
-      <section className="grid items-center gap-8 py-10 sm:py-16 lg:grid-cols-[1.15fr_1fr]">
-        <div>
-          <h1
-            className="display max-w-[22ch] text-[34px] sm:text-[44px]"
-            style={{ fontFamily: "var(--font-display-loaded), var(--font-display)" }}
-          >
-            {catalog.styles.length} Karten,
-            <br />
-            alle druckbar
-          </h1>
-          <p className="mt-4 max-w-[52ch]" style={{ color: "var(--muted)" }}>
-            Jede Karte ist 84 mal 52 mm und besteht aus zwei Filamenten mit
-            einem einzigen Farbwechsel. Such dir eine aus, setz deinen Namen
-            darauf, und lade die Druckdatei.
-          </p>
-        </div>
-
-        <div className="rounded-lg border rule p-4" style={{ background: "var(--panel)" }}>
-          <div
-            className="num mb-3 flex items-baseline gap-2 text-[11px] uppercase tracking-wider"
-            style={{ color: "var(--muted)" }}
-          >
-            Querschnitt
-            <span className="normal-case tracking-normal">
-              1.3 mm ueber alles
-            </span>
-          </div>
-          <ZStack base="#17181a" feature="#f2f0ec" engraved embossed />
-          <p className="mt-3 text-[12px]" style={{ color: "var(--muted)" }}>
-            Vier Ebenen: die Basis, eine Nut darin, die Features im zweiten
-            Filament, und darauf der Emboss. Drei davon spuerst du mit dem
-            Daumen.
-          </p>
-        </div>
+      <section className="py-8 sm:py-12">
+        <h1
+          className="display text-[30px] sm:text-[40px]"
+          style={{ fontFamily: "var(--font-display-loaded), var(--font-display)" }}
+        >
+          Every card
+        </h1>
+        <p className="mt-3 max-w-[58ch]" style={{ color: "var(--muted)" }}>
+          All {catalog.styles.length} of them, {catalog.card.w} by{" "}
+          {catalog.card.h} mm, two filaments each. Hover a card to see its
+          cross section.
+        </p>
       </section>
 
       <div
@@ -118,13 +92,13 @@ export function Gallery() {
       >
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative">
-            <span className="sr-only">Karten durchsuchen</span>
+            <span className="sr-only">Search the cards</span>
             <input
               ref={searchRef}
               type="text"
               value={term}
               onChange={(e) => setTerm(e.target.value)}
-              placeholder="suchen"
+              placeholder="search"
               className="num w-[190px] rounded px-2.5 py-1.5 text-[13px]"
             />
             <kbd
@@ -139,7 +113,7 @@ export function Gallery() {
             <Chip
               active={category === "all"}
               onClick={() => setCategory("all")}
-              label="alle"
+              label="all"
               count={catalog.styles.length}
             />
             {CATEGORIES.map((c) => (
@@ -158,14 +132,14 @@ export function Gallery() {
             style={{ color: "var(--muted)" }}
             aria-live="polite"
           >
-            {shown.length} von {catalog.styles.length}
+            {shown.length} of {catalog.styles.length}
           </span>
         </div>
       </div>
 
       {shown.length === 0 ? (
         <div className="rounded-lg border rule py-20 text-center">
-          <p className="num text-[14px]">Keine Karte passt auf {term}</p>
+          <p className="num text-[14px]">No card matches {term}</p>
           <button
             type="button"
             onClick={() => {
@@ -174,7 +148,7 @@ export function Gallery() {
             }}
             className="mt-3 rounded px-3 py-1.5 text-[13px] underline underline-offset-4"
           >
-            Filter zuruecksetzen
+            Clear the filters
           </button>
         </div>
       ) : (

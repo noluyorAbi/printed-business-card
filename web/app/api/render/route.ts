@@ -32,14 +32,14 @@ export async function POST(request: Request) {
   const limit = rateLimit(`render:${clientKey(request)}`, RATE);
   if (!limit.ok) {
     return NextResponse.json(
-      { detail: "Zu viele Anfragen. Warte einen Moment." },
+      { detail: "Too many requests. Give it a moment." },
       { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
     );
   }
 
   const raw = await request.text();
   if (raw.length > MAX_BODY) {
-    return NextResponse.json({ detail: "Spec zu gross" }, { status: 413 });
+    return NextResponse.json({ detail: "Spec too large" }, { status: 413 });
   }
 
   let spec: CardSpec;
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     spec = cardSpecSchema.parse(JSON.parse(raw));
   } catch (error) {
     return NextResponse.json(
-      { detail: "Ungueltige Spec", error: String(error) },
+      { detail: "Invalid spec", error: String(error) },
       { status: 422 },
     );
   }
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       return NextResponse.json(error.payload, { status: error.status });
     }
     return NextResponse.json(
-      { detail: "Der Worker antwortet nicht." },
+      { detail: "The worker is not responding." },
       { status: 502 },
     );
   }

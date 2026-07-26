@@ -1,9 +1,30 @@
 import { expect, test } from "@playwright/test";
 
+test.describe("landing", () => {
+  test("opens on the pitch and sends you into the app", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "A business card",
+    );
+    // the hero card is a real preview, not a placeholder
+    await expect(page.locator("figure img").first()).toBeVisible();
+
+    await page.getByRole("link", { name: /Browse all 163/ }).click();
+    await expect(page).toHaveURL(/\/gallery/);
+    await expect(page.locator("[data-tile]")).toHaveCount(163);
+  });
+
+  test("the primary call to action lands in the studio", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Open the studio" }).first().click();
+    await expect(page).toHaveURL(/\/studio\?s=/);
+  });
+});
+
 test.describe("gallery", () => {
   test("shows every card and filters without a round trip", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("163");
+    await page.goto("/gallery");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Every card");
 
     const tiles = page.locator("[data-tile]");
     await expect(tiles).toHaveCount(163);
@@ -20,16 +41,16 @@ test.describe("gallery", () => {
     expect(developerCount).toBeGreaterThan(10);
     expect(developerCount).toBeLessThan(163);
 
-    await page.getByPlaceholder("suchen").fill("terminal");
+    await page.getByPlaceholder("search").fill("terminal");
     await expect(page.locator("[data-tile='terminal']")).toBeVisible();
     expect(requests).toBe(0);
   });
 
   test("says so when nothing matches", async ({ page }) => {
-    await page.goto("/");
-    await page.getByPlaceholder("suchen").fill("zzzznope");
-    await expect(page.getByText(/Keine Karte passt/)).toBeVisible();
-    await page.getByRole("button", { name: /zuruecksetzen/ }).click();
+    await page.goto("/gallery");
+    await page.getByPlaceholder("search").fill("zzzznope");
+    await expect(page.getByText(/No card matches/)).toBeVisible();
+    await page.getByRole("button", { name: /Clear the filters/ }).click();
     await expect(page.locator("[data-tile]")).toHaveCount(163);
   });
 
@@ -37,7 +58,7 @@ test.describe("gallery", () => {
     await page.goto("/card/terminal");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("terminal");
 
-    await page.getByRole("link", { name: /Im Studio oeffnen/ }).click();
+    await page.getByRole("link", { name: /Open in Studio/ }).click();
     await expect(page).toHaveURL(/\/studio\?s=/);
     await expect(page.getByLabel("Name")).toHaveValue("Alperen Adatepe");
   });
@@ -69,20 +90,20 @@ test.describe("studio", () => {
 
   test("reports a print problem at the field that caused it", async ({ page }) => {
     await page.goto("/studio");
-    await page.getByLabel("QR-Ziel").fill(`https://example.com/${"x".repeat(90)}`);
+    await page.getByLabel("QR target").fill(`https://example.com/${"x".repeat(90)}`);
 
-    await expect(page.getByText(/QR-Modul/).first()).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText(/unter dem Minimum/).first()).toBeVisible();
+    await expect(page.getByText(/QR module/).first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/under the .* minimum/).first()).toBeVisible();
 
     // and the download is refused while the error stands
     await expect(page.getByRole("button", { name: "3MF" })).toBeDisabled();
-    await expect(page.getByText(/Der Druck-Check meldet einen Fehler/)).toBeVisible();
+    await expect(page.getByText(/The print check found an error/)).toBeVisible();
   });
 
   test("a warning does not block the download", async ({ page }) => {
     await page.goto("/studio");
-    await page.getByLabel("QR-Ziel").fill("https://linkedin.com/in/mirahalvorsen");
-    await expect(page.getByText(/unter dem Zielwert/).first()).toBeVisible({ timeout: 20_000 });
+    await page.getByLabel("QR target").fill("https://linkedin.com/in/mirahalvorsen");
+    await expect(page.getByText(/under the .* target/).first()).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("button", { name: "3MF" })).toBeEnabled();
   });
 
@@ -117,8 +138,8 @@ test.describe("studio", () => {
 
   test("resets to the preset", async ({ page }) => {
     await page.goto("/studio");
-    await page.getByRole("button", { name: "eckig" }).click();
-    const reset = page.getByRole("button", { name: /Auf classic zuruecksetzen/ });
+    await page.getByRole("button", { name: "square" }).click();
+    const reset = page.getByRole("button", { name: /Reset to classic/ });
     await expect(reset).toBeVisible();
     await reset.click();
     await expect(reset).toBeHidden();
@@ -127,7 +148,7 @@ test.describe("studio", () => {
 
 test.describe("layout", () => {
   test("nothing scrolls sideways", async ({ page }) => {
-    for (const path of ["/", "/card/tree", "/studio"]) {
+    for (const path of ["/", "/gallery", "/card/tree", "/studio"]) {
       await page.goto(path);
       await page.waitForTimeout(500);
       const overflow = await page.evaluate(
@@ -139,11 +160,11 @@ test.describe("layout", () => {
 
   test("the theme toggle sticks across a reload", async ({ page }) => {
     await page.goto("/");
-    const toggle = page.getByRole("button", { name: /wechseln/ });
+    const toggle = page.getByRole("button", { name: /Switch to/ });
     const label = await toggle.textContent();
     await toggle.click();
     await page.reload();
-    await expect(page.getByRole("button", { name: /wechseln/ })).not.toHaveText(
+    await expect(page.getByRole("button", { name: /Switch to/ })).not.toHaveText(
       label ?? "",
     );
   });

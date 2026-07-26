@@ -44,7 +44,7 @@ export function useRender(spec: CardSpec, delay = 200) {
             message:
               typeof payload?.detail === "string"
                 ? payload.detail
-                : "Die Karte konnte nicht gerechnet werden.",
+                : "The card could not be computed.",
             // 502 and 503 mean the geometry service is not reachable at all,
             // which is a different thing to tell someone than a bad spec
             offline: response.status === 502 || response.status === 503,
@@ -55,7 +55,7 @@ export function useRender(spec: CardSpec, delay = 200) {
         }
       } catch (caught) {
         if ((caught as Error).name === "AbortError" || cancelled) return;
-        setError({ message: "Keine Verbindung zum Renderer.", offline: true });
+        setError({ message: "No connection to the renderer.", offline: true });
       } finally {
         if (!cancelled && inFlight.current === controller) setPending(false);
       }

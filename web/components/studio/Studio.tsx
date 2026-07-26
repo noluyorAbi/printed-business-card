@@ -20,7 +20,7 @@ const Card3D = dynamic(() => import("@/components/viewer/Card3D"), {
   loading: () => (
     <div className="num grid h-full place-items-center text-[12px]"
          style={{ color: "var(--muted)" }}>
-      3D wird geladen
+      loading 3D
     </div>
   ),
 });
@@ -73,7 +73,7 @@ export function Studio({ initial }: { initial: CardSpec }) {
       <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)_300px]">
         {/* content */}
         <section className="order-2 lg:order-1">
-          <Panel title="Inhalt">
+          <Panel title="Content">
             <SpecForm
               spec={spec}
               onChange={setSpec}
@@ -124,8 +124,8 @@ export function Studio({ initial }: { initial: CardSpec }) {
                   style={{ color: "var(--muted)" }}
                 >
                   {error?.offline
-                    ? "Ohne den Geometrie-Dienst gibt es nichts zu zeigen."
-                    : "wird gerechnet"}
+                    ? "Nothing to show without the geometry service."
+                    : "computing"}
                 </div>
               )}
             </div>
@@ -147,7 +147,7 @@ export function Studio({ initial }: { initial: CardSpec }) {
 
         {/* style and output */}
         <section className="order-3 space-y-4">
-          <Panel title="Stil">
+          <Panel title="Style">
             <StyleRail spec={spec} onChange={setSpec} />
           </Panel>
           <CheckPanel check={result?.check ?? null} />

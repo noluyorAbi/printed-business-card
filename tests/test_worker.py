@@ -111,7 +111,7 @@ def test_a_character_the_font_cannot_draw_is_refused(client):
     payload["text"]["name"] = "Alperen 中文"
     r = client.post("/render", json=payload, headers=AUTH)
     assert r.status_code == 422
-    assert "Schrift" in r.text
+    assert "cannot draw" in r.text
 
 
 def test_an_oversized_body_is_refused(client):

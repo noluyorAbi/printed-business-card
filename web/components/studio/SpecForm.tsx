@@ -8,7 +8,7 @@ const ICON_LABELS: Record<(typeof ICONS)[number], string> = {
   linkedin: "LinkedIn",
   github: "GitHub",
   mail: "Mail",
-  none: "kein Icon",
+  none: "no icon",
 };
 
 /** Every input that changes what the card says. */
@@ -43,17 +43,17 @@ export function SpecForm({
       />
 
       <fieldset className="min-w-0">
-        <Legend>Untertitel</Legend>
+        <Legend>Tagline</Legend>
         <div className="space-y-2">
           {[0, 1].map((i) => (
             <Field
               key={i}
-              label={`Zeile ${i + 1}`}
+              label={`Line ${i + 1}`}
               hideLabel
               value={spec.text.tagline[i] ?? ""}
               max={LIMITS.tagline_line}
               issue={issueFor(`text.tagline.${i}`)}
-              placeholder={i === 0 ? "erste Zeile" : "zweite Zeile"}
+              placeholder={i === 0 ? "first line" : "second line"}
               onChange={(line) => {
                 const next = [spec.text.tagline[0] ?? "", spec.text.tagline[1] ?? ""];
                 next[i] = line;
@@ -68,7 +68,7 @@ export function SpecForm({
 
       <fieldset className="min-w-0">
         <Legend>
-          Kontakt
+          Contact
           <span className="num ml-2 text-[10px]" style={{ color: "var(--muted)" }}>
             {spec.text.rows.length} / {LIMITS.rows}
           </span>
@@ -80,7 +80,7 @@ export function SpecForm({
             return (
               <div key={i} className="flex gap-1.5">
                 <select
-                  aria-label={`Icon der Zeile ${i + 1}`}
+                  aria-label={`Icon for line ${i + 1}`}
                   value={row.icon}
                   onChange={(e) => setRow(i, { icon: e.target.value as Row["icon"] })}
                   className="num w-[96px] shrink-0 rounded px-1 py-1.5 text-[12px]"
@@ -93,7 +93,7 @@ export function SpecForm({
                 </select>
                 <input
                   type="text"
-                  aria-label={`Text der Zeile ${i + 1}`}
+                  aria-label={`Text of line ${i + 1}`}
                   value={row.label}
                   maxLength={LIMITS.label}
                   onChange={(e) => setRow(i, { label: e.target.value })}
@@ -102,7 +102,7 @@ export function SpecForm({
                 />
                 <button
                   type="button"
-                  aria-label={`Zeile ${i + 1} entfernen`}
+                  aria-label={`Remove line ${i + 1}`}
                   onClick={() =>
                     patchText({ rows: spec.text.rows.filter((_, x) => x !== i) })
                   }
@@ -125,13 +125,13 @@ export function SpecForm({
             }
             className="mt-2 w-full rounded border border-dashed rule py-1.5 text-[12px] hover:border-[var(--accent)]"
           >
-            Zeile hinzufuegen
+            Add a line
           </button>
         )}
       </fieldset>
 
       <Field
-        label="QR-Ziel"
+        label="QR target"
         value={spec.qr.data}
         max={LIMITS.qr_data}
         issue={issueFor("qr.data")}
@@ -140,10 +140,10 @@ export function SpecForm({
       />
 
       <fieldset className="min-w-0">
-        <Legend>Farben</Legend>
+        <Legend>Colours</Legend>
         <div className="flex gap-2">
           <Swatch
-            label="Basis"
+            label="Base"
             value={spec.colors?.base ?? currentColors(spec).base}
             onChange={(base) =>
               patch({
@@ -166,7 +166,7 @@ export function SpecForm({
               onClick={() => patch({ colors: null })}
               className="num self-end rounded border rule px-2 py-1.5 text-[11px]"
             >
-              zuruecksetzen
+              reset
             </button>
           )}
         </div>
@@ -261,7 +261,7 @@ function Swatch({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="h-6 w-6 cursor-pointer border-0 bg-transparent p-0"
-          aria-label={`${label} Farbe`}
+          aria-label={`${label} colour`}
         />
         <span className="num text-[11px]">{value}</span>
       </span>

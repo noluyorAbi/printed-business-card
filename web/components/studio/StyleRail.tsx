@@ -32,7 +32,7 @@ export function StyleRail({
       <label className="block">
         <span className="num mb-1 block text-[11px] uppercase tracking-wider"
               style={{ color: "var(--muted)" }}>
-          Vorlage
+          Preset
         </span>
         <select
           value={spec.style}
@@ -57,7 +57,7 @@ export function StyleRail({
       </label>
 
       <Select
-        label="Textur"
+        label="Texture"
         value={spec.overrides.decor_set ? (spec.overrides.decor ?? "") : "__keep"}
         onChange={(v) =>
           v === "__keep"
@@ -65,8 +65,8 @@ export function StyleRail({
             : over({ decor_set: true, decor: v || null })
         }
         options={[
-          { value: "__keep", label: `wie ${spec.style}` },
-          { value: "", label: "keine" },
+          { value: "__keep", label: `as in ${spec.style}` },
+          { value: "", label: "none" },
           ...catalog.decors.map((d) => ({ value: d.id, label: d.id })),
         ]}
       />
@@ -76,7 +76,7 @@ export function StyleRail({
         value={spec.overrides.layout ?? "__keep"}
         onChange={(v) => over({ layout: v === "__keep" ? null : v })}
         options={[
-          { value: "__keep", label: `wie ${spec.style}` },
+          { value: "__keep", label: `as in ${spec.style}` },
           ...catalog.layouts.map((l) => ({
             value: l.id,
             label: l.mono ? `${l.id} (mono)` : l.id,
@@ -85,27 +85,27 @@ export function StyleRail({
       />
 
       <Select
-        label="Rahmen"
+        label="Frame"
         value={spec.overrides.frame ?? "__keep"}
         onChange={(v) =>
           over({ frame: v === "__keep" ? null : (v as "band" | "double" | "none") })
         }
         options={[
-          { value: "__keep", label: `wie ${spec.style}` },
+          { value: "__keep", label: `as in ${spec.style}` },
           { value: "band", label: "Band" },
-          { value: "double", label: "Doppellinie" },
-          { value: "none", label: "keiner" },
+          { value: "double", label: "Double line" },
+          { value: "none", label: "None" },
         ]}
       />
 
       <fieldset className="min-w-0">
         <span className="num mb-1 block text-[11px] uppercase tracking-wider"
               style={{ color: "var(--muted)" }}>
-          Ecken
+          Corners
         </span>
         <div className="flex gap-1">
-          {[{ value: null, label: `wie ${spec.style}` },
-            ...CORNERS.map((c) => ({ value: c, label: c === "round" ? "rund" : "eckig" }))]
+          {[{ value: null, label: `as in ${spec.style}` },
+            ...CORNERS.map((c) => ({ value: c, label: c === "round" ? "round" : "square" }))]
             .map((option) => (
               <button
                 key={String(option.value)}
@@ -127,14 +127,14 @@ export function StyleRail({
 
       <div className="space-y-1.5">
         <Toggle
-          label="Erhabene Schrift"
-          hint={`${catalog.card.high_z} mm ueber den Features, mit dem Daumen spuerbar`}
+          label="Raised type"
+          hint={`${catalog.card.high_z} mm above the features, you can feel it`}
           value={spec.overrides.emboss}
           onChange={(v) => over({ emboss: v })}
         />
         <Toggle
-          label="Gravur"
-          hint={`${catalog.card.engrave_z} mm tief in die Basis, keine zweite Farbe`}
+          label="Engraving"
+          hint={`${catalog.card.engrave_z} mm into the base, no second colour`}
           value={spec.overrides.engrave}
           onChange={(v) => over({ engrave: v })}
         />
@@ -153,7 +153,7 @@ export function StyleRail({
           }
           className="num w-full rounded border rule py-1.5 text-[12px] hover:border-[var(--accent)]"
         >
-          Auf {spec.style} zuruecksetzen
+          Reset to {spec.style}
         </button>
       )}
     </div>
@@ -222,8 +222,8 @@ function Toggle({
 }) {
   const states: { value: boolean | null; label: string }[] = [
     { value: null, label: "auto" },
-    { value: true, label: "an" },
-    { value: false, label: "aus" },
+    { value: true, label: "on" },
+    { value: false, label: "off" },
   ];
   return (
     <div className="flex items-center gap-2">

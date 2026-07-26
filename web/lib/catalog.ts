@@ -47,12 +47,12 @@ export type Category =
 export const catalog = raw as unknown as Catalog;
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  basic: "Grundformen",
+  basic: "Plain",
   developer: "Developer",
-  generative: "Generativ",
-  machine: "Maschinenlesbar",
+  generative: "Generative",
+  machine: "Machine readable",
   retro: "Retro",
-  pattern: "Muster",
+  pattern: "Pattern",
 };
 
 export const byId = new Map(catalog.styles.map((s) => [s.id, s]));
@@ -68,12 +68,12 @@ export function styleOr404(id: string): StyleEntry {
  * it is: which texture, which frame, which depth trick, at what module size.
  */
 export function partsLine(s: StyleEntry): string[] {
-  const parts = [s.layout === "default" ? "Standard" : s.layout];
+  const parts = [s.layout === "default" ? "standard" : s.layout];
   if (s.decor) parts.push(s.decor);
-  if (s.frame !== "none") parts.push(s.frame === "double" ? "Doppelrahmen" : "Rahmen");
-  if (s.engrave) parts.push("graviert");
-  if (s.emboss) parts.push("erhaben");
-  if (s.qr !== "recess") parts.push(`QR ${s.qr}`);
+  if (s.frame !== "none") parts.push(s.frame === "double" ? "double frame" : "frame");
+  if (s.engrave) parts.push("engraved");
+  if (s.emboss) parts.push("embossed");
+  if (s.qr !== "recess") parts.push(`qr ${s.qr}`);
   return parts;
 }
 

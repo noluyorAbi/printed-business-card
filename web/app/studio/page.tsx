@@ -5,7 +5,7 @@ import { StudioClient } from "@/components/studio/StudioClient";
 export const metadata: Metadata = {
   title: "Studio · Card Studio",
   description:
-    "Setz deinen Namen auf eine der 163 Karten, pruef sie gegen eine 0.2 mm Duese und lade die Druckdatei.",
+    "Put your own name on one of the 163 cards, check it against a 0.2 mm nozzle, and download the print file.",
 };
 
 export default function StudioPage() {

@@ -35,7 +35,7 @@ def _printable(value: str, field: str) -> str:
     bad = sorted({c for c in value if ord(c) not in _PRINTABLE})
     if bad:
         raise ValueError(
-            f"{field} enthaelt Zeichen, die die Schrift nicht setzen kann: "
+            f"{field} contains characters the card font cannot draw: "
             + " ".join(bad))
     return value
 
@@ -72,7 +72,7 @@ class Text(BaseModel):
         for line in out:
             if len(line) > LIMITS["tagline_line"]:
                 raise ValueError(
-                    f"tagline hoechstens {LIMITS['tagline_line']} Zeichen je Zeile")
+                    f"tagline is at most {LIMITS['tagline_line']} characters per line")
         return out
 
 
@@ -98,14 +98,14 @@ class Overrides(BaseModel):
     @classmethod
     def _check_decor(cls, v):
         if v is not None and v not in DECOR_IDS:
-            raise ValueError(f"unbekanntes Decor: {v}")
+            raise ValueError(f"unknown decor: {v}")
         return v
 
     @field_validator("layout")
     @classmethod
     def _check_layout(cls, v):
         if v is not None and v not in LAYOUT_IDS:
-            raise ValueError(f"unbekanntes Layout: {v}")
+            raise ValueError(f"unknown layout: {v}")
         return v
 
 
@@ -135,7 +135,7 @@ class CardSpec(BaseModel):
     @classmethod
     def _check_style(cls, v: str) -> str:
         if v not in STYLE_IDS:
-            raise ValueError(f"unbekannter Style: {v}")
+            raise ValueError(f"unknown style: {v}")
         return v
 
     def to_spec(self) -> build_card.Spec:

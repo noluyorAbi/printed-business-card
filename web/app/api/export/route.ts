@@ -16,32 +16,32 @@ export async function POST(request: Request) {
   const limit = rateLimit(`export:${clientKey(request)}`, RATE);
   if (!limit.ok) {
     return NextResponse.json(
-      { detail: "Zu viele Downloads. Warte einen Moment." },
+      { detail: "Too many downloads. Give it a moment." },
       { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
     );
   }
 
   const raw = await request.text();
   if (raw.length > MAX_BODY) {
-    return NextResponse.json({ detail: "Spec zu gross" }, { status: 413 });
+    return NextResponse.json({ detail: "Spec too large" }, { status: 413 });
   }
 
   let body: { spec: unknown; format?: string };
   try {
     body = JSON.parse(raw);
   } catch {
-    return NextResponse.json({ detail: "Kein gueltiges JSON" }, { status: 400 });
+    return NextResponse.json({ detail: "Not valid JSON" }, { status: 400 });
   }
 
   const format = body.format ?? "3mf";
   if (!FORMATS.has(format)) {
-    return NextResponse.json({ detail: `Unbekanntes Format: ${format}` }, { status: 422 });
+    return NextResponse.json({ detail: `Unknown format: ${format}` }, { status: 422 });
   }
 
   const parsed = cardSpecSchema.safeParse(body.spec);
   if (!parsed.success) {
     return NextResponse.json(
-      { detail: "Ungueltige Spec", error: parsed.error.message },
+      { detail: "Invalid spec", error: parsed.error.message },
       { status: 422 },
     );
   }
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       return NextResponse.json(error.payload, { status: error.status });
     }
     return NextResponse.json(
-      { detail: "Der Worker antwortet nicht." },
+      { detail: "The worker is not responding." },
       { status: 502 },
     );
   }

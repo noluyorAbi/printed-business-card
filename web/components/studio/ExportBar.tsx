@@ -5,9 +5,9 @@ import { useState } from "react";
 import { canonicalSpec, type CardSpec, type PrintCheck } from "@/lib/spec";
 
 const FORMATS = [
-  { id: "3mf", label: "3MF", hint: "beide Farben, fuer Bambu Studio" },
-  { id: "stl-base", label: "STL Basis", hint: "erstes Filament" },
-  { id: "stl-top", label: "STL Top", hint: "zweites Filament" },
+  { id: "3mf", label: "3MF", hint: "both colours, for Bambu Studio" },
+  { id: "stl-base", label: "STL base", hint: "first filament" },
+  { id: "stl-top", label: "STL top", hint: "second filament" },
 ] as const;
 
 export function ExportBar({
@@ -38,7 +38,7 @@ export function ExportBar({
           payload?.detail?.detail ??
             (typeof payload?.detail === "string"
               ? payload.detail
-              : "Der Download hat nicht geklappt."),
+              : "The download did not work."),
         );
         return;
       }
@@ -56,7 +56,7 @@ export function ExportBar({
       link.click();
       URL.revokeObjectURL(url);
     } catch {
-      setError("Keine Verbindung.");
+      setError("No connection.");
     } finally {
       setBusy(null);
     }
@@ -66,7 +66,7 @@ export function ExportBar({
     <section className="rounded-lg border rule p-3" style={{ background: "var(--panel)" }}>
       <div className="num mb-2 text-[11px] uppercase tracking-wider"
            style={{ color: "var(--muted)" }}>
-        Herunterladen
+        Download
       </div>
 
       <div className="grid grid-cols-3 gap-1.5">
@@ -91,8 +91,8 @@ export function ExportBar({
 
       {blocked && (
         <p className="mt-2 text-[11px]" style={{ color: "var(--flag)" }}>
-          Der Druck-Check meldet einen Fehler. Behebe ihn oben, dann gibt es die
-          Datei.
+          The print check found an error. Fix it above and the file is
+          yours.
         </p>
       )}
       {error && (

@@ -25,7 +25,7 @@ export function StudioClient() {
           className="num mx-auto max-w-[1400px] px-4 py-20 text-[12px] sm:px-6"
           style={{ color: "var(--muted)" }}
         >
-          Studio wird geladen
+          loading studio
         </div>
       }
     >

@@ -47,12 +47,12 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={flip}
-      aria-label={theme === "dark" ? "Auf hell wechseln" : "Auf dunkel wechseln"}
+      aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
       className="ml-1 rounded px-2.5 py-1.5 text-[13px] hover:bg-[var(--shade)]"
     >
       {/* fixed width, so the header does not shift when the label appears */}
       <span className="num inline-block w-[42px] text-center">
-        {theme === null ? "" : theme === "dark" ? "hell" : "dunkel"}
+        {theme === null ? "" : theme === "dark" ? "light" : "dark"}
       </span>
     </button>
   );

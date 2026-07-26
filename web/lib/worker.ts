@@ -31,7 +31,7 @@ export async function callWorker(
   if (!URL_ENV || !TOKEN) {
     throw new WorkerError(503, {
       detail:
-        "WORKER_URL und WORKER_TOKEN sind nicht gesetzt. Ohne Worker kann die App keine Geometrie rechnen.",
+        "WORKER_URL and WORKER_TOKEN are not set. Without the worker this app cannot compute geometry.",
     });
   }
 

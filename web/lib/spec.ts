@@ -31,7 +31,7 @@ export const FRAMES = ["band", "double", "none"] as const;
 const PRINTABLE = /^[\x20-\x7E\xA0-\xFF]*$/;
 const printable = (field: string) =>
   z.string().refine((v) => PRINTABLE.test(v), {
-    message: `${field} enthält Zeichen, die die Schrift nicht setzen kann`,
+    message: `${field} contains characters the card font cannot draw`,
   });
 
 export const rowSchema = z.object({

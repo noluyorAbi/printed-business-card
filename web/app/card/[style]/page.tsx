@@ -29,7 +29,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { style } = await params;
   const entry = byId.get(style);
-  if (!entry) return { title: "Karte nicht gefunden" };
+  if (!entry) return { title: "Card not found" };
   return { title: `${entry.id} · Card Studio`, description: entry.label };
 }
 
@@ -50,8 +50,8 @@ export default async function CardPage({
   return (
     <main className="mx-auto max-w-[1100px] px-4 pb-20 sm:px-6">
       <nav className="num flex items-center gap-2 py-5 text-[12px]">
-        <Link href="/" className="underline underline-offset-4">
-          Galerie
+        <Link href="/gallery" className="underline underline-offset-4">
+          Gallery
         </Link>
         <span style={{ color: "var(--muted)" }}>/</span>
         <span>{entry.id}</span>
@@ -98,18 +98,18 @@ export default async function CardPage({
             className="mt-5 block rounded px-4 py-2.5 text-center text-[14px] font-semibold text-white"
             style={{ background: "var(--accent)" }}
           >
-            Im Studio oeffnen
+            Open in Studio
           </Link>
 
           <dl className="num mt-6 space-y-0 text-[12px]">
-            <Spec k="Kategorie" v={CATEGORY_LABELS[entry.category]} />
+            <Spec k="Category" v={CATEGORY_LABELS[entry.category]} />
             <Spec k="Layout" v={entry.layout} />
-            <Spec k="Textur" v={entry.decor ?? "keine"} />
-            <Spec k="Rahmen" v={entry.frame} />
+            <Spec k="Texture" v={entry.decor ?? "none"} />
+            <Spec k="Frame" v={entry.frame} />
             <Spec k="QR" v={`${entry.qr} · ${entry.qr_shape}`} />
-            <Spec k="Emboss" v={entry.emboss ?? "keiner"} />
-            <Spec k="Gravur" v={entry.engrave ? "ja" : "nein"} />
-            <Spec k="Basis" v={entry.filaments.base} swatch={entry.colors.base} />
+            <Spec k="Emboss" v={entry.emboss ?? "none"} />
+            <Spec k="Engraving" v={entry.engrave ? "yes" : "no"} />
+            <Spec k="Base" v={entry.filaments.base} swatch={entry.colors.base} />
             <Spec
               k="Features"
               v={entry.filaments.feature}
@@ -163,21 +163,21 @@ function describe(s: StyleEntry): string {
   const bits: string[] = [];
   bits.push(
     s.decor
-      ? `Die Flaeche traegt die Textur "${s.decor}", die ueberall dort ausgespart wird, wo Text oder QR-Code stehen.`
-      : "Die Flaeche bleibt leer, die Karte lebt allein von der Typografie.",
+      ? `The surface carries the "${s.decor}" texture, cut away wherever type or the QR code sits.`
+      : "The surface stays empty; this card lives on its typography alone.",
   );
   if (s.engrave)
     bits.push(
-      `Ein Teil davon ist ${catalog.card.engrave_z} mm tief in die Basis gefraest, also nur als Tiefe spuerbar, nicht als Farbe.`,
+      `Part of it is cut ${catalog.card.engrave_z} mm into the base, so it reads as depth under a thumb rather than as colour.`,
     );
   if (s.emboss)
     bits.push(
-      `${s.emboss === "text" ? "Die Schrift" : "Ein Teil der Features"} steht ${catalog.card.high_z} mm hoeher als der Rest und laesst sich mit dem Daumen ertasten.`,
+      `${s.emboss === "text" ? "The type" : "Part of the features"} stands ${catalog.card.high_z} mm above the rest, high enough to feel.`,
     );
   bits.push(
     s.qr === "relief"
-      ? "Der QR-Code steht erhaben auf der Basis."
-      : "Der QR-Code ist in ein Feld aus dem zweiten Filament gesenkt, damit der Kontrast auch bei dunkler Basis stimmt.",
+      ? "The QR code stands raised on the base."
+      : "The QR code is sunk into a panel of the second filament, so the contrast holds even on a dark base.",
   );
   return bits.join(" ");
 }

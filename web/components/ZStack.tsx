@@ -130,13 +130,13 @@ export function ZStack({
           className="num mt-1.5 flex flex-wrap gap-x-3 text-[10px]"
           style={{ color: "var(--muted)" }}
         >
-          <span>Basis {base_z.toFixed(1)} mm</span>
-          <span>Features {top_z.toFixed(1)} mm</span>
+          <span>base {base_z.toFixed(1)} mm</span>
+          <span>features {top_z.toFixed(1)} mm</span>
           <span style={{ opacity: embossed ? 1 : 0.4 }}>
-            Emboss {high_z.toFixed(1)} mm
+            emboss {high_z.toFixed(1)} mm
           </span>
           <span style={{ opacity: engraved ? 1 : 0.4 }}>
-            Gravur {engrave_z.toFixed(1)} mm tief
+            engraved {engrave_z.toFixed(1)} mm deep
           </span>
         </figcaption>
       )}
