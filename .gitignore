@@ -43,3 +43,6 @@ visitenkarte_*_base.stl
 visitenkarte_*_top.stl
 visitenkarte_*.3mf
 !visitenkarte.3mf
+
+# ---------------------------------------------------------- private (NAWI)
+private/
