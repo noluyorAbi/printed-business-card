@@ -418,6 +418,55 @@ def test_metadata_survives_a_name_full_of_xml():
     assert found["Designer"] == 'Mira <b>"&" Halvorsen</b>'
 
 
+def test_the_3mf_names_the_colour_of_both_filaments():
+    """A slot number says nothing about what is loaded in that slot.
+
+    The card is drawn light on dark. Opened in a slicer that happens to hold
+    two dark filaments it slices black on black, and the text disappears. So
+    the file carries the two colours itself, twice: as 3MF core materials for
+    any conformant reader, and as filament_colour for Bambu Studio and Orca,
+    which read their slots from the project settings and nowhere else.
+    """
+    import json
+    import tempfile
+    import zipfile
+    from xml.etree import ElementTree
+
+    spec = build_card.Spec(style="classic")
+    st = spec.resolved()
+    card = build_card.build_shapes(spec=spec)
+    base_mesh, feature_mesh = build_card.card_meshes(card)
+    meta, custom = build_card.card_metadata(spec, card)
+
+    with tempfile.NamedTemporaryFile(suffix=".3mf") as fh:
+        build_card.write_3mf(fh.name,
+                             [(st["base_name"], 1, base_mesh),
+                              (st["feature_name"], 2, feature_mesh)],
+                             meta=meta, custom=custom,
+                             colors=[st["base_color"], st["feature_color"]])
+        with zipfile.ZipFile(fh.name) as z:
+            model = z.read("3D/3dmodel.model").decode()
+            project = json.loads(z.read("Metadata/project_settings.config"))
+
+    ns = {"c": "http://schemas.microsoft.com/3dmanufacturing/core/2015/02"}
+    root = ElementTree.fromstring(model)
+
+    bases = root.findall("c:resources/c:basematerials/c:base", ns)
+    assert [b.get("displaycolor") for b in bases] == ["#151515FF", "#ECECECFF"]
+    assert [b.get("name") for b in bases] == [st["base_name"], st["feature_name"]]
+
+    # both meshes point at a material, or there is nothing for a reader to paint
+    meshes = [o for o in root.findall("c:resources/c:object", ns)
+              if o.find("c:mesh", ns) is not None]
+    assert [(o.get("pid"), o.get("pindex")) for o in meshes] == [("1", "0"), ("1", "1")]
+
+    assert project["filament_colour"] == ["#151515", "#ECECEC"]
+    # the printer and the print profile stay whatever the person opening the
+    # file already had selected
+    assert "printer_settings_id" not in project
+    assert "print_settings_id" not in project
+
+
 def test_the_stl_header_carries_a_description_and_stays_binary():
     card = build_card.build_shapes("classic")
     base_mesh, _ = build_card.card_meshes(card)

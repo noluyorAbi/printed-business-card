@@ -105,6 +105,7 @@ def export(spec: CardSpec, fmt: str) -> tuple[bytes, str, str]:
              (resolved["feature_name"], 2, feature_mesh)],
             meta=meta, custom=custom,
             object_name=f"{spec.text.name} ({spec.style})",
+            colors=[resolved["base_color"], resolved["feature_color"]],
         )
         data = Path(fh.name).read_bytes()
     return data, MEDIA_TYPES["3mf"], f"{name}.3mf"

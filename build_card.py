@@ -4577,6 +4577,21 @@ def _xml_attr(value):
             .replace(">", "&gt;").replace('"', "&quot;"))
 
 
+def _hex_rgb(color):
+    """#rgb or #rrggbb to the upper case #RRGGBB every slicer config expects."""
+    text = str(color).lstrip("#")
+    if len(text) == 3:
+        text = "".join(c * 2 for c in text)
+    if len(text) != 6 or any(c not in "0123456789abcdefABCDEF" for c in text):
+        raise ValueError(f"not a hex colour: {color!r}")
+    return "#" + text.upper()
+
+
+def _hex_rgba(color):
+    """The 3MF core spec wants displaycolor opaque and eight digits."""
+    return _hex_rgb(color) + "FF"
+
+
 def card_metadata(spec=None, card=None, card_hash=None):
     """What the file should be able to tell someone who only has the file.
 
@@ -4636,12 +4651,21 @@ def stl_bytes(mesh, header=""):
     return bytes(data)
 
 
-def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
+def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte",
+              colors=None):
     """Bambu-Studio project 3MF: one object with one part per filament.
 
     parts: list of (name, extruder_number, trimesh). Extruder numbers are
     1-based filament slots, stored in Metadata/model_settings.config so
     Bambu Studio opens the file already two-colored.
+
+    colors: one hex color per part, in the same order. A slot number alone
+    says nothing about what is loaded there, so a card built black on white
+    opens black on black if the slicer happens to hold two dark filaments.
+    The colors go out twice, because no single place is read by everyone:
+    as 3MF core <basematerials> for any conformant slicer, and as
+    filament_colour in Metadata/project_settings.config, which is where
+    Bambu Studio and Orca take theirs from.
 
     meta: the 3MF core specification's own metadata names (Title, Designer,
     Description and so on). custom: anything else, which the specification
@@ -4655,9 +4679,18 @@ def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
         return str(uuid.uuid5(uuid.NAMESPACE_URL, f"adatepe-card-{tag}"))
 
     identity = "1 0 0 0 1 0 0 0 1 0 0 0"
+    colors = list(colors or [])
+    materials = ""
+    if len(colors) == len(parts):
+        bases = "".join(
+            f'<base name="{_xml_attr(name)}" displaycolor="{_hex_rgba(color)}"/>'
+            for (name, _, _), color in zip(parts, colors)
+        )
+        materials = f'<basematerials id="1">{bases}</basematerials>'
     objects, components, part_cfg = [], [], []
     for i, (name, extruder, mesh) in enumerate(parts):
         oid = i + 2
+        material = f' pid="1" pindex="{i}"' if materials else ""
         verts = "".join(
             f'<vertex x="{v[0]:.4f}" y="{v[1]:.4f}" z="{v[2]:.4f}"/>'
             for v in mesh.vertices
@@ -4666,7 +4699,7 @@ def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
             f'<triangle v1="{t[0]}" v2="{t[1]}" v3="{t[2]}"/>' for t in mesh.faces
         )
         objects.append(
-            f'<object id="{oid}" p:UUID="{uid(oid)}" type="model">'
+            f'<object id="{oid}" p:UUID="{uid(oid)}" type="model"{material}>'
             f"<mesh><vertices>{verts}</vertices><triangles>{tris}</triangles></mesh></object>"
         )
         components.append(f'<component objectid="{oid}" transform="{identity}"/>')
@@ -4703,7 +4736,7 @@ def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
         '<metadata name="Application">BambuStudio-01.10.00.00</metadata>'
         '<metadata name="BambuStudio:3mfVersion">1</metadata>'
         f"{extra}"
-        f"<resources>{''.join(objects)}"
+        f"<resources>{materials}{''.join(objects)}"
         f'<object id="{parent_id}" p:UUID="{uid(parent_id)}" type="model">'
         f"<components>{''.join(components)}</components></object>"
         f'</resources><build p:UUID="{uid("build")}">'
@@ -4726,6 +4759,10 @@ def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
         '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
         '<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>'
         '<Default Extension="config" ContentType="text/xml"/>'
+        # model_settings.config is XML, project_settings.config is JSON, and
+        # they share an extension, so the JSON one needs its own override.
+        '<Override PartName="/Metadata/project_settings.config" '
+        'ContentType="application/json"/>'
         "</Types>"
     )
     rels = (
@@ -4735,11 +4772,28 @@ def write_3mf(path, parts, meta=None, custom=None, object_name="Visitenkarte"):
         'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>'
         "</Relationships>"
     )
+    # Bambu Studio and Orca read their filament slots from here, not from the
+    # core <basematerials>. Only the filaments are named: printer and print
+    # presets stay whatever the person opening the file already chose.
+    project_settings = None
+    if materials:
+        import json
+
+        project_settings = json.dumps({
+            "from": "project",
+            "name": "project_settings",
+            "version": "01.10.00.00",
+            "filament_colour": [_hex_rgb(c) for c in colors],
+            "filament_type": ["PLA"] * len(colors),
+        }, indent=4) + "\n"
+
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml", content_types)
         z.writestr("_rels/.rels", rels)
         z.writestr("3D/3dmodel.model", model)
         z.writestr("Metadata/model_settings.config", model_settings)
+        if project_settings:
+            z.writestr("Metadata/project_settings.config", project_settings)
 
 
 def card_meshes(card):
@@ -5184,6 +5238,7 @@ def build_style(style, prefix, preview_path, meshes=True, corners=None):
             f"{prefix}.3mf",
             [(st["base_name"], 1, base_mesh), (st["feature_name"], 2, feature_mesh)],
             meta=meta, custom=custom, object_name=meta["Title"],
+            colors=[st["base_color"], st["feature_color"]],
         )
     preview(card, preview_path, style)
     print(f"{style}: {preview_path}")
@@ -5261,10 +5316,12 @@ def main():
             fh.write(stl_bytes(base_mesh, f"{meta['Title']} | base | Basis Schwarz"))
         with open("visitenkarte_top_white.stl", "wb") as fh:
             fh.write(stl_bytes(white_mesh, f"{meta['Title']} | features | Schrift Weiss"))
+        st = spec.resolved()
         write_3mf(
             "visitenkarte.3mf",
             [("Basis Schwarz", 1, base_mesh), ("Schrift Weiss", 2, white_mesh)],
             meta=meta, custom=custom, object_name=meta["Title"],
+            colors=[st["base_color"], st["feature_color"]],
         )
         preview(card, "visitenkarte_preview.png", DEFAULT_STYLE)
     else:
